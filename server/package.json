@@ -4,6 +4,7 @@
   "main": "generate_indices.js",
   "dependencies": {
     "async": "^0.9.0",
+    "commander": "^2.7.1",
     "elasticsearch": "^3.1.3"
   },
   "devDependencies": {},

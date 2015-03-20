@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
+var program = require('commander');
+var async = require('async');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client();
 
-var args = process.argv.slice(2);
 
 function deleteIndex(callback) {
     client.indices.delete({
@@ -35,16 +36,18 @@ function createIndex(callback) {
     });
 }
 
-var async = require('async');
+program
+    .description('Generate elastisearch indices.')
+    .option('-d, --delete', 'delete old indices')
+    .parse(process.argv);
+
 
 var tasks = [];
 
-if (args.indexOf('-d') != -1) {
+if (program.delete)
     tasks[tasks.length] = deleteIndex;
-}
 
 tasks[tasks.length] = createIndex;
-
 
 async.series(
     tasks,
