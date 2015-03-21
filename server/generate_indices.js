@@ -11,7 +11,7 @@ function deleteIndex(callback) {
         index: 'customers'
     }, function(err, resp, respcode) {
         if (!err) {
-            console.log('Index customer deleted');
+            console.log('Index customers deleted');
         }
         callback(err, resp);
     });
@@ -30,7 +30,49 @@ function createIndex(callback) {
         }
     }, function(err, resp, respcode) {
         if (!err) {
-            console.log('Index customer created');
+            console.log('Index customers created');
+        }
+        callback(err, resp);
+    });
+}
+
+function putMapping(callback) {
+    client.indices.putMapping({
+        index: 'customers',
+        type: 'customer',
+        body: {
+            customer: {
+                properties: {
+                    name: {type: 'string'},
+                    surname: {type: 'string'},
+                    mobile_phone: {type: 'string'},
+                    allow_sms: {type: 'boolean'},
+                    phone: {type: 'string'},
+                    email: {type: 'string'},
+                    allow_email: {type: 'boolean'},
+                    discount: {type: 'integer'},
+                    first_see: {type: 'date'},
+                    last_see: {type: 'date'},
+                    notes: {type: 'string'},
+                    appointments: {
+                        properties: {
+                            date: {type: 'date'},
+                            services: {
+                                properties: {
+                                    description: {type: 'string'}
+                                }
+                            },
+                            satisfaction: {type: 'integer'},
+                            discount: {type: 'integer'},
+                            notes: {type: 'string'}
+                        }
+                    },
+                }
+            }
+        }
+    }, function(err, resp, respcode) {
+        if (!err) {
+            console.log('Mapping customer created');
         }
         callback(err, resp);
     });
@@ -48,6 +90,7 @@ if (program.delete)
     tasks[tasks.length] = deleteIndex;
 
 tasks[tasks.length] = createIndex;
+tasks[tasks.length] = putMapping;
 
 async.series(
     tasks,
