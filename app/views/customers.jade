@@ -1,0 +1,19 @@
+extends layout
+
+block content
+    h1= title
+    a(href='#{newCustomerUrl}', class=['btn', 'btn-primary', 'pull-right']) Create new customer
+    div.container
+        table(class=['table', 'table-hover'])
+            thead
+                th Name
+                th Surname
+            tbody
+                each res in customers
+                    tr
+                        td #{res.name}
+                        td #{res.surname}
+
+
+
+
