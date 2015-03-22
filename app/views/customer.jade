@@ -1,17 +1,51 @@
 extends layout
 
-mixin textInput(fieldName, fieldLabel)
+mixin input(fieldType, fieldName, fieldLabel)
     div.form-group
         label(class=['control-label', 'col-sm-2'], for='#{fieldName}') #{fieldLabel}
         div.col-sm-10
-            input.form-control(type='text', name='#{fieldName}', id='#{fieldName}', placeholder='#{fieldLabel}')
+            input.form-control(type='#{fieldType}', name='#{fieldName}', id='#{fieldName}', placeholder='#{fieldLabel}')
+
+mixin inputAndCheckbox(fieldType, fieldName, fieldLabel, checkboxName, checkboxLabel)
+    div.form-group
+        label(class=['control-label', 'col-sm-2'], for='#{fieldName}') #{fieldLabel}
+        div.col-sm-10
+            input.form-control(type='#{fieldType}', name='#{fieldName}', id='#{fieldName}', placeholder='#{fieldLabel}')
+
+        div(class=['col-sm-offset-2', 'col-sm-10'])
+            div.checkbox
+                label
+                    input(type='checkbox' name='#{checkboxName}')
+                    | #{checkboxLabel}
 
 block content
     h1= title
     div.container
         form.form-horizontal(method='post', action='')
-            +textInput('name', 'Name')
-            +textInput('surname', 'Surname')
+            +input('text', 'name', 'Name')
+            +input('text', 'surname', 'Surname')
+            +inputAndCheckbox('tel', 'mobile', 'Mobile Phone', 'allow_sms', 'Allow sms')
+            +input('tel', 'phone', 'Phone')
+            +inputAndCheckbox('email', 'email', 'Email', 'allow_email', 'Allow email')
+
+            div.form-group
+                label(class=['control-label', 'col-sm-2'], for='discount') Discount
+                div(class=['col-sm-8'])
+                    label.radio-inline
+                        input(type='radio' name='discount', value='0')
+                        | 0%
+
+                    label.radio-inline
+                        input(type='radio' name='discount', value='10')
+                        | 10%
+
+                    label.radio-inline
+                        input(type='radio' name='discount', value='20')
+                        | 20%
+
+                    label.radio-inline
+                        input(type='radio' name='discount', value='30')
+                        | 30%
 
             div.form-group
                 div(class=['col-sm-offset-2', 'col-sm-10'])

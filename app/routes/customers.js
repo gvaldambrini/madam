@@ -37,14 +37,27 @@ router.get('/new', function(req, res, next) {
 
 router.post('/new', function(req, res, next) {
 
+    obj = {
+        name: req.body.name
+    };
+    if (req.body.surname)
+        obj.surname = req.body.surname;
+    if (req.body.mobile)
+        obj.mobile_phone = req.body.mobile;
+    if (req.body.allow_sms)
+        obj.allow_sms = true;
+    if (req.body.phone)
+        obj.phone = req.body.phone;
+    if (req.body.email)
+        obj.email = req.body.email;
+    if (req.body.allow_email)
+        obj.allow_email = true;
+
     client.index({
         index: 'customers',
         type: 'customer',
         refresh: true,
-        body: {
-            name: req.body.name,
-            surname: req.body.surname
-        }
+        body: obj
     }, function(err, resp, respcode) {
         if (!err) {
             // redirect does not take into account being in inside a router
