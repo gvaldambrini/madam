@@ -21,6 +21,15 @@ mixin inputAndCheckbox(fieldType, fieldName, fieldLabel, checkboxName, checkboxL
 block content
     h1= title
     div.container
+
+        if flash
+          div.alert(class='#{flash.type}')
+            ul
+            - for (var i = 0; i < flash.messages.length; i++) {
+                //- TODO: use field labels instead of field names
+                li #{flash.messages[i].msg} for #{flash.messages[i].param}
+            - }
+
         form.form-horizontal(method='post', action='')
             +input('text', 'name', 'Name')
             +input('text', 'surname', 'Surname')

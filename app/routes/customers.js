@@ -37,6 +37,28 @@ router.get('/new', function(req, res, next) {
 
 router.post('/new', function(req, res, next) {
 
+    req.checkBody('name').notEmpty();
+
+    if (!req.sanitize('mobile').trim())
+        req.checkBody('allow_sms').optional().isEmpty();
+
+    if (!req.sanitize('email').trim()) {
+        req.checkBody('allow_email').optional().isEmpty();
+    }
+    else {
+        req.checkBody('email').isEmail();
+    }
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        res.render('customer', {
+            title: 'Create new customer',
+            flash: { type: 'alert-danger', messages: errors},
+        });
+        return;
+    }
+
     obj = {
         name: req.body.name
     };
