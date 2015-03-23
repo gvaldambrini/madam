@@ -17,11 +17,22 @@ router.get('/', function(req, res, next) {
     }, function(err, resp, respcode) {
         var results = [];
         var hits = resp.hits.hits;
-        for (var i = 0; i < hits.length; i++)
+        for (var i = 0; i < hits.length; i++) {
+            var phone;
+            if (hits[i]._source.phone && hits[i]._source.mobile_phone) {
+                phone = hits[i]._source.mobile_phone + ' / ' + hits[i]._source.phone;
+            }
+            else if (hits[i]._source.mobile_phone) {
+                phone = hits[i]._source.mobile_phone;
+            }
+            else
+                phone = hits[i]._source.phone;
             results[results.length] = {
                 name: hits[i]._source.name,
-                surname: hits[i]._source.surname
+                surname: hits[i]._source.surname,
+                phone: phone,
             };
+        }
         res.render('customers', {
             title: 'Customers',
             customers: results,
