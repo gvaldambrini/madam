@@ -55,6 +55,7 @@ block content
                         input(type='radio' name='discount', value='30')
                         | 30%
 
+            input(type="hidden", name="_csrf", value="#{csrftoken}")
             div.form-group
                 div(class=['col-sm-offset-2', 'col-sm-10'])
                     button(type='submit', class=['btn', 'btn-primary'], name='submit') Submit

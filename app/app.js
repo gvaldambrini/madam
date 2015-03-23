@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var validator = require('express-validator');
+var csrf = require('csurf');
 
 var routes = require('./routes/index');
 //var users = require('./routes/users');
@@ -30,6 +31,11 @@ app.use(validator({
 }));
 
 app.use(cookieParser());
+app.use(csrf({ cookie: true }));
+app.use(function (request, response, next) {
+  response.locals.csrftoken = request.csrfToken();
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
