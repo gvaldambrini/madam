@@ -26,8 +26,7 @@ block content
           div.alert(class='#{flash.type}')
             ul
             - for (var i = 0; i < flash.messages.length; i++) {
-                //- TODO: use field labels instead of field names
-                li #{flash.messages[i].msg} for #{flash.messages[i].param}
+                li #{flash.messages[i]}
             - }
 
         form.form-horizontal(method='post', action='')

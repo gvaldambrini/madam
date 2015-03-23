@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client();
-
+var esErrors = elasticsearch.errors;
 var customersPath = '/customers';
 
 router.get('/', function(req, res, next) {
@@ -37,6 +37,7 @@ router.get('/new', function(req, res, next) {
 
 router.post('/new', function(req, res, next) {
 
+    // Form validation
     req.checkBody('name').notEmpty();
 
     if (!req.sanitize('mobile').trim())
@@ -52,9 +53,13 @@ router.post('/new', function(req, res, next) {
     var errors = req.validationErrors();
 
     if (errors) {
+        var messages = [];
+        for (var i = 0; i < errors.length; i++)
+            messages[messages.length] = errors[i].msg + ' for ' + errors[i].param;
+
         res.render('customer', {
             title: 'Create new customer',
-            flash: { type: 'alert-danger', messages: errors},
+            flash: { type: 'alert-danger', messages: messages}
         });
         return;
     }
@@ -86,9 +91,16 @@ router.post('/new', function(req, res, next) {
             res.redirect(customersPath);
         }
         else {
-            // TODO: handle errors
-            console.log(err, resp, respcode);
-            res.render('customer', { title: 'Create new customer' });
+            if (err instanceof esErrors.NoConnections)
+                var messages = ['Database connection error'];
+            else
+                var messages = ['Database error'];
+            console.error(err);
+
+            res.render('customer', {
+                title: 'Create new customer',
+                flash: { type: 'alert-danger', messages: messages}
+            });
         }
     });
 });
