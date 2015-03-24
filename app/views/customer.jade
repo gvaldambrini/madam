@@ -18,6 +18,14 @@ mixin inputAndCheckbox(fieldType, fieldName, fieldLabel, checkboxName, checkboxL
                     input(type='checkbox' name='#{checkboxName}')
                     | #{checkboxLabel}
 
+mixin inputDate(fieldName, fieldLabel)
+    div(class='form-group', id='#{fieldName}-container')
+        label(class=['control-label', 'col-sm-2'], for='#{fieldName}') #{fieldLabel}
+        div(class=['col-sm-10', 'input-group', 'date'])
+            input.form-control(type='text', name='#{fieldName}', placeholder='dd/mm/yyyy')
+            span.input-group-addon
+                i(class=['glyphicon', 'glyphicon-th'])
+
 block content
     h1= title
     div.container
@@ -26,7 +34,7 @@ block content
           div.alert(class='#{flash.type}')
             ul
             - for (var i = 0; i < flash.messages.length; i++) {
-                li #{flash.messages[i]}
+                li #{flash.messages[i].msg}
             - }
 
         form.form-horizontal(method='post', action='')
@@ -55,8 +63,23 @@ block content
                         input(type='radio' name='discount', value='30')
                         | 30%
 
+            +inputDate('first_see', 'First see')
+            +inputDate('last_see', 'Last see')
             input(type="hidden", name="_csrf", value="#{csrftoken}")
             div.form-group
                 div(class=['col-sm-offset-2', 'col-sm-10'])
                     button(type='submit', class=['btn', 'btn-primary'], name='submit') Submit
 
+            script(type='text/javascript').
+                $('#first_see-container .input-group.date').datepicker({
+                    weekStart: 1,
+                    daysOfWeekDisabled: "0,1",
+                    autoclose: true,
+                    todayHighlight: true
+                });
+                $('#last_see-container .input-group.date').datepicker({
+                    weekStart: 1,
+                    daysOfWeekDisabled: "0,1",
+                    autoclose: true,
+                    todayHighlight: true
+                });

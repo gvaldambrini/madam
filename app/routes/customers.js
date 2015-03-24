@@ -48,29 +48,36 @@ router.get('/new', function(req, res, next) {
 
 router.post('/new', function(req, res, next) {
 
-    // Form validation
-    req.checkBody('name').notEmpty();
+    // Trim all the fields that allow the user write text
+    fields = ['name', 'surname', 'mobile', 'phone', 'email', 'first_see', 'last_see'];
+    for (var i = 0; i < fields.length; i++)
+        req.sanitize(fields[i]).trim();
 
-    if (!req.sanitize('mobile').trim())
-        req.checkBody('allow_sms').optional().isEmpty();
+    req.checkBody('name', 'The name is mandatory').notEmpty();
 
-    if (!req.sanitize('email').trim()) {
-        req.checkBody('allow_email').optional().isEmpty();
+    if (!req.body.mobile)
+        req.checkBody(
+            'allow_sms', 'To set allow sms, you must specify a mobile phone').optional().isEmpty();
+
+    if (!req.body.email) {
+        req.checkBody('allow_email', 'To set allow email, you must specify an email').optional().isEmpty();
     }
     else {
-        req.checkBody('email').isEmail();
+        req.checkBody('email', 'The email does not seem a valid email').isEmail();
     }
 
+    if (req.body.first_see) {
+        req.checkBody('first_see', 'The first date does not seem a valid date').isDate();
+    }
+    if (req.body.last_see) {
+        req.checkBody('last_see', 'The last date does not seem a valid date').isDate();
+    }
     var errors = req.validationErrors();
 
     if (errors) {
-        var messages = [];
-        for (var i = 0; i < errors.length; i++)
-            messages[messages.length] = errors[i].msg + ' for ' + errors[i].param;
-
         res.render('customer', {
             title: 'Create new customer',
-            flash: { type: 'alert-danger', messages: messages}
+            flash: { type: 'alert-danger', messages: errors}
         });
         return;
     }
@@ -90,6 +97,10 @@ router.post('/new', function(req, res, next) {
         obj.email = req.body.email;
     if (req.body.allow_email)
         obj.allow_email = true;
+    if (req.body.first_see)
+        obj.first_see = new Date(req.body.first_see).toISOString().slice(0, 10);
+    if (req.body.last_see)
+        obj.last_see = new Date(req.body.last_see).toISOString().slice(0, 10);
 
     client.index({
         index: 'customers',
