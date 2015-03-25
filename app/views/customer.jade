@@ -40,7 +40,7 @@ block content
         form.form-horizontal(method='post', action='')
             +input('text', 'name', 'Name')
             +input('text', 'surname', 'Surname')
-            +inputAndCheckbox('tel', 'mobile', 'Mobile Phone', 'allow_sms', 'Allow sms')
+            +inputAndCheckbox('tel', 'mobile_phone', 'Mobile Phone', 'allow_sms', 'Allow sms')
             +input('tel', 'phone', 'Phone')
             +inputAndCheckbox('email', 'email', 'Email', 'allow_email', 'Allow email')
 
@@ -71,6 +71,16 @@ block content
                     button(type='submit', class=['btn', 'btn-primary'], name='submit') Submit
 
             script(type='text/javascript').
+                var customerData = !{JSON.stringify(obj)};
+
+                $(document).ready(function() {
+                    $('.container form input').map(function() {
+                        var name = $(this).attr('name');
+                        if (typeof customerData[name] !== 'undefined')
+                            $(this).val(customerData[name]);
+                    });
+                });
+
                 $('#first_see-container .input-group.date').datepicker({
                     weekStart: 1,
                     daysOfWeekDisabled: "0,1",

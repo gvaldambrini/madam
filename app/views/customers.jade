@@ -11,12 +11,12 @@ block content
                 th Mobile / Phone
             tbody
                 each res in customers
-                    tr
+                    tr(data-edit-url='#{res.edit_url}')
                         td #{res.name}
                         td #{res.surname}
                         td #{res.phone}
 
-
-
-
-
+    script(type='text/javascript').
+        $('.table tbody tr').on("click", function(event) {
+            window.location.href = $(this).data('edit-url');
+        });

@@ -5,6 +5,10 @@ var client = new elasticsearch.Client();
 var esErrors = elasticsearch.errors;
 var customersPath = '/customers';
 
+function getCustomerUrl(req, route) {
+    return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
+}
+
 router.get('/', function(req, res, next) {
     client.search({
         index: 'customers',
@@ -28,6 +32,7 @@ router.get('/', function(req, res, next) {
             else
                 phone = hits[i]._source.phone;
             results[results.length] = {
+                edit_url: getCustomerUrl(req, 'edit/' + hits[i]._id),
                 name: hits[i]._source.name,
                 surname: hits[i]._source.surname,
                 phone: phone,
@@ -37,25 +42,21 @@ router.get('/', function(req, res, next) {
             title: 'Customers',
             customers: results,
             // TODO: create a generic method to get the url from the route name.
-            newCustomerUrl: req.protocol + "://" + req.get('host') + customersPath + '/new' });
+            newCustomerUrl: getCustomerUrl(req, 'new')
+        });
     });
 });
 
 
-router.get('/new', function(req, res, next) {
-    res.render('customer', { title: 'Create new customer' });
-});
-
-router.post('/new', function(req, res, next) {
-
+function handleCustomerForm(title, req, res) {
     // Trim all the fields that allow the user write text
-    fields = ['name', 'surname', 'mobile', 'phone', 'email', 'first_see', 'last_see'];
+    fields = ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see'];
     for (var i = 0; i < fields.length; i++)
         req.sanitize(fields[i]).trim();
 
     req.checkBody('name', 'The name is mandatory').notEmpty();
 
-    if (!req.body.mobile)
+    if (!req.body.mobile_phone)
         req.checkBody(
             'allow_sms', 'To set allow sms, you must specify a mobile phone').optional().isEmpty();
 
@@ -72,42 +73,38 @@ router.post('/new', function(req, res, next) {
     if (req.body.last_see) {
         req.checkBody('last_see', 'The last date does not seem a valid date').isDate();
     }
-    var errors = req.validationErrors();
 
+    var obj = {};
+    for (var i = 0; i < fields.length; i++) {
+        var field = fields[i];
+        if (req.body[field]) {
+            if (field == 'first_see' || field == 'last_see')
+                obj[field] = new Date(req.body[field]).toISOString().slice(0, 10);
+            else
+                obj[field] = req.body[field];
+        }
+    }
+
+    var errors = req.validationErrors();
     if (errors) {
         res.render('customer', {
-            title: 'Create new customer',
-            flash: { type: 'alert-danger', messages: errors}
+            title: title,
+            flash: { type: 'alert-danger', messages: errors},
+            obj: obj
         });
         return;
     }
 
-    obj = {
-        name: req.body.name
-    };
-    if (req.body.surname)
-        obj.surname = req.body.surname;
-    if (req.body.mobile)
-        obj.mobile_phone = req.body.mobile;
-    if (req.body.allow_sms)
-        obj.allow_sms = true;
-    if (req.body.phone)
-        obj.phone = req.body.phone;
-    if (req.body.email)
-        obj.email = req.body.email;
-    if (req.body.allow_email)
-        obj.allow_email = true;
-    if (req.body.first_see)
-        obj.first_see = new Date(req.body.first_see).toISOString().slice(0, 10);
-    if (req.body.last_see)
-        obj.last_see = new Date(req.body.last_see).toISOString().slice(0, 10);
-
-    client.index({
+    var args = {
         index: 'customers',
         type: 'customer',
         refresh: true,
         body: obj
-    }, function(err, resp, respcode) {
+    }
+    if (typeof req.params.id != 'undefined')
+        args.id = req.params.id;
+
+    client.index(args, function(err, resp, respcode) {
         if (!err) {
             // redirect does not take into account being in inside a router
             res.redirect(customersPath);
@@ -120,10 +117,50 @@ router.post('/new', function(req, res, next) {
             console.error(err);
 
             res.render('customer', {
-                title: 'Create new customer',
-                flash: { type: 'alert-danger', messages: messages}
+                title: title,
+                flash: { type: 'alert-danger', messages: messages},
+                obj: obj
             });
         }
+    });
+
+}
+
+router.get('/new', function(req, res, next) {
+    res.render('customer', { title: 'Create new customer', obj: {}});
+});
+
+router.post('/new', function(req, res, next) {
+    handleCustomerForm('Create new customer', req, res);
+});
+
+function getTitle(esObj) {
+    if (esObj.name && esObj.surname)
+        return 'Edit ' + esObj.name + ' ' + esObj.surname;
+
+    return 'Edit ' + esObj.name;
+}
+
+router.get('/edit/:id', function(req, res, next) {
+    client.get({
+        index:'customers',
+        type:'customer',
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        res.render('customer', {
+            title: getTitle(resp._source),
+            obj: resp._source
+        });
+    });
+});
+
+router.post('/edit/:id', function(req, res, next) {
+    client.get({
+        index:'customers',
+        type:'customer',
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        handleCustomerForm(getTitle(resp._source), req, res);
     });
 });
 
