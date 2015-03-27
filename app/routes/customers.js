@@ -1,9 +1,11 @@
 var express = require('express');
-var router = express.Router();
 var elasticsearch = require('elasticsearch');
+var router = express.Router();
 var client = new elasticsearch.Client();
 var esErrors = elasticsearch.errors;
 var customersPath = '/customers';
+var moment = require('moment');
+
 
 function getCustomerUrl(req, route) {
     return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
@@ -41,18 +43,57 @@ router.get('/', function(req, res, next) {
         res.render('customers', {
             title: 'Customers',
             customers: results,
-            // TODO: create a generic method to get the url from the route name.
             newCustomerUrl: getCustomerUrl(req, 'new')
         });
     });
 });
 
+function toISODate(req, localFormattedDate) {
+    return moment.utc(localFormattedDate, req.config.date_format).format('YYYY-MM-DD');
+}
+
+function toLocalFormattedDate(req, ISODate) {
+    return moment.utc(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
+}
+
+function bootstrapDateFormat(date_format) {
+    return date_format.toLowerCase();
+}
+
+var customerFormFields = ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see'];
+
+function toElasticsearchFormat(req, sourceObj) {
+    var obj = {};
+    for (var i = 0; i < customerFormFields.length; i++) {
+        var field = customerFormFields[i];
+        if (sourceObj[field]) {
+            if (field == 'first_see' || field == 'last_see')
+                obj[field] = toISODate(req, sourceObj[field]);
+            else
+                obj[field] = sourceObj[field];
+        }
+    }
+    return obj;
+}
+
+function toViewFormat(req, sourceObj) {
+    var obj = {};
+    for (var i = 0; i < customerFormFields.length; i++) {
+        var field = customerFormFields[i];
+        if (sourceObj[field]) {
+            if (field == 'first_see' || field == 'last_see')
+                obj[field] = toLocalFormattedDate(req, sourceObj[field]);
+            else
+                obj[field] = sourceObj[field];
+        }
+    }
+    return obj;
+}
 
 function handleCustomerForm(title, req, res) {
     // Trim all the fields that allow the user write text
-    fields = ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see'];
-    for (var i = 0; i < fields.length; i++)
-        req.sanitize(fields[i]).trim();
+    for (var i = 0; i < customerFormFields.length; i++)
+        req.sanitize(customerFormFields[i]).trim();
 
     req.checkBody('name', 'The name is mandatory').notEmpty();
 
@@ -68,29 +109,19 @@ function handleCustomerForm(title, req, res) {
     }
 
     if (req.body.first_see) {
-        req.checkBody('first_see', 'The first date does not seem a valid date').isDate();
+        req.checkBody('first_see', 'The first date does not seem a valid date').isValidDate();
     }
     if (req.body.last_see) {
-        req.checkBody('last_see', 'The last date does not seem a valid date').isDate();
-    }
-
-    var obj = {};
-    for (var i = 0; i < fields.length; i++) {
-        var field = fields[i];
-        if (req.body[field]) {
-            if (field == 'first_see' || field == 'last_see')
-                obj[field] = new Date(req.body[field]).toISOString().slice(0, 10);
-            else
-                obj[field] = req.body[field];
-        }
+        req.checkBody('last_see', 'The last date does not seem a valid date').isValidDate();
     }
 
     var errors = req.validationErrors();
     if (errors) {
         res.render('customer', {
             title: title,
+            date_format: bootstrapDateFormat(req.config.date_format),
             flash: { type: 'alert-danger', messages: errors},
-            obj: obj
+            obj: req.body
         });
         return;
     }
@@ -99,8 +130,8 @@ function handleCustomerForm(title, req, res) {
         index: 'customers',
         type: 'customer',
         refresh: true,
-        body: obj
-    }
+        body: toElasticsearchFormat(req, req.body)
+    };
     if (typeof req.params.id != 'undefined')
         args.id = req.params.id;
 
@@ -110,16 +141,18 @@ function handleCustomerForm(title, req, res) {
             res.redirect(customersPath);
         }
         else {
+            var messages;
             if (err instanceof esErrors.NoConnections)
-                var messages = ['Database connection error'];
+                messages = ['Database connection error'];
             else
-                var messages = ['Database error'];
+                messages = ['Database error'];
             console.error(err);
 
             res.render('customer', {
                 title: title,
+                date_format: bootstrapDateFormat(req.config.date_format),
                 flash: { type: 'alert-danger', messages: messages},
-                obj: obj
+                obj: req.body
             });
         }
     });
@@ -127,7 +160,11 @@ function handleCustomerForm(title, req, res) {
 }
 
 router.get('/new', function(req, res, next) {
-    res.render('customer', { title: 'Create new customer', obj: {}});
+    res.render('customer', {
+        title: 'Create new customer',
+        date_format: bootstrapDateFormat(req.config.date_format),
+        obj: {}
+    });
 });
 
 router.post('/new', function(req, res, next) {
@@ -149,7 +186,8 @@ router.get('/edit/:id', function(req, res, next) {
     }, function(err, resp, respcode) {
         res.render('customer', {
             title: getTitle(resp._source),
-            obj: resp._source
+            date_format: bootstrapDateFormat(req.config.date_format),
+            obj: toViewFormat(req, resp._source)
         });
     });
 });

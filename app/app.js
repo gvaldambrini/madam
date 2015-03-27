@@ -6,12 +6,16 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var validator = require('express-validator');
 var csrf = require('csurf');
-
+var moment = require('moment');
 var routes = require('./routes/index');
 //var users = require('./routes/users');
 var customers = require('./routes/customers');
 
 var app = express();
+app.use(function(request, response, next) {
+  request.config = require('./config.json');
+  next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,13 +26,20 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(validator({
-  customValidators: {
-    isEmpty: function(value) {
-      return /^\s+$/.test(value);
+
+app.use(function (request, response, next) {
+  var validatorOptions = {
+    customValidators: {
+      isEmpty: function(value) {
+        return /^\s+$/.test(value);
+      },
+      isValidDate: function(value) {
+        return moment.utc(value, request.config.date_format).isValid();
+      }
     }
-  }
-}));
+  };
+  return validator(validatorOptions)(request, response, next);
+});
 
 app.use(cookieParser());
 app.use(csrf({ cookie: true }));

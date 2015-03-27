@@ -74,22 +74,35 @@ block content
                 var customerData = !{JSON.stringify(obj)};
 
                 $(document).ready(function() {
+                    // this trick is required to set the selected date respecting the date format
+                    $.fn.datepicker.defaults.format = "#{date_format}";
                     $('.container form input').map(function() {
                         var name = $(this).attr('name');
-                        if (typeof customerData[name] !== 'undefined')
-                            $(this).val(customerData[name]);
+                        if (typeof customerData[name] !== 'undefined') {
+                            if (name == 'first_see' || name == 'last_see') {
+                                $('#' + name + '-container .input-group.date').datepicker(
+                                    'setDate', customerData[name]);
+                            }
+                            else {
+                                $(this).val(customerData[name]);
+                            }
+                        }
                     });
                 });
 
                 $('#first_see-container .input-group.date').datepicker({
+                    format: "#{date_format}",
                     weekStart: 1,
                     daysOfWeekDisabled: "0,1",
                     autoclose: true,
-                    todayHighlight: true
+                    todayHighlight: true,
+                    endDate: "0d"
                 });
                 $('#last_see-container .input-group.date').datepicker({
+                    format: "#{date_format}",
                     weekStart: 1,
                     daysOfWeekDisabled: "0,1",
                     autoclose: true,
-                    todayHighlight: true
+                    todayHighlight: true,
+                    endDate: "0d"
                 });
