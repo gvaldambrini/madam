@@ -22,7 +22,7 @@ mixin inputDate(fieldName, fieldLabel)
     div(class='form-group', id='#{fieldName}-container')
         label(class=['control-label', 'col-sm-2'], for='#{fieldName}') #{fieldLabel}
         div(class=['col-sm-10', 'input-group', 'date'])
-            input.form-control(type='text', name='#{fieldName}', placeholder='dd/mm/yyyy')
+            input.form-control(type='text', name='#{fieldName}', placeholder='#{date_format}')
             span.input-group-addon
                 i(class=['glyphicon', 'glyphicon-th'])
 
@@ -93,7 +93,7 @@ block content
                 $('#first_see-container .input-group.date').datepicker({
                     format: "#{date_format}",
                     weekStart: 1,
-                    daysOfWeekDisabled: "0,1",
+                    daysOfWeekDisabled: "0",
                     autoclose: true,
                     todayHighlight: true,
                     endDate: "0d"
@@ -101,7 +101,7 @@ block content
                 $('#last_see-container .input-group.date').datepicker({
                     format: "#{date_format}",
                     weekStart: 1,
-                    daysOfWeekDisabled: "0,1",
+                    daysOfWeekDisabled: "0",
                     autoclose: true,
                     todayHighlight: true,
                     endDate: "0d"
