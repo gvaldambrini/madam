@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var validator = require('express-validator');
 var csrf = require('csurf');
 var moment = require('moment');
+var i18n = require('i18n-2');
+
 var routes = require('./routes/index');
 //var users = require('./routes/users');
 var customers = require('./routes/customers');
@@ -15,6 +17,10 @@ var app = express();
 app.use(function(request, response, next) {
   request.config = require('./config.json');
   next();
+});
+
+i18n.expressBind(app, {
+  locales: ['en', 'it'],
 });
 
 // view engine setup

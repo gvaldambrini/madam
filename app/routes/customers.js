@@ -41,7 +41,7 @@ router.get('/', function(req, res, next) {
             };
         }
         res.render('customers', {
-            title: 'Customers',
+            title: req.i18n.__('Customers'),
             customers: results,
             newCustomerUrl: getCustomerUrl(req, 'new')
         });
@@ -61,6 +61,20 @@ function bootstrapDateFormat(date_format) {
 }
 
 var customerFormFields = ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see'];
+
+function customerFormNames(req) {
+    return {
+        'name': req.i18n.__('Name'),
+        'surname': req.i18n.__('Surname'),
+        'mobile_phone': req.i18n.__('Mobile Phone'),
+        'allow_sms': req.i18n.__('Allow sms'),
+        'phone': req.i18n.__('Phone'),
+        'email': req.i18n.__('Email'),
+        'allow_email': req.i18n.__('Allow email'),
+        'first_see': req.i18n.__('First see'),
+        'last_see': req.i18n.__('Last see')
+    };
+}
 
 function toElasticsearchFormat(req, sourceObj) {
     var obj = {};
@@ -119,6 +133,7 @@ function handleCustomerForm(title, req, res) {
     if (errors) {
         res.render('customer', {
             title: title,
+            form_names: customerFormNames(req),
             date_format: bootstrapDateFormat(req.config.date_format),
             flash: { type: 'alert-danger', messages: errors},
             obj: req.body
@@ -150,6 +165,7 @@ function handleCustomerForm(title, req, res) {
 
             res.render('customer', {
                 title: title,
+                form_names: customerFormNames(req),
                 date_format: bootstrapDateFormat(req.config.date_format),
                 flash: { type: 'alert-danger', messages: messages},
                 obj: req.body
@@ -161,14 +177,15 @@ function handleCustomerForm(title, req, res) {
 
 router.get('/new', function(req, res, next) {
     res.render('customer', {
-        title: 'Create new customer',
+        title: req.i18n.__('Create new customer'),
+        form_names: customerFormNames(req),
         date_format: bootstrapDateFormat(req.config.date_format),
         obj: {}
     });
 });
 
 router.post('/new', function(req, res, next) {
-    handleCustomerForm('Create new customer', req, res);
+    handleCustomerForm(req.i18n.__('Create new customer'), req, res);
 });
 
 function getTitle(esObj) {
@@ -186,6 +203,7 @@ router.get('/edit/:id', function(req, res, next) {
     }, function(err, resp, respcode) {
         res.render('customer', {
             title: getTitle(resp._source),
+            form_names: customerFormNames(req),
             date_format: bootstrapDateFormat(req.config.date_format),
             obj: toViewFormat(req, resp._source)
         });

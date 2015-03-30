@@ -2,13 +2,13 @@ extends layout
 
 block content
     h1= title
-    a(href='#{newCustomerUrl}', class=['btn', 'btn-primary', 'pull-right']) Create new customer
+    a(href='#{newCustomerUrl}', class=['btn', 'btn-primary', 'pull-right']) #{__('Create new customer')}
     div.container
         table(class=['table', 'table-hover'])
             thead
-                th Name
-                th Surname
-                th Mobile / Phone
+                th #{__('Name')}
+                th #{__('Surname')}
+                th #{__('Mobile')} / #{__('Phone')}
             tbody
                 each res in customers
                     tr(data-edit-url='#{res.edit_url}')
