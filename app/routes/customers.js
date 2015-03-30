@@ -48,144 +48,157 @@ router.get('/', function(req, res, next) {
     });
 });
 
-function toISODate(req, localFormattedDate) {
-    return moment.utc(localFormattedDate, req.config.date_format).format('YYYY-MM-DD');
-}
+var customerUtils = {
+    init: function(req, res) {
+        this.req = req;
+        this.res = res;
+    },
 
-function toLocalFormattedDate(req, ISODate) {
-    return moment.utc(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
-}
+    toISODate: function(localFormattedDate) {
+        return moment.utc(localFormattedDate, this.req.config.date_format).format('YYYY-MM-DD');
+    },
 
-function bootstrapDateFormat(date_format) {
-    return date_format.toLowerCase();
-}
+    toLocalFormattedDate: function(ISODate) {
+        return moment.utc(ISODate, 'YYYY-MM-DD').format(this.req.config.date_format);
+    },
 
-var customerFormFields = ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see'];
+    bootstrapDateFormat: function() {
+        return this.req.config.date_format.toLowerCase();
+    },
 
-function customerFormNames(req) {
-    return {
-        'name': req.i18n.__('Name'),
-        'surname': req.i18n.__('Surname'),
-        'mobile_phone': req.i18n.__('Mobile Phone'),
-        'allow_sms': req.i18n.__('Allow sms'),
-        'phone': req.i18n.__('Phone'),
-        'email': req.i18n.__('Email'),
-        'allow_email': req.i18n.__('Allow email'),
-        'first_see': req.i18n.__('First see'),
-        'last_see': req.i18n.__('Last see')
-    };
-}
+    formFields: ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see'],
 
-function toElasticsearchFormat(req, sourceObj) {
-    var obj = {};
-    for (var i = 0; i < customerFormFields.length; i++) {
-        var field = customerFormFields[i];
-        if (sourceObj[field]) {
-            if (field == 'first_see' || field == 'last_see')
-                obj[field] = toISODate(req, sourceObj[field]);
-            else
-                obj[field] = sourceObj[field];
+    formNames: function() {
+        return {
+            'name': this.req.i18n.__('Name'),
+            'surname': this.req.i18n.__('Surname'),
+            'mobile_phone': this.req.i18n.__('Mobile Phone'),
+            'allow_sms': this.req.i18n.__('Allow sms'),
+            'phone': this.req.i18n.__('Phone'),
+            'email': this.req.i18n.__('Email'),
+            'allow_email': this.req.i18n.__('Allow email'),
+            'first_see': this.req.i18n.__('First see'),
+            'last_see': this.req.i18n.__('Last see')
+        };
+    },
+
+    toElasticsearchFormat: function(sourceObj) {
+        var obj = {};
+        for (var i = 0; i < this.formFields.length; i++) {
+            var field = this.formFields[i];
+            if (sourceObj[field]) {
+                if (field == 'first_see' || field == 'last_see')
+                    obj[field] = this.toISODate(sourceObj[field]);
+                else
+                    obj[field] = sourceObj[field];
+            }
         }
-    }
-    return obj;
-}
+        return obj;
+    },
 
-function toViewFormat(req, sourceObj) {
-    var obj = {};
-    for (var i = 0; i < customerFormFields.length; i++) {
-        var field = customerFormFields[i];
-        if (sourceObj[field]) {
-            if (field == 'first_see' || field == 'last_see')
-                obj[field] = toLocalFormattedDate(req, sourceObj[field]);
-            else
-                obj[field] = sourceObj[field];
+    toViewFormat: function(sourceObj) {
+        var obj = {};
+        for (var i = 0; i < this.formFields.length; i++) {
+            var field = this.formFields[i];
+            if (sourceObj[field]) {
+                if (field == 'first_see' || field == 'last_see')
+                    obj[field] = this.toLocalFormattedDate(sourceObj[field]);
+                else
+                    obj[field] = sourceObj[field];
+            }
         }
-    }
-    return obj;
-}
+        return obj;
+    },
 
-function handleCustomerForm(title, req, res) {
-    // Trim all the fields that allow the user write text
-    for (var i = 0; i < customerFormFields.length; i++)
-        req.sanitize(customerFormFields[i]).trim();
+    handleForm: function(title) {
+        // Trim all the fields that allow the user write text
+        for (var i = 0; i < this.formFields.length; i++)
+            this.req.sanitize(this.formFields[i]).trim();
 
-    req.checkBody('name', 'The name is mandatory').notEmpty();
+        this.req.checkBody('name', 'The name is mandatory').notEmpty();
 
-    if (!req.body.mobile_phone)
-        req.checkBody(
-            'allow_sms', 'To set allow sms, you must specify a mobile phone').optional().isEmpty();
+        if (!this.req.body.mobile_phone)
+            this.req.checkBody(
+                'allow_sms', 'To set allow sms, you must specify a mobile phone').optional().isEmpty();
 
-    if (!req.body.email) {
-        req.checkBody('allow_email', 'To set allow email, you must specify an email').optional().isEmpty();
-    }
-    else {
-        req.checkBody('email', 'The email does not seem a valid email').isEmail();
-    }
-
-    if (req.body.first_see) {
-        req.checkBody('first_see', 'The first date does not seem a valid date').isValidDate();
-    }
-    if (req.body.last_see) {
-        req.checkBody('last_see', 'The last date does not seem a valid date').isValidDate();
-    }
-
-    var errors = req.validationErrors();
-    if (errors) {
-        res.render('customer', {
-            title: title,
-            form_names: customerFormNames(req),
-            date_format: bootstrapDateFormat(req.config.date_format),
-            flash: { type: 'alert-danger', messages: errors},
-            obj: req.body
-        });
-        return;
-    }
-
-    var args = {
-        index: 'customers',
-        type: 'customer',
-        refresh: true,
-        body: toElasticsearchFormat(req, req.body)
-    };
-    if (typeof req.params.id != 'undefined')
-        args.id = req.params.id;
-
-    client.index(args, function(err, resp, respcode) {
-        if (!err) {
-            // redirect does not take into account being in inside a router
-            res.redirect(customersPath);
+        if (!this.req.body.email) {
+            this.req.checkBody('allow_email', 'To set allow email, you must specify an email').optional().isEmpty();
         }
         else {
-            var messages;
-            if (err instanceof esErrors.NoConnections)
-                messages = ['Database connection error'];
-            else
-                messages = ['Database error'];
-            console.error(err);
-
-            res.render('customer', {
-                title: title,
-                form_names: customerFormNames(req),
-                date_format: bootstrapDateFormat(req.config.date_format),
-                flash: { type: 'alert-danger', messages: messages},
-                obj: req.body
-            });
+            this.req.checkBody('email', 'The email does not seem a valid email').isEmail();
         }
-    });
 
-}
+        if (this.req.body.first_see) {
+            this.req.checkBody('first_see', 'The first date does not seem a valid date').isValidDate();
+        }
+        if (this.req.body.last_see) {
+            this.req.checkBody('last_see', 'The last date does not seem a valid date').isValidDate();
+        }
+
+        var errors = this.req.validationErrors();
+        if (errors) {
+            this.res.render('customer', {
+                title: title,
+                form_names: this.formNames(),
+                date_format: this.bootstrapDateFormat(),
+                flash: { type: 'alert-danger', messages: errors},
+                obj: this.req.body
+            });
+            return;
+        }
+
+        var args = {
+            index: 'customers',
+            type: 'customer',
+            refresh: true,
+            body: this.toElasticsearchFormat(this.req.body)
+        };
+        if (typeof this.req.params.id != 'undefined')
+            args.id = this.req.params.id;
+
+        var that = this;  // workaround for the this visibility problem inside inner functions.
+        client.index(args, function(err, resp, respcode) {
+            if (!err) {
+                // redirect does not take into account being in inside a router
+                that.res.redirect(customersPath);
+            }
+            else {
+                var messages;
+                if (err instanceof esErrors.NoConnections)
+                    messages = ['Database connection error'];
+                else
+                    messages = ['Database error'];
+                console.error(err);
+
+                that.res.render('customer', {
+                    title: title,
+                    form_names: that.formNames(),
+                    date_format: that.bootstrapDateFormat(),
+                    flash: { type: 'alert-danger', messages: messages},
+                    obj: that.req.body
+                });
+            }
+        });
+    }
+};
+
+
+router.use(['/new', '/edit*'], function (req, res, next) {
+    customerUtils.init(req, res);
+    next();
+});
 
 router.get('/new', function(req, res, next) {
     res.render('customer', {
         title: req.i18n.__('Create new customer'),
-        form_names: customerFormNames(req),
-        date_format: bootstrapDateFormat(req.config.date_format),
+        form_names: customerUtils.formNames(),
+        date_format: customerUtils.bootstrapDateFormat(),
         obj: {}
     });
 });
 
 router.post('/new', function(req, res, next) {
-    handleCustomerForm(req.i18n.__('Create new customer'), req, res);
+    customerUtils.handleForm(req.i18n.__('Create new customer'));
 });
 
 function getTitle(esObj) {
@@ -203,9 +216,9 @@ router.get('/edit/:id', function(req, res, next) {
     }, function(err, resp, respcode) {
         res.render('customer', {
             title: getTitle(resp._source),
-            form_names: customerFormNames(req),
-            date_format: bootstrapDateFormat(req.config.date_format),
-            obj: toViewFormat(req, resp._source)
+            form_names: customerUtils.formNames(),
+            date_format: customerUtils.bootstrapDateFormat(),
+            obj: customerUtils.toViewFormat(resp._source)
         });
     });
 });
@@ -216,7 +229,7 @@ router.post('/edit/:id', function(req, res, next) {
         type:'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
-        handleCustomerForm(getTitle(resp._source), req, res);
+        customerUtils.handleForm(getTitle(resp._source));
     });
 });
 
