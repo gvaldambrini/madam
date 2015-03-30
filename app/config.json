@@ -1,3 +1,4 @@
 {
-  "date_format": "DD/MM/YYYY"
+  "date_format": "DD/MM/YYYY",
+  "preferred_locale": "it"
 }

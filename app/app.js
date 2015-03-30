@@ -14,13 +14,15 @@ var routes = require('./routes/index');
 var customers = require('./routes/customers');
 
 var app = express();
-app.use(function(request, response, next) {
-  request.config = require('./config.json');
-  next();
-});
 
 i18n.expressBind(app, {
   locales: ['en', 'it'],
+});
+
+app.use(function(request, response, next) {
+  request.config = require('./config.json');
+  request.i18n.setLocale(request.config.preferred_locale);
+  next();
 });
 
 // view engine setup
