@@ -91,6 +91,7 @@ block content
                 });
 
                 $('#first_see-container .input-group.date').datepicker({
+                    language: '#{language}',
                     format: "#{date_format}",
                     weekStart: 1,
                     daysOfWeekDisabled: "0",
@@ -99,6 +100,7 @@ block content
                     endDate: "0d"
                 });
                 $('#last_see-container .input-group.date').datepicker({
+                    language: '#{language}',
                     format: "#{date_format}",
                     weekStart: 1,
                     daysOfWeekDisabled: "0",

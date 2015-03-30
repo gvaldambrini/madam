@@ -146,6 +146,7 @@ var customerUtils = {
                 title: title,
                 form_names: this.formNames(),
                 date_format: this.bootstrapDateFormat(),
+                language: this.req.config.preferred_locale,
                 flash: { type: 'alert-danger', messages: errors},
                 obj: this.req.body
             });
@@ -179,6 +180,7 @@ var customerUtils = {
                     title: title,
                     form_names: that.formNames(),
                     date_format: that.bootstrapDateFormat(),
+                    language: that.req.config.preferred_locale,
                     flash: { type: 'alert-danger', messages: messages},
                     obj: that.req.body
                 });
@@ -198,6 +200,7 @@ router.get('/new', function(req, res, next) {
         title: req.i18n.__('Create new customer'),
         form_names: customerUtils.formNames(),
         date_format: customerUtils.bootstrapDateFormat(),
+        language: req.config.preferred_locale,
         obj: {}
     });
 });
@@ -223,6 +226,7 @@ router.get('/edit/:id', function(req, res, next) {
             title: getTitle(resp._source),
             form_names: customerUtils.formNames(),
             date_format: customerUtils.bootstrapDateFormat(),
+            language: req.config.preferred_locale,
             obj: customerUtils.toViewFormat(resp._source)
         });
     });
