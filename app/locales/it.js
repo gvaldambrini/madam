@@ -11,5 +11,10 @@
     "Last see": "Ultima volta",
     "Discount": "Sconto",
     "Allow sms": "Invia sms",
-    "Allow email": "Invia email"
+    "Allow email": "Invia email",
+    "The name is mandatory": "Il nome è obbligatorio",
+    "To set allow sms, you must specify a mobile phone": "Per impostare invia sms è necessario specificare un cellulare",
+    "To set allow email, you must specify an email": "Per impostare invia email, è necessario impostare un'email",
+    "The first date does not seem a valid date": "Prima volta non sembra essere una data valida",
+    "The last date does not seem a valid date": "Ultima volta non sembra essere una data valida"
 }

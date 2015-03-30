@@ -115,24 +115,29 @@ var customerUtils = {
         for (var i = 0; i < this.formFields.length; i++)
             this.req.sanitize(this.formFields[i]).trim();
 
-        this.req.checkBody('name', 'The name is mandatory').notEmpty();
+        this.req.checkBody('name', this.req.i18n.__('The name is mandatory')).notEmpty();
 
         if (!this.req.body.mobile_phone)
             this.req.checkBody(
-                'allow_sms', 'To set allow sms, you must specify a mobile phone').optional().isEmpty();
+                'allow_sms', this.req.i18n.__(
+                    'To set allow sms, you must specify a mobile phone')).optional().isEmpty();
 
         if (!this.req.body.email) {
-            this.req.checkBody('allow_email', 'To set allow email, you must specify an email').optional().isEmpty();
+            this.req.checkBody('allow_email', this.req.i18n.__(
+                'To set allow email, you must specify an email')).optional().isEmpty();
         }
         else {
-            this.req.checkBody('email', 'The email does not seem a valid email').isEmail();
+            this.req.checkBody('email', this.req.i18n.__(
+                'The email does not seem a valid email')).isEmail();
         }
 
         if (this.req.body.first_see) {
-            this.req.checkBody('first_see', 'The first date does not seem a valid date').isValidDate();
+            this.req.checkBody('first_see', this.req.i18n.__(
+                'The first date does not seem a valid date')).isValidDate();
         }
         if (this.req.body.last_see) {
-            this.req.checkBody('last_see', 'The last date does not seem a valid date').isValidDate();
+            this.req.checkBody('last_see', this.req.i18n.__(
+                'The last date does not seem a valid date')).isValidDate();
         }
 
         var errors = this.req.validationErrors();
