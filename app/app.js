@@ -21,7 +21,9 @@ i18n.expressBind(app, {
 
 app.use(function(request, response, next) {
   request.config = require('./config.json');
-  request.i18n.setLocale(request.config.preferred_locale);
+  request.i18n.setLocale(request.config.language);
+  // Let the configuration available also in templates.
+  response.locals.config = request.config;
   next();
 });
 

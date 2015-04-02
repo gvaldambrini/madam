@@ -68,10 +68,6 @@ var customerUtils = {
         return moment.utc(ISODate, 'YYYY-MM-DD').format(this.req.config.date_format);
     },
 
-    bootstrapDateFormat: function() {
-        return this.req.config.date_format.toLowerCase();
-    },
-
     formFields: ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see'],
 
     formNames: function() {
@@ -151,8 +147,6 @@ var customerUtils = {
             this.res.render('customer', {
                 title: title,
                 form_names: this.formNames(),
-                date_format: this.bootstrapDateFormat(),
-                language: this.req.config.preferred_locale,
                 flash: { type: 'alert-danger', messages: errors},
                 obj: this.req.body
             });
@@ -185,8 +179,6 @@ var customerUtils = {
                 that.res.render('customer', {
                     title: title,
                     form_names: that.formNames(),
-                    date_format: that.bootstrapDateFormat(),
-                    language: that.req.config.preferred_locale,
                     flash: { type: 'alert-danger', messages: messages},
                     obj: that.req.body
                 });
@@ -205,8 +197,6 @@ router.get('/new', function(req, res, next) {
     res.render('customer', {
         title: req.i18n.__('Create new customer'),
         form_names: customerUtils.formNames(),
-        date_format: customerUtils.bootstrapDateFormat(),
-        language: req.config.preferred_locale,
         obj: {}
     });
 });
@@ -231,8 +221,6 @@ router.get('/edit/:id', function(req, res, next) {
         res.render('customer', {
             title: getTitle(resp._source),
             form_names: customerUtils.formNames(),
-            date_format: customerUtils.bootstrapDateFormat(),
-            language: req.config.preferred_locale,
             obj: customerUtils.toViewFormat(resp._source)
         });
     });
