@@ -7,6 +7,12 @@ var customersPath = '/customers';
 var moment = require('moment');
 
 
+router.use(function (request, response, next) {
+  // everything inside this file is under the active view 'customers'
+  response.locals.active_view = 'customers';
+  next();
+});
+
 function getCustomerUrl(req, route) {
     return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
 }

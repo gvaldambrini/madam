@@ -2,12 +2,9 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-
-
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css')
-    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css')
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
 
     script(src='https://code.jquery.com/jquery-1.11.2.min.js')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js')
@@ -15,4 +12,20 @@ html
     script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/locales/bootstrap-datepicker.it.min.js')
 
   body
-    block content
+    nav(class=['navbar', 'navbar-inverse', 'navbar-fixed-top'])
+        div.container-fluid
+            div(id=navbar, class=['navbar-collapse', 'collapse'])
+                form(class=['navbar-form', 'navbar-right'])
+                    input.form-control(type='text', placeholder="#{__('Search...')}")
+    div.container-fluid
+        div.row
+            div(class=['col-sm-3', 'col-md-2', 'sidebar'])
+                ul(class=['nav', 'nav-sidebar'])
+                    li(class=[active_view == 'home' ? 'active' : ''])
+                        a(href='/') #{__('Home')}
+                    li(class=[active_view == 'customers' ? 'active' : ''])
+                        a(href='/customers') #{__('Customers')}
+                    li
+                        a(href='#') #{__('Products')}
+            div(class=['col-sm-9', 'col-sm-offset-3', 'col-md-offset-2', 'main'])
+                block content

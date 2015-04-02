@@ -16,5 +16,8 @@
 	"To set allow sms, you must specify a mobile phone": "To set allow sms, you must specify a mobile phone",
 	"To set allow email, you must specify an email": "To set allow email, you must specify an email",
 	"The first date does not seem a valid date": "The first date does not seem a valid date",
-	"The last date does not seem a valid date": "The last date does not seem a valid date"
+	"The last date does not seem a valid date": "The last date does not seem a valid date",
+	"Home": "Home",
+	"Products": "Products",
+	"Search...": "Search..."
 }
