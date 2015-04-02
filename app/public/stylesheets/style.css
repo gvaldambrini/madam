@@ -96,3 +96,10 @@ body {
 .main .table {
     margin-top: 30px;
 }
+
+/*
+ * Customers table
+ */
+ .table.table.table-hover tbody{
+  cursor: pointer;
+ }
