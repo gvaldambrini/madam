@@ -34,6 +34,10 @@ body {
   border: 0;
 }
 
+.navbar-logo {
+  padding-top: 4px;
+  float: left;
+}
 /*
  * Sidebar
  */
