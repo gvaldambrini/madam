@@ -80,6 +80,10 @@ block content
                             $('#' + name + '-container .input-group.date').datepicker(
                                 'setDate', customerData[name]);
                         }
+                        else if (name == 'allow_sms' || name == 'allow_email') {
+                            if (customerData[name])
+                                $(this).attr('checked', 'checked');
+                        }
                         else {
                             $(this).val(customerData[name]);
                         }

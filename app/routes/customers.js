@@ -68,7 +68,7 @@ var customerUtils = {
         return moment.utc(ISODate, 'YYYY-MM-DD').format(this.req.config.date_format);
     },
 
-    formFields: ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see'],
+    formFields: ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see', 'allow_sms', 'allow_email'],
 
     formNames: function() {
         return {
@@ -91,6 +91,8 @@ var customerUtils = {
             if (sourceObj[field]) {
                 if (field == 'first_see' || field == 'last_see')
                     obj[field] = this.toISODate(sourceObj[field]);
+                else if (field == 'allow_sms' || field == 'allow_email')
+                    obj[field] = sourceObj[field] == 'on'
                 else
                     obj[field] = sourceObj[field];
             }
