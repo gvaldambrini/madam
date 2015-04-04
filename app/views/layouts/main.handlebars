@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/locales/bootstrap-datepicker.it.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-logo">
+                <a href="/"><img src="/images/logo.png"></a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <form class="navbar-form navbar-right">
+                    <input type="text" placeholder="{{{__ 'Search...'}}}" class="form-control">
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li {{#if isHomeActive}}class="active"{{/if}}>
+                        <a href="/">{{{__ 'Home'}}}</a>
+                    </li>
+                    <li {{#if isCustomersActive}}class="active"{{/if}}>
+                        <a href="/customers">{{{__ 'Customers'}}}</a>
+                    </li>
+                    <li>
+                        <a href="#">{{{__ 'Products'}}}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-offset-2 main">
+                {{{body}}}
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+</html>

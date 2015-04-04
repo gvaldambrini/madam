@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { 'active_view': 'home'});
+  res.render('index', {isHomeActive: true});
 });
 
 module.exports = router;

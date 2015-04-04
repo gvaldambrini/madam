@@ -1,0 +1,87 @@
+{{#flash}}
+    <div class="alert {{type}}">
+        <ul>
+            {{#each messages}}
+                <li>{{msg}}</li>
+            {{/each}}
+        </ul>
+    </div>
+{{/flash}}
+
+<form class="form-horizontal" method="post" action=''>
+    {{> input type='text' name='name' label=form_names.name }}
+    {{> input type='text' name='surname' label=form_names.surname }}
+    {{> input_and_checkbox type='tel' name='mobile_phone' label=form_names.mobile_phone cbname='allow_sms' cblabel=form_names.allow_sms}}
+
+    {{> input type='tel' name='phone' label=form_names.phone }}
+    {{> input_and_checkbox type='email' name='email' label=form_names.email cbname='allow_email' cblabel=form_names.allow_email}}
+
+    <div class="form-group">
+        <label class="control-label col-sm-2" for='discount'>{{{__ 'Discount'}}}</label>
+        <div class="col-sm-8">
+            <label class="radio-inline">
+                <input type="radio" name="discount" value="0">0%</input>
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="discount" value="10">10%</input>
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="discount" value="20">20%</input>
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="discount" value="30">30%</input>
+            </label>
+        </div>
+    </div>
+    {{> input_date name='first_see' label=form_names.first_see}}
+    {{> input_date name='last_see' label=form_names.last_see}}
+    <input type='hidden' name="_csrf" value="{{csrftoken}}">
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var customerData = {{{json obj}}};
+
+        $(document).ready(function() {
+            // this trick is required to set the selected date respecting the date format
+            $.fn.datepicker.defaults.format = "{{config.date_format}}".toLowerCase();
+            $('form input').map(function() {
+                var name = $(this).attr('name');
+                if (typeof customerData[name] !== 'undefined') {
+                    if (name == 'first_see' || name == 'last_see') {
+                        $('#' + name + '-container .input-group.date').datepicker(
+                            'setDate', customerData[name]);
+                    }
+                    else if (name == 'allow_sms' || name == 'allow_email') {
+                        if (customerData[name])
+                            $(this).attr('checked', 'checked');
+                    }
+                    else {
+                        $(this).val(customerData[name]);
+                    }
+                }
+            });
+        });
+        $('#first_see-container .input-group.date').datepicker({
+            language: '{{config.language}}',
+            format: "{{config.date_format}}".toLowerCase(),
+            weekStart: 1,
+            daysOfWeekDisabled: "0",
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "0d"
+        });
+        $('#last_see-container .input-group.date').datepicker({
+            language: '{{config.language}}',
+            format: "{{config.date_format}}".toLowerCase(),
+            weekStart: 1,
+            daysOfWeekDisabled: "0",
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "0d"
+        });
+    </script>
+</form>
+

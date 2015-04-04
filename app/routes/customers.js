@@ -9,7 +9,7 @@ var moment = require('moment');
 
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'customers'
-  response.locals.active_view = 'customers';
+  response.locals.isCustomersActive = true;
   next();
 });
 
