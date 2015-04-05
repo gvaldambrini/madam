@@ -17,7 +17,35 @@ function getCustomerUrl(req, route) {
     return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
 }
 
-router.get('/', function(req, res, next) {
+// Middleware to expose shared templates to the client side.
+function exposeTemplates(req, res, next) {
+
+    req.app.hbs.getTemplates('views/shared/', {
+        cache: req.app.enabled('view cache'),
+        precompiled: true
+    }).then(function (templates) {
+        var extRegex = new RegExp(req.app.hbs.extname + '$');
+
+        // Creates an array of templates which are exposed via
+        // `res.locals.templates`.
+        templates = Object.keys(templates).map(function (name) {
+            return {
+                name: name.replace(extRegex, ''),
+                template: templates[name]
+            };
+        });
+
+        // Exposes the templates during view rendering.
+        if (templates.length) {
+            res.locals.templates = templates;
+        }
+
+        setImmediate(next);
+    })
+    .catch(next);
+}
+
+router.get('/', exposeTemplates, function(req, res, next) {
     client.search({
         index: 'customers',
         size: 50,
@@ -44,6 +72,9 @@ router.get('/', function(req, res, next) {
                 name: hits[i]._source.name,
                 surname: hits[i]._source.surname,
                 phone: phone,
+                header_name: req.i18n.__('Name'),
+                header_surname: req.i18n.__('Surname'),
+                header_phone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
             };
         }
         res.render('customers', {

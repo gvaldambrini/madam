@@ -1,0 +1,16 @@
+<table class='table table-hover'>
+    <thead>
+        <th>{{this.[0].header_name}}</th>
+        <th>{{this.[0].header_surname}}</th>
+        <th>{{this.[0].header_phone}}</th>
+    </thead>
+    <tbody>
+        {{#each this}}
+            <tr data-edit-url='{{edit_url}}'>
+                <td>{{name}}</td>
+                <td>{{surname}}</td>
+                <td>{{phone}}</td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>

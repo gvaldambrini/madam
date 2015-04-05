@@ -1,23 +1,22 @@
 
 <a href='{{newCustomerUrl}}' class='btn btn-primary'>{{{__ 'Create new customer'}}}</a>
-<table class='table table-hover'>
-    <thead>
-        <th>{{{__ 'Name'}}}</th>
-        <th>{{{__ 'Surname'}}}</th>
-        <th>{{{__ 'Mobile'}}} / {{{__ 'Phone'}}}</th>
-    </thead>
-    <tbody>
-        {{#each customers}}
-            <tr data-edit-url='{{edit_url}}'>
-                <td>{{name}}</td>
-                <td>{{surname}}</td>
-                <td>{{phone}}</td>
-            </tr>
-        {{/each}}
-    </tbody>
-</table>
+<div id="customers-table-container"></div>
+
 <script type='text/javascript'>
-    $('.table tbody tr').on("click", function(event) {
-        window.location.href = $(this).data('edit-url');
-    });
+    $(document).ready(function() {
+
+        var templates = Handlebars.templates = Handlebars.templates || {};
+        {{#templates}}
+        templates['{{{name}}}'] = Handlebars.template({{{template}}});
+        {{/templates}}
+
+        var html = Handlebars.templates.customers_table({{{json customers}}});
+        $('#customers-table-container').html(html);
+
+        $('.table tbody tr').on("click", function(event) {
+            window.location.href = $(this).data('edit-url');
+        });
+
+    })
+
 </script>

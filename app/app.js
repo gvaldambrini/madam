@@ -29,14 +29,22 @@ app.use(function(request, response, next) {
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.engine('handlebars', exphbs({
+
+var hbs = exphbs.create({
   defaultLayout: 'main',
   helpers: {
     json: function(context) {
       return JSON.stringify(context);
     }
-  }}));
+  },
+  partialsDir: [
+      'views/shared/',
+      'views/partials/'
+  ]
+});
 
+app.hbs = hbs;
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
 // uncomment after placing your favicon in /public
