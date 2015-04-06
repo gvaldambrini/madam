@@ -22,9 +22,48 @@ function createIndex(callback) {
         index: 'customers',
         body: {
             settings: {
-                index: {
-                    number_of_shards: 1,
-                    number_of_replicas: 1
+                number_of_shards: 1,
+                analysis: {
+                    tokenizer: {
+                        edge_ngram_tokenizer: {
+                            type: "edgeNGram",
+                            min_gram: 1,
+                            max_gram: 20,
+                            token_chars: ["letter", "digit"]
+                        },
+                        ngram_tokenizer: {
+                            type: "nGram",
+                            min_gram: 1,
+                            max_gram: 20,
+                            token_chars: ["letter", "digit"]
+                        },
+                    },
+                    analyzer: {
+                        searchable_text: {
+                            filter: [
+                                'standard',
+                                'lowercase'
+                            ],
+                            type: 'custom',
+                            tokenizer: 'standard'
+                        },
+                        searchable_text_partial: {
+                            filter: [
+                                'standard',
+                                'lowercase'
+                            ],
+                            type: 'custom',
+                            tokenizer: 'ngram_tokenizer'
+                        },
+                        searchable_text_autocomplete: {
+                            filter: [
+                                'standard',
+                                'lowercase'
+                            ],
+                            type: 'custom',
+                            tokenizer: 'edge_ngram_tokenizer'
+                        }
+                    }
                 }
             },
         }
@@ -43,11 +82,67 @@ function putMapping(callback) {
         body: {
             customer: {
                 properties: {
-                    name: {type: 'string'},
-                    surname: {type: 'string'},
-                    mobile_phone: {type: 'string'},
+                    name: {
+                        type: 'multi_field',
+                        fields: {
+                            name: {
+                                type: 'string',
+                                analyzer: 'searchable_text'
+                            },
+                            autocomplete: {
+                                type: 'string',
+                                search_analyzer: 'searchable_text',
+                                index_analyzer: 'searchable_text_autocomplete',
+                                term_vector: 'with_positions_offsets'
+                            }
+                        }
+                    },
+                    surname: {
+                        type: 'multi_field',
+                        fields: {
+                            surname: {
+                                type: 'string',
+                                analyzer: 'searchable_text'
+                            },
+                            autocomplete: {
+                                type: 'string',
+                                search_analyzer: 'searchable_text',
+                                index_analyzer: 'searchable_text_autocomplete',
+                                term_vector: 'with_positions_offsets'
+                            }
+                        }
+                    },
+                    mobile_phone: {
+                        type: 'multi_field',
+                        fields: {
+                            mobile_phone: {
+                                type: 'string',
+                                analyzer: 'searchable_text'
+                            },
+                            partial: {
+                                type: 'string',
+                                search_analyzer: 'searchable_text',
+                                index_analyzer: 'searchable_text_partial',
+                                term_vector: 'with_positions_offsets'
+                            }
+                        }
+                    },
                     allow_sms: {type: 'boolean'},
-                    phone: {type: 'string'},
+                    phone: {
+                        type: 'multi_field',
+                        fields: {
+                            phone: {
+                                type: 'string',
+                                analyzer: 'searchable_text'
+                            },
+                            partial: {
+                                type: 'string',
+                                search_analyzer: 'searchable_text',
+                                index_analyzer: 'searchable_text_partial',
+                                term_vector: 'with_positions_offsets'
+                            }
+                        }
+                    },
                     email: {type: 'string'},
                     allow_email: {type: 'boolean'},
                     discount: {type: 'integer'},

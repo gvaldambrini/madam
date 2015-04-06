@@ -10,13 +10,47 @@
         templates['{{{name}}}'] = Handlebars.template({{{template}}});
         {{/templates}}
 
-        var html = Handlebars.templates.customers_table({{{json customers}}});
-        $('#customers-table-container').html(html);
+        var original_html = Handlebars.templates.customers_table({{{json customers}}});
+        $('#customers-table-container').html(original_html);
 
         $('.table tbody tr').on("click", function(event) {
             window.location.href = $(this).data('edit-url');
         });
 
+        $('#search-input').on('keyup', function(event) {
+            $("#search-clear").toggle(Boolean($(this).val()));
+            var text = $(this).val();
+            if (text) {
+                $.ajax({
+                    url: '{{searchUrl}}',
+                    data: {
+                        text: text
+                    },
+                    success: function(msg) {
+                        var html = Handlebars.templates.customers_table(msg);
+                        $('#customers-table-container').html(html);
+
+                        $('.table tbody tr').on("click", function(event) {
+                            window.location.href = $(this).data('edit-url');
+                        });
+                    }
+                });
+            }
+            else {
+                $('#customers-table-container').html(original_html);
+            $('.table tbody tr').on("click", function(event) {
+                window.location.href = $(this).data('edit-url');
+            });
+            }
+        });
+        $("#search-clear").click(function(){
+            $("#search-input").val('').focus();
+            $(this).hide();
+            $('#customers-table-container').html(original_html);
+            $('.table tbody tr').on("click", function(event) {
+                window.location.href = $(this).data('edit-url');
+            });
+        });
     })
 
 </script>

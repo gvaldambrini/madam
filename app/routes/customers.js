@@ -45,6 +45,74 @@ function exposeTemplates(req, res, next) {
     .catch(next);
 }
 
+function processElasticsearchResults(req, hits) {
+
+    function getField(hit, field, field_type) {
+        if (hit.highlight && hit.highlight[field + '.' + field_type])
+            return hit.highlight[field + '.' + field_type][0];
+
+        return hit._source[field];
+    }
+
+    var results = [];
+    for (var i = 0; i < hits.length; i++) {
+        var phone = getField(hits[i], 'phone', 'partial');
+        var mobile = getField(hits[i], 'mobile_phone', 'partial');
+
+        var phone_mpbile;
+        if (phone && mobile)
+            phone_mpbile = mobile + ' / ' + phone;
+        else if (mobile)
+            phone_mpbile = mobile;
+        else
+            phone_mpbile = phone;
+
+        results[results.length] = {
+            edit_url: getCustomerUrl(req, 'edit/' + hits[i]._id),
+            name: getField(hits[i], 'name', 'autocomplete'),
+            surname: getField(hits[i], 'surname', 'autocomplete'),
+            phone: phone_mpbile,
+            header_name: req.i18n.__('Name'),
+            header_surname: req.i18n.__('Surname'),
+            header_phone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
+        };
+    }
+    return results;
+}
+
+router.get('/search', function(req, res, next) {
+    client.search({
+        index: 'customers',
+        size: 50,
+        body: {
+            query: {
+                multi_match: {
+                    query: req.query.text,
+                    operator: 'and',
+                    type: 'cross_fields',
+                    fields: [
+                        "name.autocomplete",
+                        "surname.autocomplete",
+                        "mobile_phone.partial",
+                        "phone.partial"
+                    ]
+                }
+            },
+            highlight: {
+                fields: {
+                    '*': {
+                        'pre_tags': ['<b>'],
+                        'post_tags': ['</b>']
+                    }
+                }
+            }
+        }
+    }, function(err, resp, respcode) {
+        var results = processElasticsearchResults(req, resp.hits.hits);
+        res.json(results);
+    });
+});
+
 router.get('/', exposeTemplates, function(req, res, next) {
     client.search({
         index: 'customers',
@@ -55,32 +123,12 @@ router.get('/', exposeTemplates, function(req, res, next) {
             }
         }
     }, function(err, resp, respcode) {
-        var results = [];
-        var hits = resp.hits.hits;
-        for (var i = 0; i < hits.length; i++) {
-            var phone;
-            if (hits[i]._source.phone && hits[i]._source.mobile_phone) {
-                phone = hits[i]._source.mobile_phone + ' / ' + hits[i]._source.phone;
-            }
-            else if (hits[i]._source.mobile_phone) {
-                phone = hits[i]._source.mobile_phone;
-            }
-            else
-                phone = hits[i]._source.phone;
-            results[results.length] = {
-                edit_url: getCustomerUrl(req, 'edit/' + hits[i]._id),
-                name: hits[i]._source.name,
-                surname: hits[i]._source.surname,
-                phone: phone,
-                header_name: req.i18n.__('Name'),
-                header_surname: req.i18n.__('Surname'),
-                header_phone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
-            };
-        }
+        var results = processElasticsearchResults(req, resp.hits.hits);
         res.render('customers', {
             title: req.i18n.__('Customers'),
             customers: results,
-            newCustomerUrl: getCustomerUrl(req, 'new')
+            newCustomerUrl: getCustomerUrl(req, 'new'),
+            searchUrl: getCustomerUrl(req, 'search')
         });
     });
 });
