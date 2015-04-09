@@ -101,9 +101,15 @@ body {
     margin-top: 30px;
 }
 
+.content-header {
+  border-bottom: 2px solid #428bca;
+  padding-bottom: 15px;
+ }
+
 /*
  * Customers table
  */
+
  .table.table.table-hover tbody{
   cursor: pointer;
  }
@@ -112,10 +118,15 @@ body {
     color: #428bca;
  }
 
+.search-form {
+  float: right;
+  position: relative;
+}
+
 #search-clear {
     display: none;
     position: absolute;
-    right: 20px;
+    right: 10px;
     top: 0;
     bottom: 0;
     height: 14px;

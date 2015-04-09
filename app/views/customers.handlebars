@@ -1,7 +1,13 @@
 
+<div class="content-header">
 <a href='{{newCustomerUrl}}' class='btn btn-primary'>{{{__ 'Create new customer'}}}</a>
-<div id="customers-table-container"></div>
+<form class="search-form">
+    <input id="search-input" type="text" placeholder="{{{__ 'Search...'}}}" class="form-control">
+    <span id="search-clear" class="glyphicon glyphicon-remove-circle"></span>
+</form>
+</div>
 
+<div id="customers-table-container"></div>
 <script type='text/javascript'>
     $(document).ready(function() {
 
