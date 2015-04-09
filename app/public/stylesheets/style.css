@@ -110,7 +110,7 @@ body {
  * Customers table
  */
 
- .table.table.table-hover tbody{
+ .table.table-hover tbody{
   cursor: pointer;
  }
 
@@ -135,3 +135,34 @@ body {
     cursor: pointer;
     color: #606060;
 }
+
+/*
+ * Settings page
+ */
+
+.content-header ul {
+ list-style-type: none;
+ margin: 0;
+ padding: 0;
+ overflow: hidden;
+}
+
+.content-header ul li {
+  display: inline;
+  margin: 0 20px 0 0;
+  height: 14px;
+  font-size: 14px;
+}
+
+.content-header li > a {
+ text-decoration: none;
+ color: #484848;
+}
+
+.content-header li > a:hover {
+ color: #909090;
+}
+
+.content-header li.active {
+  font-weight: bold;
+ }

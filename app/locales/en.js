@@ -19,5 +19,8 @@
 	"The last date does not seem a valid date": "The last date does not seem a valid date",
 	"Home": "Home",
 	"Products": "Products",
-	"Search...": "Search..."
+	"Search...": "Search...",
+	"Settings": "Settings",
+	"Workers": "Workers",
+	"Services": "Services"
 }

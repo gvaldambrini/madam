@@ -20,5 +20,8 @@
 	"The email does not seem a valid email": "The email does not seem a valid email",
 	"Home": "Home",
 	"Products": "Prodotti",
-	"Search...": "Ricerca..."
+	"Search...": "Ricerca...",
+	"Settings": "Impostazioni",
+	"Workers": "Lavoratori",
+	"Services": "Servizi"
 }
