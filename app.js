@@ -12,6 +12,7 @@ var i18n = require('i18n-2');
 
 var routes = require('./routes/index');
 var customers = require('./routes/customers');
+var settings = require('./routes/settings');
 
 var app = express();
 
@@ -77,6 +78,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use(customers.path, customers.router);
+app.use(settings.path, settings.router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
