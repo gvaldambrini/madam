@@ -1,7 +1,8 @@
 var express = require('express');
 var elasticsearch = require('elasticsearch');
 var router = express.Router();
-var client = new elasticsearch.Client();
+var utils = require('../utils');
+var client = utils.createClient();
 var esErrors = elasticsearch.errors;
 var customersPath = '/customers';
 var moment = require('moment');

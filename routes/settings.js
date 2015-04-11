@@ -4,7 +4,8 @@ var router = express.Router();
 var settingsPath = '/settings';
 
 var elasticsearch = require('elasticsearch');
-var client = new elasticsearch.Client();
+var utils = require('../utils');
+var client = utils.createClient();
 
 // For simplicity, we hardcode the id of the workers document
 var workersDocId = '0b78ce22-a667-423b-bdb4-9a09b64dcf7c';
