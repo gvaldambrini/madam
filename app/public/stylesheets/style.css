@@ -166,3 +166,7 @@ body {
 .content-header li.active {
   font-weight: bold;
  }
+
+ .settings-content {
+   margin-top: 20px;
+ }
