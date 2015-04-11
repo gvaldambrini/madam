@@ -82,7 +82,8 @@ function processElasticsearchResults(req, hits) {
 
 router.get('/search', function(req, res, next) {
     client.search({
-        index: 'customers',
+        index: 'main',
+        type: 'customer',
         size: 50,
         body: {
             query: {
@@ -115,7 +116,8 @@ router.get('/search', function(req, res, next) {
 
 router.get('/', exposeTemplates, function(req, res, next) {
     client.search({
-        index: 'customers',
+        index: 'main',
+        type: 'customer',
         size: 50,
         body: {
             query: {
@@ -235,7 +237,7 @@ var customerUtils = {
         }
 
         var args = {
-            index: 'customers',
+            index: 'main',
             type: 'customer',
             refresh: true,
             body: this.toElasticsearchFormat(this.req.body)
@@ -295,7 +297,7 @@ function getTitle(esObj) {
 
 router.get('/edit/:id', function(req, res, next) {
     client.get({
-        index:'customers',
+        index:'main',
         type:'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
@@ -309,7 +311,7 @@ router.get('/edit/:id', function(req, res, next) {
 
 router.post('/edit/:id', function(req, res, next) {
     client.get({
-        index:'customers',
+        index:'main',
         type:'customer',
         id: req.params.id
     }, function(err, resp, respcode) {

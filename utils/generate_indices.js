@@ -8,10 +8,10 @@ var client = new elasticsearch.Client();
 
 function deleteIndex(callback) {
     client.indices.delete({
-        index: 'customers'
+        index: 'main'
     }, function(err, resp, respcode) {
         if (!err) {
-            console.log('Index customers deleted');
+            console.log('Index main deleted');
         }
         callback(err, resp);
     });
@@ -19,7 +19,7 @@ function deleteIndex(callback) {
 
 function createIndex(callback) {
     client.indices.create({
-        index: 'customers',
+        index: 'main',
         body: {
             settings: {
                 number_of_shards: 1,
@@ -69,7 +69,7 @@ function createIndex(callback) {
         }
     }, function(err, resp, respcode) {
         if (!err) {
-            console.log('Index customers created');
+            console.log('Index main created');
         }
         callback(err, resp);
     });
@@ -77,7 +77,7 @@ function createIndex(callback) {
 
 function putMapping(callback) {
     client.indices.putMapping({
-        index: 'customers',
+        index: 'main',
         type: 'customer',
         body: {
             customer: {
