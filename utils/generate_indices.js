@@ -75,7 +75,7 @@ function createIndex(callback) {
     });
 }
 
-function putMapping(callback) {
+function createCustomerType(callback) {
     client.indices.putMapping({
         index: 'main',
         type: 'customer',
@@ -167,7 +167,30 @@ function putMapping(callback) {
         }
     }, function(err, resp, respcode) {
         if (!err) {
-            console.log('Mapping customer created');
+            console.log('Type customer created');
+        }
+        callback(err, resp);
+    });
+}
+
+function createWorkersType(callback) {
+    client.indices.putMapping({
+        index: 'main',
+        type: 'workers',
+        body: {
+            workers: {
+                properties: {
+                    names : {
+                        type: "string",
+                        index_name: "worker_name",
+                        index: "not_analyzed"
+                    }
+                }
+            }
+        }
+    }, function(err, resp, respcode) {
+        if (!err) {
+            console.log('Type workers created');
         }
         callback(err, resp);
     });
@@ -185,7 +208,8 @@ if (program.delete)
     tasks[tasks.length] = deleteIndex;
 
 tasks[tasks.length] = createIndex;
-tasks[tasks.length] = putMapping;
+tasks[tasks.length] = createCustomerType;
+tasks[tasks.length] = createWorkersType;
 
 async.series(
     tasks,
