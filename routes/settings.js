@@ -22,7 +22,6 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/workers', function(req, res, next) {
-
     client.get({
         index: 'main',
         type: 'workers',
@@ -30,7 +29,7 @@ router.get('/workers', function(req, res, next) {
     }, function(err, resp, respcode) {
         res.render('settings_workers', {
             isWorkersActive: true,
-            workers: resp.found ? resp._source.names : [''],
+            workers: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
             workersUrl: '#',
             servicesUrl: '/settings/services'
         });
@@ -38,7 +37,11 @@ router.get('/workers', function(req, res, next) {
 });
 
 router.post('/workers', function(req, res, next) {
-    var workers = req.body.name.filter(function(e) { return e; });
+    var names = req.body.name;
+    if (typeof names == 'string')
+        names = [names];
+
+    var workers = names.filter(function(e) { return e; });
 
     var args = {
         index: 'main',
