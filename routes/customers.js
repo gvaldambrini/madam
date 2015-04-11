@@ -10,6 +10,7 @@ var moment = require('moment');
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'customers'
   response.locals.isCustomersActive = true;
+  response.locals.title = request.i18n.__('Customers'),
   next();
 });
 
@@ -127,7 +128,6 @@ router.get('/', exposeTemplates, function(req, res, next) {
     }, function(err, resp, respcode) {
         var results = processElasticsearchResults(req, resp.hits.hits);
         res.render('customers', {
-            title: req.i18n.__('Customers'),
             customers: results,
             newCustomerUrl: getCustomerUrl(req, 'new'),
             searchUrl: getCustomerUrl(req, 'search')
