@@ -8,8 +8,9 @@ var esErrors = elasticsearch.errors;
 var utils = require('../utils');
 var client = utils.createClient();
 
-// For simplicity, we hardcode the id of the workers document
+// For simplicity, we hardcode the id for the workers and services documents
 var workersDocId = '0b78ce22-a667-423b-bdb4-9a09b64dcf7c';
+var servicesDocId = '5678a632-9d9a-43c9-b440-4f6e1f6dfea7';
 
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'settings'
@@ -93,12 +94,72 @@ router.post('/workers', function(req, res, next) {
 });
 
 router.get('/services', function(req, res, next) {
-    res.render('settings', {
-        items: [''],
-        isServicesActive: true,
-        workersUrl: '/settings/workers',
-        servicesUrl: '#'
+    client.get({
+        index: 'main',
+        type: 'services',
+        id: servicesDocId
+    }, function(err, resp, respcode) {
+        res.render('settings', {
+            isServicesActive: true,
+            items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
+            workersUrl: '/settings/workers',
+            servicesUrl: '#'
+        });
+    });
+});
 
+router.post('/services', function(req, res, next) {
+    var names = req.body.name;
+    if (typeof names == 'string')
+        names = [names];
+
+    var services = names.filter(function(e) { return e; });
+    if (services.length == 0) {
+        res.render('settings', {
+            isServicesActive: true,
+            flash: {
+                type: 'alert-danger',
+                messages: [{msg: req.i18n.__('At least one service is mandatory')}]
+            },
+            items: [''],
+            workersUrl: '/settings/workers',
+            servicesUrl: '#'
+        });
+        return;
+    }
+
+    var args = {
+        index: 'main',
+        type: 'services',
+        refresh: true,
+        id: servicesDocId,
+        body: {
+            names: services
+        }
+    };
+
+    client.index(args, function(err, resp, respcode) {
+        var params = {
+            isServicesActive: true,
+            items: services.length > 0 ? services : [''],
+            workersUrl: '/settings/workers',
+            servicesUrl: '#'
+        };
+
+        if (err) {
+            var messages;
+            if (err instanceof esErrors.NoConnections)
+                messages = [{msg: req.i18n.__('Database connection error')}];
+            else
+                messages = [{msg: req.i18n.__('Database error')}];
+            console.error(err);
+            params.flash = {
+                type: 'alert-danger',
+                messages: messages
+            };
+        }
+
+        res.render('settings', params);
     });
 });
 
