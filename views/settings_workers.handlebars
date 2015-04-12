@@ -1,13 +1,24 @@
 {{> settings_header }}
 
 <div class="settings-content">
+
+{{#flash}}
+    <div class="alert {{type}}">
+        <ul>
+            {{#each messages}}
+                <li>{{msg}}</li>
+            {{/each}}
+        </ul>
+    </div>
+{{/flash}}
+
 <form class="form-horizontal" method="post" action='' id="form">
     <div class="form-controls" id="form-controls">
         {{#each workers}}
         <div class="form-group">
             <label class="control-label col-sm-2" for="name">{{{../__ 'Name'}}}</label>
             <div class="col-sm-8">
-                <input class="form-control" type="text" name="name" placeholder="{{{../__ 'Name'}}}" value="{{this}}">
+                <input data-original-value="{{this}}" class="form-control" type="text" name="name" placeholder="{{{../__ 'Name'}}}" value="{{this}}">
             </div>
             {{#if @first}}
             <button class="btn btn-default btn-add">
@@ -86,9 +97,6 @@
             var $formControls = $('#form-controls');
             var $inputs = $formControls.find('input');
             $formControls.data('original-length', $inputs.length);
-            $inputs.each(function(e) {
-                $(this).data('original-value', $(this).val());
-            });
 
             $inputs.on('keyup', dirtyHandler);
             $formControls.find('.btn-remove').on('click', removeHandler);

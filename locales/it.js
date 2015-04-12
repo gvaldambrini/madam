@@ -23,5 +23,7 @@
 	"Search...": "Ricerca...",
 	"Settings": "Impostazioni",
 	"Workers": "Lavoratori",
-	"Services": "Servizi"
+	"Services": "Servizi",
+	"At least one worker is mandatory": "Almeno un lavorante è obbligatorio.",
+	"Database connection error": "Database connection error"
 }

@@ -22,5 +22,7 @@
 	"Search...": "Search...",
 	"Settings": "Settings",
 	"Workers": "Workers",
-	"Services": "Services"
+	"Services": "Services",
+	"At least one worker is mandatory": "At least one worker is mandatory",
+	"Database connection error": "Database connection error"
 }

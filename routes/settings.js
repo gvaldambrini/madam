@@ -4,6 +4,7 @@ var router = express.Router();
 var settingsPath = '/settings';
 
 var elasticsearch = require('elasticsearch');
+var esErrors = elasticsearch.errors;
 var utils = require('../utils');
 var client = utils.createClient();
 
@@ -42,6 +43,19 @@ router.post('/workers', function(req, res, next) {
         names = [names];
 
     var workers = names.filter(function(e) { return e; });
+    if (workers.length == 0) {
+        res.render('settings_workers', {
+            isWorkersActive: true,
+            flash: {
+                type: 'alert-danger',
+                messages: [{msg: req.i18n.__('At least one worker is mandatory')}]
+            },
+            workers: [''],
+            workersUrl: '#',
+            servicesUrl: '/settings/services'
+        });
+        return;
+    }
 
     var args = {
         index: 'main',
@@ -54,17 +68,27 @@ router.post('/workers', function(req, res, next) {
     };
 
     client.index(args, function(err, resp, respcode) {
-        if (err) {
-            console.error(err);
-            // TODO: display the error in the ui.
-        }
-
-        res.render('settings_workers', {
+        var params = {
             isWorkersActive: true,
             workers: workers.length > 0 ? workers : [''],
             workersUrl: '#',
             servicesUrl: '/settings/services'
-        });
+        };
+
+        if (err) {
+            var messages;
+            if (err instanceof esErrors.NoConnections)
+                messages = [{msg: req.i18n.__('Database connection error')}];
+            else
+                messages = [{msg: req.i18n.__('Database error')}];
+            console.error(err);
+            params.flash = {
+                type: 'alert-danger',
+                messages: messages
+            };
+        }
+
+        res.render('settings_workers', params);
     });
 });
 
