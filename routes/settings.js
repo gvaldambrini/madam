@@ -28,9 +28,9 @@ router.get('/workers', function(req, res, next) {
         type: 'workers',
         id: workersDocId
     }, function(err, resp, respcode) {
-        res.render('settings_workers', {
+        res.render('settings', {
             isWorkersActive: true,
-            workers: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
+            items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
             workersUrl: '#',
             servicesUrl: '/settings/services'
         });
@@ -44,13 +44,13 @@ router.post('/workers', function(req, res, next) {
 
     var workers = names.filter(function(e) { return e; });
     if (workers.length == 0) {
-        res.render('settings_workers', {
+        res.render('settings', {
             isWorkersActive: true,
             flash: {
                 type: 'alert-danger',
                 messages: [{msg: req.i18n.__('At least one worker is mandatory')}]
             },
-            workers: [''],
+            items: [''],
             workersUrl: '#',
             servicesUrl: '/settings/services'
         });
@@ -70,7 +70,7 @@ router.post('/workers', function(req, res, next) {
     client.index(args, function(err, resp, respcode) {
         var params = {
             isWorkersActive: true,
-            workers: workers.length > 0 ? workers : [''],
+            items: workers.length > 0 ? workers : [''],
             workersUrl: '#',
             servicesUrl: '/settings/services'
         };
@@ -88,12 +88,13 @@ router.post('/workers', function(req, res, next) {
             };
         }
 
-        res.render('settings_workers', params);
+        res.render('settings', params);
     });
 });
 
 router.get('/services', function(req, res, next) {
-    res.render('settings_services', {
+    res.render('settings', {
+        items: [''],
         isServicesActive: true,
         workersUrl: '/settings/workers',
         servicesUrl: '#'
