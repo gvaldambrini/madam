@@ -1,8 +1,8 @@
 {{> settings_header }}
 
 <div class="settings-content">
-<form class="form-horizontal" method="post" action=''>
-    <div class="form-controls">
+<form class="form-horizontal" method="post" action='' id="form">
+    <div class="form-controls" id="form-controls">
         {{#each workers}}
         <div class="form-group">
             <label class="control-label col-sm-2" for="name">{{{../__ 'Name'}}}</label>
@@ -25,7 +25,7 @@
     <input type='hidden' name="_csrf" value="{{csrftoken}}">
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+            <button type="submit" class="btn btn-primary" name="submit" disabled="disabled">Submit</button>
         </div>
     </div>
     <script>
@@ -33,19 +33,66 @@
             event.preventDefault();
             event.stopPropagation();
             $(this).parents('.form-group:first').remove();
+            checkDirties();
+        }
+
+        function addHandler(event) {
+            event.preventDefault();
+            var $newEntry = $(this).parents('.form-group:first').clone().appendTo($('#form-controls'));
+            var $newInput = $newEntry.find('input');
+            $newInput.val('');
+            $newInput.data('original-value', '');
+            $newInput.removeClass('dirty');
+            $newInput.on('keyup', dirtyHandler);
+            $newEntry.find('.btn-add').removeClass('btn-add').addClass('btn-remove').html(
+                '<i class="glyphicon glyphicon-minus"></i>'
+            ).on('click', removeHandler);
+        }
+
+        // Loop over all the input fields to verify if someone is dirty or the original number of
+        // inputs is different from the current one.
+        function checkDirties() {
+            function filterDirty(e) {
+                return $(this).hasClass('dirty');
+            }
+            var $inputs = $('#form-controls').find('input');
+
+            if ($inputs.filter(filterDirty).length == 0 &&
+                $inputs.length == $('#form-controls').data('original-length')) {
+                $('#form').find('.btn-primary').attr('disabled', 'disabled');
+            }
+            else {
+                $('#form').find('.btn-primary').removeAttr('disabled');
+            }
+        }
+
+        function dirtyHandler(event) {
+            var dirty = $(this).val() != $(this).data('original-value');
+            if (dirty) {
+                $(this).addClass('dirty');
+                // there is no need to check every field, we can just enable
+                // the submit button.
+                $('#form').find('.btn-primary').removeAttr('disabled');
+            }
+            else {
+                $(this).removeClass('dirty');
+                checkDirties();
+            }
         }
 
         $(document).ready(function() {
-            $('.btn-add').on('click', function(event) {
-                event.preventDefault();
-                var form = $('.form-controls');
-                var newEntry = $(this).parents('.form-group:first').clone().appendTo(form);
-                newEntry.find('input').val('');
-                newEntry.find('.btn-add').removeClass('btn-add').addClass('btn-remove').html(
-                    '<i class="glyphicon glyphicon-minus"></i>'
-                ).on('click', removeHandler);
+            // Set the initial state on the input elements to detect if any of them has been
+            // modified.
+            var $formControls = $('#form-controls');
+            var $inputs = $formControls.find('input');
+            $formControls.data('original-length', $inputs.length);
+            $inputs.each(function(e) {
+                $(this).data('original-value', $(this).val());
             });
-            $('.btn-remove').on('click', removeHandler);
+
+            $inputs.on('keyup', dirtyHandler);
+            $formControls.find('.btn-remove').on('click', removeHandler);
+            $formControls.find('.btn-add').on('click', addHandler);
         })
     </script>
 </form>

@@ -170,3 +170,7 @@ body {
  .settings-content {
    margin-top: 20px;
  }
+
+input.form-control.dirty {
+  background-color: #CCFFFF;
+}
