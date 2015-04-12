@@ -255,9 +255,9 @@ var customerUtils = {
             else {
                 var messages;
                 if (err instanceof esErrors.NoConnections)
-                    messages = ['Database connection error'];
+                    messages = [{msg: that.req.i18n.__('Database connection error')}];
                 else
-                    messages = ['Database error'];
+                    messages = [{msg: that.req.i18n.__('Database error')}];
                 console.error(err);
 
                 that.res.render('customer', {
