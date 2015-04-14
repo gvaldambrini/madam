@@ -228,9 +228,15 @@ var customerUtils = {
 
         var errors = this.req.validationErrors();
         if (errors) {
+            var appDisabled = typeof this.req.params.id == 'undefined';
+
             this.res.render('customer', {
                 title: title,
                 form_names: this.formNames(),
+                isInfoActive: true,
+                isAppointmentsDisabled: appDisabled,
+                appointmentsUrl: appDisabled ? '#' :
+                    getCustomerUrl(this.req, this.req.params.id + '/appointments'),
                 flash: { type: 'alert-danger', messages: errors},
                 obj: this.req.body
             });
@@ -260,9 +266,14 @@ var customerUtils = {
                     messages = [{msg: that.req.i18n.__('Database error')}];
                 console.error(err);
 
+                var appDisabled = typeof that.req.params.id == 'undefined';
                 that.res.render('customer', {
                     title: title,
                     form_names: that.formNames(),
+                    isInfoActive: true,
+                    isAppointmentsDisabled: appDisabled,
+                    appointmentsUrl: appDisabled ? '#' :
+                        getCustomerUrl(that.req, that.req.params.id + '/appointments'),
                     flash: { type: 'alert-danger', messages: messages},
                     obj: that.req.body
                 });
@@ -281,6 +292,9 @@ router.get('/new', function(req, res, next) {
     res.render('customer', {
         title: req.i18n.__('Create new customer'),
         form_names: customerUtils.formNames(),
+        isInfoActive: true,
+        isAppointmentsDisabled: true,
+        appointmentsUrl: '#',
         obj: {}
     });
 });
@@ -305,6 +319,9 @@ router.get('/:id/edit', function(req, res, next) {
         res.render('customer', {
             title: getTitle(resp._source),
             form_names: customerUtils.formNames(),
+            isInfoActive: true,
+            isAppointmentsDisabled: false,
+            appointmentsUrl: getCustomerUrl(req, req.params.id + '/appointments'),
             obj: customerUtils.toViewFormat(resp._source)
         });
     });
@@ -317,6 +334,15 @@ router.post('/:id/edit', function(req, res, next) {
         id: req.params.id
     }, function(err, resp, respcode) {
         customerUtils.handleForm(getTitle(resp._source));
+    });
+});
+
+router.get('/:id/appointments', function(req, res, next) {
+    res.render('appointments', {
+        title: req.i18n.__('Appointments'),
+        infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
+        isAppointmentsActive: true,
+        appointmentsUrl: '#'
     });
 });
 

@@ -1,0 +1,10 @@
+<div class="content-header">
+    <ul>
+        <li role="presentation" {{#if isInfoActive}}class="active"{{/if}}>
+            <a href="{{#if isInfoActive}}#{{else}}{{infoUrl}}{{/if}}">{{{__ 'Info'}}}</a>
+        </li>
+        <li role="presentation" {{#if isAppointmentsActive}}class="active"{{/if}}{{#if isAppointmentsDisabled}}class="disabled"{{/if}}>
+            <a href="{{appointmentsUrl}}">{{{__ 'Appointments'}}}</a>
+        </li>
+    </ul>
+</div>

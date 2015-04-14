@@ -25,5 +25,7 @@
 	"Workers": "Lavoratori",
 	"Services": "Servizi",
 	"At least one worker is mandatory": "Almeno un lavorante è obbligatorio.",
-	"Database connection error": "Database connection error"
+	"Database connection error": "Database connection error",
+	"Info": "Info",
+	"Appointments": "Appuntamenti"
 }

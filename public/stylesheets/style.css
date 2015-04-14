@@ -167,7 +167,13 @@ body {
   font-weight: bold;
  }
 
- .settings-content {
+.content-header li.disabled > a {
+  color: #C3B6B6;
+  pointer-events: none;
+  cursor: default;
+}
+
+ .settings-content, .customer-content {
    margin-top: 20px;
  }
 
