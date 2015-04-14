@@ -70,7 +70,7 @@ function processElasticsearchResults(req, hits) {
             phone_mpbile = phone;
 
         results[results.length] = {
-            edit_url: getCustomerUrl(req, 'edit/' + hits[i]._id),
+            edit_url: getCustomerUrl(req, hits[i]._id + '/edit'),
             name: getField(hits[i], 'name', 'autocomplete'),
             surname: getField(hits[i], 'surname', 'autocomplete'),
             phone: phone_mpbile,
@@ -272,7 +272,7 @@ var customerUtils = {
 };
 
 
-router.use(['/new', '/edit*'], function (req, res, next) {
+router.use(['/new', '*edit'], function (req, res, next) {
     customerUtils.init(req, res);
     next();
 });
@@ -296,7 +296,7 @@ function getTitle(esObj) {
     return 'Edit ' + esObj.name;
 }
 
-router.get('/edit/:id', function(req, res, next) {
+router.get('/:id/edit', function(req, res, next) {
     client.get({
         index:'main',
         type:'customer',
@@ -310,7 +310,7 @@ router.get('/edit/:id', function(req, res, next) {
     });
 });
 
-router.post('/edit/:id', function(req, res, next) {
+router.post('/:id/edit', function(req, res, next) {
     client.get({
         index:'main',
         type:'customer',
