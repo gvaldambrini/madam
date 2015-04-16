@@ -338,13 +338,46 @@ router.post('/:id/edit', function(req, res, next) {
 });
 
 router.get('/:id/appointments', function(req, res, next) {
-    res.render('appointments', {
-        title: req.i18n.__('Appointments'),
-        infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
-        isAppointmentsActive: true,
-        appointmentsUrl: '#'
+    client.mget({
+        body: {
+            docs: [
+                {_index: 'main', _type: 'workers', _id: utils.workersDocId},
+                {_index: 'main', _type: 'services', _id: utils.servicesDocId}
+            ]
+        }
+    }, function(err, resp, respcode) {
+        res.render('appointments', {
+            title: req.i18n.__('Appointments'),
+            infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
+            isAppointmentsActive: true,
+            appointmentsUrl: '#',
+            workers: resp.docs[0]._source['names'],
+            services: resp.docs[1]._source['names']
+        });
     });
 });
+
+// TODO: replace with the real implementation!
+router.post('/:id/appointments', function(req, res, next) {
+    client.mget({
+        body: {
+            docs: [
+                {_index: 'main', _type: 'workers', _id: utils.workersDocId},
+                {_index: 'main', _type: 'services', _id: utils.servicesDocId}
+            ]
+        }
+    }, function(err, resp, respcode) {
+        res.render('appointments', {
+            title: req.i18n.__('Appointments'),
+            infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
+            isAppointmentsActive: true,
+            appointmentsUrl: '#',
+            workers: resp.docs[0]._source['names'],
+            services: resp.docs[1]._source['names']
+        });
+    });
+});
+
 
 module.exports.router = router;
 module.exports.path = customersPath;

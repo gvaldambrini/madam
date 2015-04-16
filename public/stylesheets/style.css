@@ -173,10 +173,14 @@ body {
   cursor: default;
 }
 
- .settings-content, .customer-content {
+ .settings-content, .customer-content, .appointments-content {
    margin-top: 20px;
  }
 
 input.form-control.dirty {
   background-color: #CCFFFF;
+}
+
+.appointments-content form {
+  margin-top: 30px;
 }

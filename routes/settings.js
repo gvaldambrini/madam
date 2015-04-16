@@ -8,10 +8,6 @@ var esErrors = elasticsearch.errors;
 var utils = require('../utils');
 var client = utils.createClient();
 
-// For simplicity, we hardcode the id for the workers and services documents
-var workersDocId = '0b78ce22-a667-423b-bdb4-9a09b64dcf7c';
-var servicesDocId = '5678a632-9d9a-43c9-b440-4f6e1f6dfea7';
-
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'settings'
   response.locals.isSettingsActive = true;
@@ -27,7 +23,7 @@ router.get('/workers', function(req, res, next) {
     client.get({
         index: 'main',
         type: 'workers',
-        id: workersDocId
+        id: utils.workersDocId
     }, function(err, resp, respcode) {
         res.render('settings', {
             isWorkersActive: true,
@@ -62,7 +58,7 @@ router.post('/workers', function(req, res, next) {
         index: 'main',
         type: 'workers',
         refresh: true,
-        id: workersDocId,
+        id: utils.workersDocId,
         body: {
             names: workers
         }
@@ -97,7 +93,7 @@ router.get('/services', function(req, res, next) {
     client.get({
         index: 'main',
         type: 'services',
-        id: servicesDocId
+        id: utils.servicesDocId
     }, function(err, resp, respcode) {
         res.render('settings', {
             isServicesActive: true,
@@ -132,7 +128,7 @@ router.post('/services', function(req, res, next) {
         index: 'main',
         type: 'services',
         refresh: true,
-        id: servicesDocId,
+        id: utils.servicesDocId,
         body: {
             names: services
         }

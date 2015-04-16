@@ -27,5 +27,8 @@
 	"At least one worker is mandatory": "Almeno un lavorante è obbligatorio.",
 	"Database connection error": "Database connection error",
 	"Info": "Info",
-	"Appointments": "Appuntamenti"
+	"Appointments": "Appuntamenti",
+	"Create new": "Crea nuovo",
+	"Prev": "Prec",
+	"Next": "Succ"
 }

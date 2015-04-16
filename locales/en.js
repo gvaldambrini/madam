@@ -26,5 +26,8 @@
 	"At least one worker is mandatory": "At least one worker is mandatory",
 	"Database connection error": "Database connection error",
 	"Info": "Info",
-	"Appointments": "Appointments"
+	"Appointments": "Appointments",
+	"Create new": "Create new",
+	"Prev": "Prev",
+	"Next": "Next"
 }
