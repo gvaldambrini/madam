@@ -312,8 +312,8 @@ function getTitle(esObj) {
 
 router.get('/:id/edit', function(req, res, next) {
     client.get({
-        index:'main',
-        type:'customer',
+        index: 'main',
+        type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
         res.render('customer', {
@@ -329,8 +329,8 @@ router.get('/:id/edit', function(req, res, next) {
 
 router.post('/:id/edit', function(req, res, next) {
     client.get({
-        index:'main',
-        type:'customer',
+        index: 'main',
+        type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
         customerUtils.handleForm(getTitle(resp._source));
