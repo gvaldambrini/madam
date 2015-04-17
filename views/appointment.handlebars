@@ -1,0 +1,76 @@
+{{> customer_header }}
+
+<div class="appointments-content">
+    <form id="form" class="form-horizontal" method="post">
+        {{> input_date name='date' label='Date'}}
+        {{#each services}}
+        <div class="form-group">
+          <div class="col-sm-12">
+            <div class="input-group">
+              <span class="input-group-addon">
+                <input type="checkbox" name="cb_enable" value="{{@index}}">
+              </span>
+              <input type="text" class="form-control" value="{{this}}" name="service">
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default btn-click">{{../workers.[0]}}</button>
+                <input type="hidden" name="worker" value="{{../workers.[0]}}">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                    {{#each ../workers}}
+                    <li><a href="#">{{this}}</a></li>
+                    {{/each}}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+
+        <input type='hidden' name="_csrf" value="{{csrftoken}}">
+        <div class="form-group">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type='text/javascript'>
+    // change the current worker to be the next one
+    function handleWorkerClick(event) {
+        var $groupBtn = $(this).closest('.input-group-btn');
+        var $workers = $groupBtn.find('ul a').map(function() { return $(this).text(); });
+        var newIndex = ($.inArray($(this).text(), $workers) + 1) % $workers.length;
+        var newText = $workers[newIndex];
+
+        $(this).text(newText);
+        $groupBtn.find('input').val(newText);
+    }
+
+    // set the current worker from the selected one in the dropdown
+    function handleWorkerSelect(event) {
+        var newText = $(this).text();
+
+        var $groupBtn = $(this).closest('.input-group-btn');
+        $groupBtn.find('button:eq(0)').text(newText);
+        $groupBtn.find('input').val(newText);
+    }
+
+    $(document).ready(function() {
+        $.fn.datepicker.defaults.format = "{{config.date_format}}".toLowerCase();
+
+        var $form = $('#form');
+        $form.find('.input-group-btn button.btn-click').on('click', handleWorkerClick);
+        $form.find('.input-group-btn ul a').on('click', handleWorkerSelect);
+        $form.find('#date-container .input-group.date').datepicker({
+            language: '{{config.language}}',
+            format: "{{config.date_format}}".toLowerCase(),
+            weekStart: 1,
+            daysOfWeekDisabled: "0",
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "0d"
+        });
+    });
+</script>

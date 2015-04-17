@@ -28,6 +28,6 @@
 	"Info": "Info",
 	"Appointments": "Appointments",
 	"Create new": "Create new",
-	"Prev": "Prev",
-	"Next": "Next"
+	"New Appointment": "New Appointment",
+	"Date": "Date"
 }

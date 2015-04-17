@@ -136,6 +136,15 @@ router.get('/', exposeTemplates, function(req, res, next) {
     });
 });
 
+
+function toISODate(req, localFormattedDate) {
+    return moment.utc(localFormattedDate, req.config.date_format).format('YYYY-MM-DD');
+}
+
+function toLocalFormattedDate(req, ISODate) {
+    return moment.utc(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
+}
+
 var customerUtils = {
     init: function(req, res) {
         this.req = req;
@@ -143,11 +152,11 @@ var customerUtils = {
     },
 
     toISODate: function(localFormattedDate) {
-        return moment.utc(localFormattedDate, this.req.config.date_format).format('YYYY-MM-DD');
+        return toISODate(this.req, localFormattedDate);
     },
 
     toLocalFormattedDate: function(ISODate) {
-        return moment.utc(ISODate, 'YYYY-MM-DD').format(this.req.config.date_format);
+        return toLocalFormattedDate(this.req, ISODate);
     },
 
     formFields: ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see', 'allow_sms', 'allow_email'],
@@ -338,6 +347,40 @@ router.post('/:id/edit', function(req, res, next) {
 });
 
 router.get('/:id/appointments', function(req, res, next) {
+    client.get({
+        index: 'main',
+        type: 'customer',
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        var obj = resp._source;
+        if (typeof obj.appointments == 'undefined' || obj.appointments.length == 0)
+            res.redirect(getCustomerUrl(req, req.params.id + '/appointments/new'));
+        else {
+            function descFn(item) {
+                return item.description;
+            }
+
+            var appointments = [];
+            for (var i = 0; i < obj.appointments.length; i++) {
+                appointments.push({
+                    date: obj.appointments[i].date,
+                    services: obj.appointments[i].services.map(descFn).join(' - ')
+                });
+            }
+
+            res.render('appointments', {
+                title: req.i18n.__('Appointments'),
+                infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
+                isAppointmentsActive: true,
+                appointmentsUrl: getCustomerUrl(req, req.params.id + '/appointments'),
+                newAppointmentUrl: getCustomerUrl(req, req.params.id + '/appointments/new'),
+                appointments: appointments
+            });
+        }
+    });
+});
+
+router.get('/:id/appointments/new', function(req, res, next) {
     client.mget({
         body: {
             docs: [
@@ -346,18 +389,18 @@ router.get('/:id/appointments', function(req, res, next) {
             ]
         }
     }, function(err, resp, respcode) {
-        res.render('appointments', {
-            title: req.i18n.__('Appointments'),
+        res.render('appointment', {
+            title: req.i18n.__('New Appointment'),
             infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
             isAppointmentsActive: true,
-            appointmentsUrl: '#',
+            appointmentsUrl: getCustomerUrl(req, req.params.id + '/appointments'),
             workers: resp.docs[0]._source['names'],
             services: resp.docs[1]._source['names']
         });
     });
 });
 
-router.post('/:id/appointments', function(req, res, next) {
+router.post('/:id/appointments/new', function(req, res, next) {
 
     // starting from es 1.4.3 groovy dynamic scripting is no longer available
     // by default, so we fallback to a get/update implementation.
@@ -371,12 +414,12 @@ router.post('/:id/appointments', function(req, res, next) {
         var version = resp._version;
         var obj = resp._source;
 
-        function filter_fn(item, index) {
+        function filterFn(item, index) {
             return req.body.cb_enable.indexOf(index.toString()) != -1;
         }
 
-        var descriptions = req.body.service.filter(filter_fn);
-        var workers = req.body.worker.filter(filter_fn);
+        var descriptions = req.body.service.filter(filterFn);
+        var workers = req.body.worker.filter(filterFn);
 
         var services = [];
         for (var i = 0; i < descriptions.length; i++) {
@@ -390,6 +433,7 @@ router.post('/:id/appointments', function(req, res, next) {
             obj.appointments = [];
 
         obj.appointments.push({
+            date: toISODate(req, req.body.date),
             services: services
         });
 
@@ -418,11 +462,11 @@ router.post('/:id/appointments', function(req, res, next) {
                         ]
                     }
                 }, function(err, resp, respcode) {
-                    res.render('appointments', {
-                        title: req.i18n.__('Appointments'),
+                    res.render('appointment', {
+                        title: req.i18n.__('New Appointment'),
                         infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
                         isAppointmentsActive: true,
-                        appointmentsUrl: '#',
+                        appointmentsUrl: getCustomerUrl(req, req.params.id + '/appointments'),
                         workers: resp.docs[0]._source['names'],
                         services: resp.docs[1]._source['names']
                     });

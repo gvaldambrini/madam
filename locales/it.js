@@ -29,6 +29,6 @@
 	"Info": "Info",
 	"Appointments": "Appuntamenti",
 	"Create new": "Crea nuovo",
-	"Prev": "Prec",
-	"Next": "Succ"
+	"New Appointment": "Nuovo Appuntamento",
+	"Date": "Data"
 }
