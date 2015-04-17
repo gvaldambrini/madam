@@ -50,7 +50,7 @@
             $(document).ready(function() {
                 // this trick is required to set the selected date respecting the date format
                 $.fn.datepicker.defaults.format = "{{config.date_format}}".toLowerCase();
-                $('form input').map(function() {
+                $('form input').each(function() {
                     var name = $(this).attr('name');
                     if (typeof customerData[name] !== 'undefined') {
                         if (name == 'first_see' || name == 'last_see') {
