@@ -357,23 +357,77 @@ router.get('/:id/appointments', function(req, res, next) {
     });
 });
 
-// TODO: replace with the real implementation!
 router.post('/:id/appointments', function(req, res, next) {
-    client.mget({
-        body: {
-            docs: [
-                {_index: 'main', _type: 'workers', _id: utils.workersDocId},
-                {_index: 'main', _type: 'services', _id: utils.servicesDocId}
-            ]
-        }
+
+    // starting from es 1.4.3 groovy dynamic scripting is no longer available
+    // by default, so we fallback to a get/update implementation.
+
+    client.get({
+        index: 'main',
+        type: 'customer',
+        id: req.params.id
     }, function(err, resp, respcode) {
-        res.render('appointments', {
-            title: req.i18n.__('Appointments'),
-            infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
-            isAppointmentsActive: true,
-            appointmentsUrl: '#',
-            workers: resp.docs[0]._source['names'],
-            services: resp.docs[1]._source['names']
+
+        var version = resp._version;
+        var obj = resp._source;
+
+        function filter_fn(item, index) {
+            return req.body.cb_enable.indexOf(index.toString()) != -1;
+        }
+
+        var descriptions = req.body.service.filter(filter_fn);
+        var workers = req.body.worker.filter(filter_fn);
+
+        var services = [];
+        for (var i = 0; i < descriptions.length; i++) {
+            services.push({
+                description: descriptions[i],
+                worker: workers[i]
+            });
+        }
+
+        if (typeof obj.appointments == 'undefined')
+            obj.appointments = [];
+
+        obj.appointments.push({
+            services: services
+        });
+
+        client.update({
+            index: 'main',
+            type: 'customer',
+            id: req.params.id,
+            version: version,
+            body: {
+                doc: obj
+            }
+        }, function(err, resp, respcode) {
+
+            if (!err) {
+                res.redirect(getCustomerUrl(req, req.params.id + '/appointments'));
+            }
+            else {
+                console.log(err);
+                // TODO: render errors
+
+                client.mget({
+                    body: {
+                        docs: [
+                            {_index: 'main', _type: 'workers', _id: utils.workersDocId},
+                            {_index: 'main', _type: 'services', _id: utils.servicesDocId}
+                        ]
+                    }
+                }, function(err, resp, respcode) {
+                    res.render('appointments', {
+                        title: req.i18n.__('Appointments'),
+                        infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
+                        isAppointmentsActive: true,
+                        appointmentsUrl: '#',
+                        workers: resp.docs[0]._source['names'],
+                        services: resp.docs[1]._source['names']
+                    });
+                });
+            }
         });
     });
 });

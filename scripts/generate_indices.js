@@ -155,7 +155,8 @@ function createCustomerType(callback) {
                             date: {type: 'date'},
                             services: {
                                 properties: {
-                                    description: {type: 'string'}
+                                    description: {type: 'string'},
+                                    worker: {type: 'string'}
                                 }
                             },
                             satisfaction: {type: 'integer'},
