@@ -76,7 +76,7 @@ function processElasticsearchResults(req, hits) {
             phone_mpbile = phone;
 
         results[results.length] = {
-            edit_url: getCustomerUrl(req, 'edit', hits[i]._id),
+            urlEdit: getCustomerUrl(req, 'edit', hits[i]._id),
             name: getField(hits[i], 'name', 'autocomplete'),
             surname: getField(hits[i], 'surname', 'autocomplete'),
             phone: phone_mpbile,
@@ -141,8 +141,8 @@ router.get('/', exposeTemplates, function(req, res, next) {
                 search: req.i18n.__('Search...'),
             },
             customers: results,
-            newCustomerUrl: getCustomersUrl(req, 'new'),
-            searchUrl: getCustomersUrl(req, 'search')
+            urlNew: getCustomersUrl(req, 'new'),
+            urlSearch: getCustomersUrl(req, 'search')
         });
     });
 });
@@ -409,7 +409,7 @@ router.get('/:id/appointments', function(req, res, next) {
                 infoUrl: getCustomerUrl(req, 'edit'),
                 isAppointmentsActive: true,
                 appointmentsUrl: getCustomerUrl(req, 'appointments'),
-                newAppointmentUrl: getCustomerUrl(req, 'appointments/new'),
+                urlNew: getCustomerUrl(req, 'appointments/new'),
                 appointments: appointments
             });
         }

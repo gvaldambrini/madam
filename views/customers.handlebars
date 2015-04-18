@@ -1,6 +1,6 @@
 
 <div class="content-header">
-<a href='{{newCustomerUrl}}' class='btn btn-primary'>{{i18n.createNewCustomer}}</a>
+<a href='{{urlNew}}' class='btn btn-primary'>{{i18n.createNewCustomer}}</a>
 <form class="search-form">
     <input id="search-input" type="text" placeholder="{{i18n.search}}" class="form-control">
     <span id="search-clear" class="glyphicon glyphicon-remove-circle"></span>
@@ -28,7 +28,7 @@
             var text = $(this).val();
             if (text) {
                 $.ajax({
-                    url: '{{searchUrl}}',
+                    url: '{{urlSearch}}',
                     data: {
                         text: text
                     },
