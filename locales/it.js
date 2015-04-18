@@ -17,18 +17,20 @@
 	"To set allow email, you must specify an email": "Per impostare invia email, è necessario impostare un'email",
 	"The first date does not seem a valid date": "Prima volta non sembra essere una data valida",
 	"The last date does not seem a valid date": "Ultima volta non sembra essere una data valida",
-	"The email does not seem a valid email": "The email does not seem a valid email",
+	"The email does not seem a valid email": "L'email non sembra valida",
 	"Home": "Home",
 	"Products": "Prodotti",
 	"Search...": "Ricerca...",
 	"Settings": "Impostazioni",
 	"Workers": "Lavoratori",
 	"Services": "Servizi",
-	"At least one worker is mandatory": "Almeno un lavorante è obbligatorio.",
+	"At least one worker is mandatory": "Almeno un lavorante è obbligatorio",
+	"At least one service is mandatory": "Almeno un servizio è obbligatorio",
 	"Database connection error": "Database connection error",
 	"Info": "Info",
 	"Appointments": "Appuntamenti",
 	"Create new": "Crea nuovo",
 	"New Appointment": "Nuovo Appuntamento",
-	"Date": "Data"
+	"Date": "Data",
+	"Edit": "Modifica"
 }

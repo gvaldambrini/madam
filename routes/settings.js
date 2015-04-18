@@ -11,7 +11,6 @@ var client = utils.createClient();
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'settings'
   response.locals.isSettingsActive = true;
-  response.locals.title = request.i18n.__('Settings'),
   next();
 });
 
@@ -26,6 +25,12 @@ router.get('/workers', function(req, res, next) {
         id: utils.workersDocId
     }, function(err, resp, respcode) {
         res.render('settings', {
+            i18n: {
+                title: req.i18n.__('Settings'),
+                name: req.i18n.__('Name'),
+                workers: req.i18n.__('Workers'),
+                services: req.i18n.__('Services')
+            },
             isWorkersActive: true,
             items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
             workersUrl: '#',
@@ -42,6 +47,12 @@ router.post('/workers', function(req, res, next) {
     var workers = names.filter(function(e) { return e; });
     if (workers.length == 0) {
         res.render('settings', {
+            i18n: {
+                title: req.i18n.__('Settings'),
+                name: req.i18n.__('Name'),
+                workers: req.i18n.__('Workers'),
+                services: req.i18n.__('Services')
+            },
             isWorkersActive: true,
             flash: {
                 type: 'alert-danger',
@@ -66,6 +77,12 @@ router.post('/workers', function(req, res, next) {
 
     client.index(args, function(err, resp, respcode) {
         var params = {
+            i18n: {
+                title: req.i18n.__('Settings'),
+                name: req.i18n.__('Name'),
+                workers: req.i18n.__('Workers'),
+                services: req.i18n.__('Services')
+            },
             isWorkersActive: true,
             items: workers.length > 0 ? workers : [''],
             workersUrl: '#',
@@ -96,6 +113,12 @@ router.get('/services', function(req, res, next) {
         id: utils.servicesDocId
     }, function(err, resp, respcode) {
         res.render('settings', {
+            i18n: {
+                title: req.i18n.__('Settings'),
+                name: req.i18n.__('Name'),
+                workers: req.i18n.__('Workers'),
+                services: req.i18n.__('Services')
+            },
             isServicesActive: true,
             items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
             workersUrl: '/settings/workers',
@@ -112,6 +135,12 @@ router.post('/services', function(req, res, next) {
     var services = names.filter(function(e) { return e; });
     if (services.length == 0) {
         res.render('settings', {
+            i18n: {
+                title: req.i18n.__('Settings'),
+                name: req.i18n.__('Name'),
+                workers: req.i18n.__('Workers'),
+                services: req.i18n.__('Services')
+            },
             isServicesActive: true,
             flash: {
                 type: 'alert-danger',
@@ -136,6 +165,12 @@ router.post('/services', function(req, res, next) {
 
     client.index(args, function(err, resp, respcode) {
         var params = {
+            i18n: {
+                title: req.i18n.__('Settings'),
+                name: req.i18n.__('Name'),
+                workers: req.i18n.__('Workers'),
+                services: req.i18n.__('Services')
+            },
             isServicesActive: true,
             items: services.length > 0 ? services : [''],
             workersUrl: '/settings/workers',

@@ -11,7 +11,6 @@ var moment = require('moment');
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'customers'
   response.locals.isCustomersActive = true;
-  response.locals.title = request.i18n.__('Customers'),
   next();
 });
 
@@ -136,6 +135,11 @@ router.get('/', exposeTemplates, function(req, res, next) {
     }, function(err, resp, respcode) {
         var results = processElasticsearchResults(req, resp.hits.hits);
         res.render('customers', {
+            i18n: {
+                title: req.i18n.__('Customers'),
+                createNewCustomer: req.i18n.__('Create new customer'),
+                search: req.i18n.__('Search...'),
+            },
             customers: results,
             newCustomerUrl: getCustomersUrl(req, 'new'),
             searchUrl: getCustomersUrl(req, 'search')
@@ -178,7 +182,8 @@ var customerUtils = {
             'email': this.req.i18n.__('Email'),
             'allow_email': this.req.i18n.__('Allow email'),
             'first_see': this.req.i18n.__('First see'),
-            'last_see': this.req.i18n.__('Last see')
+            'last_see': this.req.i18n.__('Last see'),
+            'discount': this.req.i18n.__('Discount')
         };
     },
 
@@ -245,10 +250,13 @@ var customerUtils = {
         var errors = this.req.validationErrors();
         if (errors) {
             var appDisabled = typeof this.req.params.id == 'undefined';
+            var i18n = customerUtils.formNames();
+            i18n.title = title;
+            i18n.info = this.req.i18n.__('Info');
+            i18n.appointments = this.req.i18n.__('Appointments');
 
             this.res.render('customer', {
-                title: title,
-                form_names: this.formNames(),
+                i18n: i18n,
                 isInfoActive: true,
                 isAppointmentsDisabled: appDisabled,
                 appointmentsUrl: appDisabled ? '#' :
@@ -283,9 +291,14 @@ var customerUtils = {
                 console.error(err);
 
                 var appDisabled = typeof that.req.params.id == 'undefined';
+                var i18n = customerUtils.formNames();
+                i18n.title = title;
+                i18n.info = that.req.i18n.__('Info');
+                i18n.appointments = that.req.i18n.__('Appointments');
+
+
                 that.res.render('customer', {
-                    title: title,
-                    form_names: that.formNames(),
+                    i18n: i18n,
                     isInfoActive: true,
                     isAppointmentsDisabled: appDisabled,
                     appointmentsUrl: appDisabled ? '#' :
@@ -305,9 +318,14 @@ router.use(['/new', '*edit'], function (req, res, next) {
 });
 
 router.get('/new', function(req, res, next) {
+    var i18n = customerUtils.formNames();
+    i18n.title = req.i18n.__('Create new customer');
+    i18n.info = req.i18n.__('Info');
+    i18n.appointments = req.i18n.__('Appointments');
+
+
     res.render('customer', {
-        title: req.i18n.__('Create new customer'),
-        form_names: customerUtils.formNames(),
+        i18n: i18n,
         isInfoActive: true,
         isAppointmentsDisabled: true,
         appointmentsUrl: '#',
@@ -319,11 +337,11 @@ router.post('/new', function(req, res, next) {
     customerUtils.handleForm(req.i18n.__('Create new customer'));
 });
 
-function getTitle(esObj) {
+function getTitle(req, esObj) {
     if (esObj.name && esObj.surname)
-        return 'Edit ' + esObj.name + ' ' + esObj.surname;
+        return req.i18n.__('Edit') + ' ' + esObj.name + ' ' + esObj.surname;
 
-    return 'Edit ' + esObj.name;
+    return req.i18n.__('Edit') + ' ' + esObj.name;
 }
 
 router.get('/:id/edit', function(req, res, next) {
@@ -332,9 +350,13 @@ router.get('/:id/edit', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
+        var i18n = customerUtils.formNames();
+        i18n.title = getTitle(req, resp._source);
+        i18n.info = req.i18n.__('Info');
+        i18n.appointments = req.i18n.__('Appointments');
+
         res.render('customer', {
-            title: getTitle(resp._source),
-            form_names: customerUtils.formNames(),
+            i18n: i18n,
             isInfoActive: true,
             isAppointmentsDisabled: false,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
@@ -349,7 +371,7 @@ router.post('/:id/edit', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
-        customerUtils.handleForm(getTitle(resp._source));
+        customerUtils.handleForm(getTitle(req, resp._source));
     });
 });
 
@@ -376,7 +398,14 @@ router.get('/:id/appointments', function(req, res, next) {
             }
 
             res.render('appointments', {
-                title: req.i18n.__('Appointments'),
+                i18n: {
+                    title: req.i18n.__('Appointments'),
+                    info: req.i18n.__('Info'),
+                    appointments: req.i18n.__('Appointments'),
+                    date: req.i18n.__('Date'),
+                    services: req.i18n.__('Services'),
+                    createNew: req.i18n.__('Create new')
+                },
                 infoUrl: getCustomerUrl(req, 'edit'),
                 isAppointmentsActive: true,
                 appointmentsUrl: getCustomerUrl(req, 'appointments'),
@@ -397,7 +426,12 @@ router.get('/:id/appointments/new', function(req, res, next) {
         }
     }, function(err, resp, respcode) {
         res.render('appointment', {
-            title: req.i18n.__('New Appointment'),
+            i18n: {
+                title: req.i18n.__('New Appointment'),
+                info: req.i18n.__('Info'),
+                appointments: req.i18n.__('Appointments'),
+                date: req.i18n.__('Date')
+            },
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
@@ -470,7 +504,12 @@ router.post('/:id/appointments/new', function(req, res, next) {
                     }
                 }, function(err, resp, respcode) {
                     res.render('appointment', {
-                        title: req.i18n.__('New Appointment'),
+                        i18n: {
+                            title: req.i18n.__('New Appointment'),
+                            info: req.i18n.__('Info'),
+                            appointments: req.i18n.__('Appointments'),
+                            date: req.i18n.__('Date')
+                        },
                         infoUrl: getCustomerUrl(req, 'edit'),
                         isAppointmentsActive: true,
                         appointmentsUrl: getCustomerUrl(req, 'appointments'),

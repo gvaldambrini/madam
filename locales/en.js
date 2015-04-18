@@ -17,6 +17,7 @@
 	"To set allow email, you must specify an email": "To set allow email, you must specify an email",
 	"The first date does not seem a valid date": "The first date does not seem a valid date",
 	"The last date does not seem a valid date": "The last date does not seem a valid date",
+	"The email does not seem a valid email": "The email does not seem a valid email",
 	"Home": "Home",
 	"Products": "Products",
 	"Search...": "Search...",
@@ -24,10 +25,12 @@
 	"Workers": "Workers",
 	"Services": "Services",
 	"At least one worker is mandatory": "At least one worker is mandatory",
+	"At least one service is mandatory": "At least one service is mandatory",
 	"Database connection error": "Database connection error",
 	"Info": "Info",
 	"Appointments": "Appointments",
 	"Create new": "Create new",
 	"New Appointment": "New Appointment",
-	"Date": "Date"
+	"Date": "Date",
+	"Edit": "Edit"
 }

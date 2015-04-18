@@ -16,9 +16,9 @@
     <div class="form-controls" id="form-controls">
         {{#each items}}
         <div class="form-group">
-            <label class="control-label col-sm-2" for="name">{{{../__ 'Name'}}}</label>
+            <label class="control-label col-sm-2" for="name">{{i18n.name}}</label>
             <div class="col-sm-8">
-                <input data-original-value="{{this}}" class="form-control" type="text" name="name" placeholder="{{{../__ 'Name'}}}" value="{{this}}">
+                <input data-original-value="{{this}}" class="form-control" type="text" name="name" placeholder="{{i18n.name}}" value="{{this}}">
             </div>
             {{#if @first}}
             <button class="btn btn-default btn-add">

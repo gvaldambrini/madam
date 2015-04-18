@@ -1,12 +1,12 @@
 {{> customer_header }}
 
 <div class="appointments-content">
-    <a href='{{newAppointmentUrl}}' class='btn btn-primary'>{{{__ 'Create new'}}}</a>
+    <a href='{{newAppointmentUrl}}' class='btn btn-primary'>{{i18n.createNew}}</a>
 
     <table class='table table-hover'>
         <thead>
-            <th>{{{__ 'Date'}}}</th>
-            <th>{{{__ 'Services'}}}</th>
+            <th>{{i18n.date}}</th>
+            <th>{{i18n.services}}</th>
         </thead>
         <tbody>
             {{#each appointments}}
