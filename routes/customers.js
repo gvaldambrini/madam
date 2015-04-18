@@ -15,7 +15,14 @@ router.use(function (request, response, next) {
   next();
 });
 
-function getCustomerUrl(req, route) {
+// Helper function to retrieve the url for a single customer based route
+function getCustomerUrl(req, route, customerId) {
+    var cid = typeof customerId == 'undefined' ? req.params.id : customerId;
+    return getCustomersUrl(req, cid + '/' + route);
+}
+
+// Helper function to retrieve the url for a customers based route
+function getCustomersUrl(req, route) {
     return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
 }
 
@@ -70,7 +77,7 @@ function processElasticsearchResults(req, hits) {
             phone_mpbile = phone;
 
         results[results.length] = {
-            edit_url: getCustomerUrl(req, hits[i]._id + '/edit'),
+            edit_url: getCustomerUrl(req, 'edit', hits[i]._id),
             name: getField(hits[i], 'name', 'autocomplete'),
             surname: getField(hits[i], 'surname', 'autocomplete'),
             phone: phone_mpbile,
@@ -130,8 +137,8 @@ router.get('/', exposeTemplates, function(req, res, next) {
         var results = processElasticsearchResults(req, resp.hits.hits);
         res.render('customers', {
             customers: results,
-            newCustomerUrl: getCustomerUrl(req, 'new'),
-            searchUrl: getCustomerUrl(req, 'search')
+            newCustomerUrl: getCustomersUrl(req, 'new'),
+            searchUrl: getCustomersUrl(req, 'search')
         });
     });
 });
@@ -245,7 +252,7 @@ var customerUtils = {
                 isInfoActive: true,
                 isAppointmentsDisabled: appDisabled,
                 appointmentsUrl: appDisabled ? '#' :
-                    getCustomerUrl(this.req, this.req.params.id + '/appointments'),
+                    getCustomerUrl(this.req, 'appointments'),
                 flash: { type: 'alert-danger', messages: errors},
                 obj: this.req.body
             });
@@ -282,7 +289,7 @@ var customerUtils = {
                     isInfoActive: true,
                     isAppointmentsDisabled: appDisabled,
                     appointmentsUrl: appDisabled ? '#' :
-                        getCustomerUrl(that.req, that.req.params.id + '/appointments'),
+                        getCustomerUrl(that.req, 'appointments'),
                     flash: { type: 'alert-danger', messages: messages},
                     obj: that.req.body
                 });
@@ -330,7 +337,7 @@ router.get('/:id/edit', function(req, res, next) {
             form_names: customerUtils.formNames(),
             isInfoActive: true,
             isAppointmentsDisabled: false,
-            appointmentsUrl: getCustomerUrl(req, req.params.id + '/appointments'),
+            appointmentsUrl: getCustomerUrl(req, 'appointments'),
             obj: customerUtils.toViewFormat(resp._source)
         });
     });
@@ -354,7 +361,7 @@ router.get('/:id/appointments', function(req, res, next) {
     }, function(err, resp, respcode) {
         var obj = resp._source;
         if (typeof obj.appointments == 'undefined' || obj.appointments.length == 0)
-            res.redirect(getCustomerUrl(req, req.params.id + '/appointments/new'));
+            res.redirect(getCustomerUrl(req, 'appointments/new'));
         else {
             function descFn(item) {
                 return item.description;
@@ -370,10 +377,10 @@ router.get('/:id/appointments', function(req, res, next) {
 
             res.render('appointments', {
                 title: req.i18n.__('Appointments'),
-                infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
+                infoUrl: getCustomerUrl(req, 'edit'),
                 isAppointmentsActive: true,
-                appointmentsUrl: getCustomerUrl(req, req.params.id + '/appointments'),
-                newAppointmentUrl: getCustomerUrl(req, req.params.id + '/appointments/new'),
+                appointmentsUrl: getCustomerUrl(req, 'appointments'),
+                newAppointmentUrl: getCustomerUrl(req, 'appointments/new'),
                 appointments: appointments
             });
         }
@@ -391,9 +398,9 @@ router.get('/:id/appointments/new', function(req, res, next) {
     }, function(err, resp, respcode) {
         res.render('appointment', {
             title: req.i18n.__('New Appointment'),
-            infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
+            infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
-            appointmentsUrl: getCustomerUrl(req, req.params.id + '/appointments'),
+            appointmentsUrl: getCustomerUrl(req, 'appointments'),
             workers: resp.docs[0]._source['names'],
             services: resp.docs[1]._source['names']
         });
@@ -448,7 +455,7 @@ router.post('/:id/appointments/new', function(req, res, next) {
         }, function(err, resp, respcode) {
 
             if (!err) {
-                res.redirect(getCustomerUrl(req, req.params.id + '/appointments'));
+                res.redirect(getCustomerUrl(req, 'appointments'));
             }
             else {
                 console.log(err);
@@ -464,9 +471,9 @@ router.post('/:id/appointments/new', function(req, res, next) {
                 }, function(err, resp, respcode) {
                     res.render('appointment', {
                         title: req.i18n.__('New Appointment'),
-                        infoUrl: getCustomerUrl(req, req.params.id + '/edit'),
+                        infoUrl: getCustomerUrl(req, 'edit'),
                         isAppointmentsActive: true,
-                        appointmentsUrl: getCustomerUrl(req, req.params.id + '/appointments'),
+                        appointmentsUrl: getCustomerUrl(req, 'appointments'),
                         workers: resp.docs[0]._source['names'],
                         services: resp.docs[1]._source['names']
                     });
