@@ -1,15 +1,7 @@
 {{> customer_header }}
 
 <div class="customer-content">
-    {{#flash}}
-        <div class="alert {{type}}">
-            <ul>
-                {{#each messages}}
-                    <li>{{msg}}</li>
-                {{/each}}
-            </ul>
-        </div>
-    {{/flash}}
+    {{> form_errors}}
 
     <form class="form-horizontal" method="post" action=''>
         {{> input type='text' name='name' label=i18n.name }}
