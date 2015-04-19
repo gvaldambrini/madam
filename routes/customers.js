@@ -250,7 +250,7 @@ var customerUtils = {
         var errors = this.req.validationErrors();
         if (errors) {
             var appDisabled = typeof this.req.params.id == 'undefined';
-            var i18n = customerUtils.formNames();
+            var i18n = this.formNames();
             i18n.title = title;
             i18n.info = this.req.i18n.__('Info');
             i18n.appointments = this.req.i18n.__('Appointments');
@@ -291,7 +291,7 @@ var customerUtils = {
                 console.error(err);
 
                 var appDisabled = typeof that.req.params.id == 'undefined';
-                var i18n = customerUtils.formNames();
+                var i18n = this.formNames();
                 i18n.title = title;
                 i18n.info = that.req.i18n.__('Info');
                 i18n.appointments = that.req.i18n.__('Appointments');
@@ -393,7 +393,8 @@ router.get('/:id/appointments', function(req, res, next) {
             for (var i = 0; i < obj.appointments.length; i++) {
                 appointments.push({
                     date: obj.appointments[i].date,
-                    services: obj.appointments[i].services.map(descFn).join(' - ')
+                    services: obj.appointments[i].services.map(descFn).join(' - '),
+                    urlEdit: getCustomerUrl(req, 'appointments/' + i + '/edit')
                 });
             }
 
@@ -416,6 +417,142 @@ router.get('/:id/appointments', function(req, res, next) {
     });
 });
 
+
+var appointmentUtil = {
+    init: function(req, res) {
+        this.req = req;
+        this.res = res;
+    },
+
+    handleForm: function(title) {
+        var that = this;
+        // starting from es 1.4.3 groovy dynamic scripting is no longer available
+        // by default, so we fallback to a get/update implementation.
+        client.mget({
+            body: {
+                docs: [
+                    {_index: 'main', _type: 'customer', _id: this.req.params.id},
+                    {_index: 'main', _type: 'workers', _id: utils.workersDocId}
+                ]
+            }
+        }, function(err, resp, respcode) {
+
+            function filterServices(req) {
+                function filterFn(item, index) {
+                    return that.req.body.enabled.indexOf(index.toString()) != -1;
+                }
+
+                var descriptions = that.req.body.service.filter(filterFn);
+                var workers = that.req.body.worker.filter(filterFn);
+
+                var services = [];
+                for (var i = 0; i < descriptions.length; i++) {
+                    services.push({
+                        description: descriptions[i],
+                        worker: workers[i]
+                    });
+                }
+                return services;
+            }
+
+            var version = resp.docs[0]._version;
+            var obj = resp.docs[0]._source;
+
+            var params = {
+                i18n: {
+                    title: title,
+                    info: that.req.i18n.__('Info'),
+                    appointments: that.req.i18n.__('Appointments'),
+                    date: that.req.i18n.__('Date')
+                },
+                infoUrl: getCustomerUrl(that.req, 'edit'),
+                isAppointmentsActive: true,
+                appointmentsUrl: getCustomerUrl(that.req, 'appointments'),
+                workers: resp.docs[1]._source['names'],
+                date: that.req.body.date
+            };
+
+            if (typeof that.req.body.enabled == 'undefined' || that.req.body.enabled.length == 0) {
+                var services = [];
+                for (var i = 0; i < that.req.body.service.length; i++) {
+                    services.push({
+                        description: that.req.body.service[i],
+                        worker: that.req.body.worker[i],
+                        checked: false
+                    });
+                }
+                params.services = services;
+                params.flash = {
+                    type: 'alert-danger',
+                    messages: [{msg: that.req.i18n.__('At least one service is mandatory')}]
+                };
+                that.res.render('appointment', params);
+                return;
+            }
+
+            var appointment = {
+                date: toISODate(that.req, that.req.body.date),
+                services: filterServices(that.req)
+            };
+
+            if (typeof that.req.params.appnum == 'undefined') {
+                if (typeof obj.appointments == 'undefined')
+                    obj.appointments = [];
+
+                obj.appointments.push(appointment);
+            }
+            else {
+                obj.appointments[that.req.params.appnum] = appointment;
+            }
+
+            client.update({
+                index: 'main',
+                type: 'customer',
+                id: that.req.params.id,
+                version: version,
+                body: {
+                    doc: obj
+                }
+            }, function(err, resp, respcode) {
+
+                if (!err) {
+                    that.res.redirect(getCustomerUrl(that.req, 'appointments'));
+                }
+                else {
+                    console.log(err);
+
+                    if (err instanceof esErrors.NoConnections)
+                        messages = [{msg: that.req.i18n.__('Database connection error')}];
+                    else
+                        messages = [{msg: that.req.i18n.__('Database error')}];
+
+                    var services = [];
+                    for (var i = 0; i < that.req.body.service.length; i++) {
+                        services.push({
+                            description: that.req.body.service[i],
+                            worker: that.req.body.worker[i],
+                            checked: that.req.body.enabled.indexOf(i.toString()) != -1
+                        });
+                    }
+                    params.services = services;
+                    params.flash = {
+                        type: 'alert-danger',
+                        messages: messages
+                    };
+                    that.res.render('appointment', params);
+                }
+            });
+        });
+
+    }
+
+};
+
+router.use(['/:id/appointments/new', '/:id/appointments/*edit'], function (req, res, next) {
+    appointmentUtil.init(req, res);
+    next();
+});
+
 router.get('/:id/appointments/new', function(req, res, next) {
     client.mget({
         body: {
@@ -425,9 +562,18 @@ router.get('/:id/appointments/new', function(req, res, next) {
             ]
         }
     }, function(err, resp, respcode) {
+        var firstWorker = resp.docs[0]._source['names'][0];
+        var services = [];
+        for (var i = 0; i < resp.docs[1]._source['names'].length; i++) {
+            services.push({
+                description: resp.docs[1]._source['names'][i],
+                worker: firstWorker,
+                checked: false
+            });
+        }
         res.render('appointment', {
             i18n: {
-                title: req.i18n.__('New Appointment'),
+                title: req.i18n.__('New appointment'),
                 info: req.i18n.__('Info'),
                 appointments: req.i18n.__('Appointments'),
                 date: req.i18n.__('Date')
@@ -436,92 +582,54 @@ router.get('/:id/appointments/new', function(req, res, next) {
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
             workers: resp.docs[0]._source['names'],
-            services: resp.docs[1]._source['names']
+            date: toLocalFormattedDate(req, moment()),
+            services: services
         });
     });
 });
 
 router.post('/:id/appointments/new', function(req, res, next) {
+    appointmentUtil.handleForm(req.i18n.__('New appointment'));
+});
 
-    // starting from es 1.4.3 groovy dynamic scripting is no longer available
-    // by default, so we fallback to a get/update implementation.
-
-    client.get({
-        index: 'main',
-        type: 'customer',
-        id: req.params.id
+router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
+    client.mget({
+        body: {
+            docs: [
+                {_index: 'main', _type: 'customer', _id: req.params.id},
+                {_index: 'main', _type: 'workers', _id: utils.workersDocId}
+            ]
+        }
     }, function(err, resp, respcode) {
-
-        var version = resp._version;
-        var obj = resp._source;
-
-        function filterFn(item, index) {
-            return req.body.cb_enable.indexOf(index.toString()) != -1;
-        }
-
-        var descriptions = req.body.service.filter(filterFn);
-        var workers = req.body.worker.filter(filterFn);
-
+        var appointment = resp.docs[0]._source.appointments[req.params.appnum];
         var services = [];
-        for (var i = 0; i < descriptions.length; i++) {
+        for (i = 0; i < appointment.services.length; i++)
             services.push({
-                description: descriptions[i],
-                worker: workers[i]
+                description: appointment.services[i].description,
+                worker: appointment.services[i].worker,
+                checked: true
             });
-        }
 
-        if (typeof obj.appointments == 'undefined')
-            obj.appointments = [];
-
-        obj.appointments.push({
-            date: toISODate(req, req.body.date),
+        res.render('appointment', {
+            i18n: {
+                title: req.i18n.__('Edit appointment'),
+                info: req.i18n.__('Info'),
+                appointments: req.i18n.__('Appointments'),
+                date: req.i18n.__('Date')
+            },
+            infoUrl: getCustomerUrl(req, 'edit'),
+            isAppointmentsActive: true,
+            appointmentsUrl: getCustomerUrl(req, 'appointments'),
+            workers: resp.docs[1]._source['names'],
+            date: toLocalFormattedDate(req, appointment.date),
             services: services
-        });
-
-        client.update({
-            index: 'main',
-            type: 'customer',
-            id: req.params.id,
-            version: version,
-            body: {
-                doc: obj
-            }
-        }, function(err, resp, respcode) {
-
-            if (!err) {
-                res.redirect(getCustomerUrl(req, 'appointments'));
-            }
-            else {
-                console.log(err);
-                // TODO: render errors
-
-                client.mget({
-                    body: {
-                        docs: [
-                            {_index: 'main', _type: 'workers', _id: utils.workersDocId},
-                            {_index: 'main', _type: 'services', _id: utils.servicesDocId}
-                        ]
-                    }
-                }, function(err, resp, respcode) {
-                    res.render('appointment', {
-                        i18n: {
-                            title: req.i18n.__('New Appointment'),
-                            info: req.i18n.__('Info'),
-                            appointments: req.i18n.__('Appointments'),
-                            date: req.i18n.__('Date')
-                        },
-                        infoUrl: getCustomerUrl(req, 'edit'),
-                        isAppointmentsActive: true,
-                        appointmentsUrl: getCustomerUrl(req, 'appointments'),
-                        workers: resp.docs[0]._source['names'],
-                        services: resp.docs[1]._source['names']
-                    });
-                });
-            }
         });
     });
 });
 
+router.post('/:id/appointments/:appnum/edit', function(req, res, next) {
+    appointmentUtil.handleForm(req.i18n.__('Edit appointment'));
+});
 
 module.exports.router = router;
 module.exports.path = customersPath;

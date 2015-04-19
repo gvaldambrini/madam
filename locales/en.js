@@ -27,10 +27,12 @@
 	"At least one worker is mandatory": "At least one worker is mandatory",
 	"At least one service is mandatory": "At least one service is mandatory",
 	"Database connection error": "Database connection error",
+	"Database error": "Database error",
 	"Info": "Info",
 	"Appointments": "Appointments",
 	"Create new": "Create new",
-	"New Appointment": "New Appointment",
+	"New appointment": "New appointment",
 	"Date": "Date",
-	"Edit": "Edit"
+	"Edit": "Edit",
+	"Edit appointment": "Edit appointment"
 }

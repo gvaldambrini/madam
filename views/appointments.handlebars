@@ -18,3 +18,12 @@
         </tbody>
     </table>
 </div>
+
+<script type='text/javascript'>
+    $(document).ready(function() {
+
+        $('.table tbody tr').on("click", function(event) {
+            window.location.href = $(this).data('edit-url');
+        });
+    });
+</script>

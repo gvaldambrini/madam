@@ -1,6 +1,9 @@
 {{> customer_header }}
 
 <div class="appointments-content">
+
+    {{> form_errors}}
+
     <form id="form" class="form-horizontal" method="post">
         {{> input_date name='date' label=i18n.date}}
         {{#each services}}
@@ -8,12 +11,12 @@
           <div class="col-sm-12">
             <div class="input-group">
               <span class="input-group-addon">
-                <input type="checkbox" name="cb_enable" value="{{@index}}">
+                <input type="checkbox" name="enabled" value="{{@index}}" {{#this.checked}}checked{{/this.checked}}>
               </span>
-              <input type="text" class="form-control" value="{{this}}" name="service">
+              <input type="text" class="form-control" value="{{this.description}}" name="service">
               <div class="input-group-btn">
-                <button type="button" class="btn btn-default btn-click">{{../workers.[0]}}</button>
-                <input type="hidden" name="worker" value="{{../workers.[0]}}">
+                <button type="button" class="btn btn-default btn-click">{{this.worker}}</button>
+                <input type="hidden" name="worker" value="{{this.worker}}">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
@@ -64,6 +67,7 @@
         $form.find('.input-group-btn button.btn-click').on('click', handleWorkerClick);
         $form.find('.input-group-btn ul a').on('click', handleWorkerSelect);
         $form.find('#date-container .input-group.date').datepicker({
+            orientation: "top left",
             language: '{{config.language}}',
             format: "{{config.date_format}}".toLowerCase(),
             weekStart: 1,
@@ -72,5 +76,7 @@
             todayHighlight: true,
             endDate: "0d"
         });
+
+        $form.find('#date-container .input-group.date').datepicker('setDate', '{{date}}');
     });
 </script>
