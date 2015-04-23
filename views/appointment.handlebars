@@ -40,43 +40,58 @@
     </form>
 </div>
 <script type='text/javascript'>
-    // change the current worker to be the next one
-    function handleWorkerClick(event) {
-        var $groupBtn = $(this).closest('.input-group-btn');
-        var $workers = $groupBtn.find('ul a').map(function() { return $(this).text(); });
-        var newIndex = ($.inArray($(this).text(), $workers) + 1) % $workers.length;
-        var newText = $workers[newIndex];
-
-        $(this).text(newText);
-        $groupBtn.find('input').val(newText);
-    }
-
-    // set the current worker from the selected one in the dropdown
-    function handleWorkerSelect(event) {
-        var newText = $(this).text();
-
-        var $groupBtn = $(this).closest('.input-group-btn');
-        $groupBtn.find('button:eq(0)').text(newText);
-        $groupBtn.find('input').val(newText);
-    }
-
-    $(document).ready(function() {
-        $.fn.datepicker.defaults.format = "{{config.date_format}}".toLowerCase();
-
+    var Appointment = (function() {
+        /// Private variables and functions
         var $form = $('#form');
-        $form.find('.input-group-btn button.btn-click').on('click', handleWorkerClick);
-        $form.find('.input-group-btn ul a').on('click', handleWorkerSelect);
-        $form.find('#date-container .input-group.date').datepicker({
-            orientation: "top left",
-            language: '{{config.language}}',
-            format: "{{config.date_format}}".toLowerCase(),
-            weekStart: 1,
-            daysOfWeekDisabled: "0",
-            autoclose: true,
-            todayHighlight: true,
-            endDate: "0d"
-        });
+        var dateFormat = "{{config.date_format}}".toLowerCase();
+        var language = '{{config.language}}';
+        var date = '{{date}}';
 
-        $form.find('#date-container .input-group.date').datepicker('setDate', '{{date}}');
-    });
+        var switchWorker = function() {
+            // change the current worker to be the next one
+            var $groupBtn = $(this).closest('.input-group-btn');
+            var $workers = $groupBtn.find('ul a').map(function() { return $(this).text(); });
+            var newIndex = ($.inArray($(this).text(), $workers) + 1) % $workers.length;
+            var newText = $workers[newIndex];
+
+            $(this).text(newText);
+            $groupBtn.find('input').val(newText);
+        };
+
+        var selectWorker = function() {
+            // set the current worker from the selected one in the dropdown
+            var newText = $(this).text();
+
+            var $groupBtn = $(this).closest('.input-group-btn');
+            $groupBtn.find('button:eq(0)').text(newText);
+            $groupBtn.find('input').val(newText);
+        };
+
+        var init = function() {
+            $.fn.datepicker.defaults.format = dateFormat;
+
+            $form.find('.input-group-btn button.btn-click').on('click', switchWorker);
+            $form.find('.input-group-btn ul a').on('click', selectWorker);
+            $form.find('#date-container .input-group.date').datepicker({
+                orientation: "top left",
+                language: language,
+                format: dateFormat,
+                weekStart: 1,
+                daysOfWeekDisabled: "0",
+                autoclose: true,
+                todayHighlight: true,
+                endDate: "0d"
+            });
+
+            $form.find('#date-container .input-group.date').datepicker('setDate', date);
+        };
+
+        /// Public API
+        return {
+            init: init
+        };
+
+    })();
+
+    $(document).ready(Appointment.init());
 </script>
