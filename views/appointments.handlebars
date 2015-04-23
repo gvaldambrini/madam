@@ -20,19 +20,5 @@
 </div>
 
 <script type='text/javascript'>
-    var Appointments = (function() {
-        /// Private variables and functions
-
-        var init = function() {
-            $('.table tbody tr').on("click", function(event) {
-                window.location.href = $(this).data('edit-url');
-            });
-        }
-        /// Public API
-        return {
-            init: init
-        };
-    })();
-
     $(document).ready(Appointments.init());
 </script>
