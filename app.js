@@ -25,6 +25,7 @@ app.use(function(request, response, next) {
   request.i18n.setLocale(request.config.language);
   // Let the configuration available also in templates.
   response.locals.config = request.config;
+  response.locals.isProduction = process.env.NODE_ENV == 'production';
   next();
 });
 
