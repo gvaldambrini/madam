@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'production') {
             .pipe(concat('main.css'))
             .pipe(rename({ suffix: '.min' }))
             .pipe(minifycss())
-            .pipe(gulp.dest('public/stylesheets/'));
+            .pipe(gulp.dest('public/stylesheets'));
     });
 
     gulp.task('scripts', function() {
@@ -23,7 +23,6 @@ if (process.env.NODE_ENV === 'production') {
           .pipe(rename('main.min.js'))
           .pipe(gulp.dest('public/javascripts'));
     });
-
 }
 else {
     console.log('*** development ***');
@@ -31,7 +30,7 @@ else {
         gulp.src('views/stylesheets/*.scss')
             .pipe(sass())
             .pipe(concat('main.css'))
-            .pipe(gulp.dest('public/stylesheets/'));
+            .pipe(gulp.dest('public/stylesheets'));
     });
 
     gulp.task('scripts', function() {
@@ -42,7 +41,21 @@ else {
 
 }
 
+gulp.task('vendorscripts', function() {
+    return gulp.src([
+        'node_modules/express-handlebars/node_modules/handlebars/dist/handlebars.runtime.min.js',
+        'node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
+        'node_modules/bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js'])
+      .pipe(concat('vendor.min.js'))
+      .pipe(gulp.dest('public/javascripts'));
+});
 
+gulp.task('vendorcss', function() {
+    return gulp.src([
+        'node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'])
+      .pipe(concat('vendor.min.css'))
+      .pipe(gulp.dest('public/stylesheets'));
+});
 
-gulp.task('default', ['sass', 'scripts']);
+gulp.task('default', ['sass', 'scripts', 'vendorcss', 'vendorscripts']);
 
