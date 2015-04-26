@@ -34,5 +34,7 @@
 	"New appointment": "Nuovo appuntamento",
 	"Date": "Data",
 	"Edit": "Modifica",
-	"Edit appointment": "Modifica appuntamento"
+	"Edit appointment": "Modifica appuntamento",
+	"Update": "Modifica",
+	"Save": "Salva"
 }

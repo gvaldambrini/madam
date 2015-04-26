@@ -29,7 +29,9 @@ router.get('/workers', function(req, res, next) {
                 title: req.i18n.__('Settings'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services')
+                services: req.i18n.__('Services'),
+                update: req.i18n.__('Update'),
+                save: req.i18n.__('Save')
             },
             isWorkersActive: true,
             items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
@@ -51,7 +53,9 @@ router.post('/workers', function(req, res, next) {
                 title: req.i18n.__('Settings'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services')
+                services: req.i18n.__('Services'),
+                update: req.i18n.__('Update'),
+                save: req.i18n.__('Save')
             },
             isWorkersActive: true,
             flash: {
@@ -81,7 +85,9 @@ router.post('/workers', function(req, res, next) {
                 title: req.i18n.__('Settings'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services')
+                services: req.i18n.__('Services'),
+                update: req.i18n.__('Update'),
+                save: req.i18n.__('Save')
             },
             isWorkersActive: true,
             items: workers.length > 0 ? workers : [''],
@@ -117,7 +123,9 @@ router.get('/services', function(req, res, next) {
                 title: req.i18n.__('Settings'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services')
+                services: req.i18n.__('Services'),
+                update: req.i18n.__('Update'),
+                save: req.i18n.__('Save')
             },
             isServicesActive: true,
             items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
@@ -139,7 +147,9 @@ router.post('/services', function(req, res, next) {
                 title: req.i18n.__('Settings'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services')
+                services: req.i18n.__('Services'),
+                update: req.i18n.__('Update'),
+                save: req.i18n.__('Save')
             },
             isServicesActive: true,
             flash: {
@@ -169,7 +179,9 @@ router.post('/services', function(req, res, next) {
                 title: req.i18n.__('Settings'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services')
+                services: req.i18n.__('Services'),
+                update: req.i18n.__('Update'),
+                save: req.i18n.__('Save')
             },
             isServicesActive: true,
             items: services.length > 0 ? services : [''],
