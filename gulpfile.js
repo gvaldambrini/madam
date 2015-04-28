@@ -4,6 +4,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var minifycss = require('gulp-minify-css');
 var rename = require('gulp-rename');
+var nodemon = require('gulp-nodemon');
 
 if (process.env.NODE_ENV === 'production') {
     console.log('*** production ***');
@@ -65,5 +66,15 @@ gulp.task('images', function() {
       .pipe(gulp.dest('public/images'));
 });
 
-gulp.task('default', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images']);
+var buildTasks = ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images'];
 
+gulp.task('default', buildTasks);
+
+gulp.task('start', function () {
+  nodemon({
+    script: 'bin/www',
+    ignore: ['public/*'],
+    ext: 'handlebars js scss',
+    tasks: buildTasks
+  });
+});
