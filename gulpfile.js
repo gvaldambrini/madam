@@ -45,17 +45,25 @@ gulp.task('vendorscripts', function() {
     return gulp.src([
         'node_modules/express-handlebars/node_modules/handlebars/dist/handlebars.runtime.min.js',
         'node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
-        'node_modules/bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js'])
+        'node_modules/bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js',
+        'vendor/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'])
       .pipe(concat('vendor.min.js'))
       .pipe(gulp.dest('public/javascripts'));
 });
 
 gulp.task('vendorcss', function() {
     return gulp.src([
-        'node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'])
+        'node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css',
+        'vendor/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css'])
       .pipe(concat('vendor.min.css'))
       .pipe(gulp.dest('public/stylesheets'));
 });
 
-gulp.task('default', ['sass', 'scripts', 'vendorcss', 'vendorscripts']);
+gulp.task('images', function() {
+    return gulp.src([
+        'vendor/bootstrap-colorpicker/dist/images/**'])
+      .pipe(gulp.dest('public/images'));
+});
+
+gulp.task('default', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images']);
 

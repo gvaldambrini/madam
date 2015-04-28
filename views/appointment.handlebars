@@ -15,14 +15,14 @@
               </span>
               <input type="text" class="form-control" value="{{this.description}}" name="service">
               <div class="input-group-btn">
-                <button type="button" class="btn btn-default btn-click">{{this.worker}}</button>
-                <input type="hidden" name="worker" value="{{this.worker}}">
+                <button type="button" class="btn btn-default btn-click" style="color:{{this.worker.color}}">{{this.worker.name}}</button>
+                <input type="hidden" name="worker" value="{{this.worker.name}}">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
                     {{#each ../workers}}
-                    <li><a href="#">{{this}}</a></li>
+                    <li><a style="color:{{this.color}}" href="#">{{this.name}}</a></li>
                     {{/each}}
                 </ul>
               </div>

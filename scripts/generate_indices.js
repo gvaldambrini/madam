@@ -182,9 +182,13 @@ function createWorkersType(callback) {
         body: {
             workers: {
                 properties: {
-                    names: {
+                    name: {
                         type: "string",
                         index_name: "worker_name",
+                        index: "not_analyzed"
+                    },
+                    color: {
+                        type: "string",
                         index: "not_analyzed"
                     }
                 }

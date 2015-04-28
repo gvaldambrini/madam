@@ -1,4 +1,5 @@
 {
   "date_format": "DD/MM/YYYY",
-  "language": "it"
+  "language": "it",
+  "defaultWorkerColor": "#000000"
 }

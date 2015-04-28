@@ -15,7 +15,7 @@ router.use(function (request, response, next) {
 });
 
 router.get('/', function(req, res, next) {
-    res.redirect('/settings/workers')
+    res.redirect('/settings/workers');
 });
 
 router.get('/workers', function(req, res, next) {
@@ -24,6 +24,14 @@ router.get('/workers', function(req, res, next) {
         type: 'workers',
         id: utils.workersDocId
     }, function(err, resp, respcode) {
+        var items;
+        if (resp.found && resp._source.workers.length > 0) {
+            items = resp._source.workers;
+        }
+        else {
+            items = [{name: '', color: req.config.defaultWorkerColor}];
+        }
+
         res.render('settings', {
             i18n: {
                 title: req.i18n.__('Settings'),
@@ -33,8 +41,9 @@ router.get('/workers', function(req, res, next) {
                 update: req.i18n.__('Update'),
                 save: req.i18n.__('Save')
             },
+            hasColorpicker: true,
             isWorkersActive: true,
-            items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
+            items: items,
             workersUrl: '#',
             servicesUrl: '/settings/services'
         });
@@ -42,11 +51,26 @@ router.get('/workers', function(req, res, next) {
 });
 
 router.post('/workers', function(req, res, next) {
-    var names = req.body.name;
-    if (typeof names == 'string')
-        names = [names];
+    var workers = [];
+    if (typeof req.body.name == 'string') {
+        if (req.body.name.trim()) {
+            workers = [{
+                name: req.body.name.trim(),
+                color: req.body.color
+            }];
+        }
+    }
+    else {
+        for (var i = 0; i < req.body.name.length; i++) {
+            if (req.body.name[i]) {
+                workers.push({
+                    name: req.body.name[i].trim(),
+                    color: req.body.color[i]
+                });
+            }
+        }
+    }
 
-    var workers = names.filter(function(e) { return e; });
     if (workers.length == 0) {
         res.render('settings', {
             i18n: {
@@ -57,12 +81,13 @@ router.post('/workers', function(req, res, next) {
                 update: req.i18n.__('Update'),
                 save: req.i18n.__('Save')
             },
+            hasColorpicker: true,
             isWorkersActive: true,
             flash: {
                 type: 'alert-danger',
                 messages: [{msg: req.i18n.__('At least one worker is mandatory')}]
             },
-            items: [''],
+            items: [{name: '', color: req.config.defaultWorkerColor}],
             workersUrl: '#',
             servicesUrl: '/settings/services'
         });
@@ -75,7 +100,7 @@ router.post('/workers', function(req, res, next) {
         refresh: true,
         id: utils.workersDocId,
         body: {
-            names: workers
+            workers: workers
         }
     };
 
@@ -89,8 +114,9 @@ router.post('/workers', function(req, res, next) {
                 update: req.i18n.__('Update'),
                 save: req.i18n.__('Save')
             },
+            hasColorpicker: true,
             isWorkersActive: true,
-            items: workers.length > 0 ? workers : [''],
+            items: workers.length > 0 ? workers : [{name: '', color: req.config.defaultWorkerColor}],
             workersUrl: '#',
             servicesUrl: '/settings/services'
         };

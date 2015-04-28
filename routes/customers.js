@@ -195,7 +195,7 @@ var customerUtils = {
                 if (field == 'first_see' || field == 'last_see')
                     obj[field] = this.toISODate(sourceObj[field]);
                 else if (field == 'allow_sms' || field == 'allow_email')
-                    obj[field] = sourceObj[field] == 'on'
+                    obj[field] = sourceObj[field] == 'on';
                 else
                     obj[field] = sourceObj[field];
             }
@@ -382,7 +382,7 @@ router.get('/:id/appointments', function(req, res, next) {
         id: req.params.id
     }, function(err, resp, respcode) {
         var obj = resp._source;
-        if (typeof obj.appointments == 'undefined' || obj.appointments.length == 0)
+        if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0)
             res.redirect(getCustomerUrl(req, 'appointments/new'));
         else {
             function descFn(item) {
@@ -468,11 +468,11 @@ var appointmentUtil = {
                 infoUrl: getCustomerUrl(that.req, 'edit'),
                 isAppointmentsActive: true,
                 appointmentsUrl: getCustomerUrl(that.req, 'appointments'),
-                workers: resp.docs[1]._source['names'],
+                workers: resp.docs[1]._source['workers'],
                 date: that.req.body.date
             };
 
-            if (typeof that.req.body.enabled == 'undefined' || that.req.body.enabled.length == 0) {
+            if (typeof that.req.body.enabled == 'undefined' || that.req.body.enabled.length === 0) {
                 var services = [];
                 for (var i = 0; i < that.req.body.service.length; i++) {
                     services.push({
@@ -562,7 +562,7 @@ router.get('/:id/appointments/new', function(req, res, next) {
             ]
         }
     }, function(err, resp, respcode) {
-        var firstWorker = resp.docs[0]._source['names'][0];
+        var firstWorker = resp.docs[0]._source['workers'][0];
         var services = [];
         for (var i = 0; i < resp.docs[1]._source['names'].length; i++) {
             services.push({
@@ -581,7 +581,7 @@ router.get('/:id/appointments/new', function(req, res, next) {
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
-            workers: resp.docs[0]._source['names'],
+            workers: resp.docs[0]._source['workers'],
             date: toLocalFormattedDate(req, moment()),
             services: services
         });
@@ -601,12 +601,26 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
             ]
         }
     }, function(err, resp, respcode) {
+        function getColor(worker, workers) {
+            for (var j = 0; j < workers.length; j++) {
+                if (workers[j].name == worker) {
+                    return workers[j].color;
+                }
+            }
+            return req.config.defaultWorkerColor;
+        }
+
         var appointment = resp.docs[0]._source.appointments[req.params.appnum];
+        var workers = resp.docs[1]._source['workers'];
         var services = [];
-        for (i = 0; i < appointment.services.length; i++)
+
+        for (var i = 0; i < appointment.services.length; i++)
             services.push({
                 description: appointment.services[i].description,
-                worker: appointment.services[i].worker,
+                worker: {
+                    name: appointment.services[i].worker,
+                    color: getColor(appointment.services[i].worker, workers)
+                },
                 checked: true
             });
 
@@ -620,7 +634,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
-            workers: resp.docs[1]._source['names'],
+            workers: workers,
             date: toLocalFormattedDate(req, appointment.date),
             services: services
         });

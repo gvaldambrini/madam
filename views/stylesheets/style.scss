@@ -184,3 +184,7 @@ input.form-control.dirty {
 .appointments-content form {
   margin-top: 30px;
 }
+
+.colorpicker-selector.disabled i {
+  cursor:not-allowed;
+}

@@ -7,21 +7,33 @@ var Appointment = (function(window, $) {
 
     var switchWorker = function() {
         // change the current worker to be the next one
+        var $this = $(this);
         var $groupBtn = $(this).closest('.input-group-btn');
-        var $workers = $groupBtn.find('ul a').map(function() { return $(this).text(); });
-        var newIndex = ($.inArray($(this).text(), $workers) + 1) % $workers.length;
-        var newText = $workers[newIndex];
+        var $workers = $groupBtn.find('ul a');
+        var newIndex = 0;
+        for (var i = 0; i < $workers.length; i++) {
+            if ($($workers[i]).text() == $this.text()) {
+                newIndex = (i + 1) % $workers.length;
+                break;
+            }
+        }
+        var $newWorker = $($workers[newIndex]);
 
-        $(this).text(newText);
-        $groupBtn.find('input').val(newText);
+        $groupBtn.find('input').val($newWorker.text());
+        $this.text($newWorker.text());
+        $this.css('color', $newWorker.css('color'));
     };
 
     var selectWorker = function() {
         // set the current worker from the selected one in the dropdown
-        var newText = $(this).text();
+        var $this = $(this);
+        var newText = $this.text();
+        var newColor = $this.css('color');
 
-        var $groupBtn = $(this).closest('.input-group-btn');
-        $groupBtn.find('button:eq(0)').text(newText);
+        var $groupBtn = $this.closest('.input-group-btn');
+        var $btn = $groupBtn.find('button:eq(0)');
+        $btn.text(newText);
+        $btn.css('color', newColor);
         $groupBtn.find('input').val(newText);
     };
 
