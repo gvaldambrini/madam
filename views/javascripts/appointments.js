@@ -5,7 +5,7 @@ var Appointments = (function(window, $) {
         $('.table tbody tr').on("click", function(event) {
             window.location.href = $(this).data('edit-url');
         });
-    }
+    };
     /// Public API
     return {
         init: init

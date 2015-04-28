@@ -71,7 +71,7 @@ router.post('/workers', function(req, res, next) {
         }
     }
 
-    if (workers.length == 0) {
+    if (workers.length === 0) {
         res.render('settings', {
             i18n: {
                 title: req.i18n.__('Settings'),
@@ -167,7 +167,7 @@ router.post('/services', function(req, res, next) {
         names = [names];
 
     var services = names.filter(function(e) { return e; });
-    if (services.length == 0) {
+    if (services.length === 0) {
         res.render('settings', {
             i18n: {
                 title: req.i18n.__('Settings'),

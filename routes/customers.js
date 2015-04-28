@@ -381,14 +381,14 @@ router.get('/:id/appointments', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
+        function descFn(item) {
+            return item.description;
+        }
+
         var obj = resp._source;
         if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0)
             res.redirect(getCustomerUrl(req, 'appointments/new'));
         else {
-            function descFn(item) {
-                return item.description;
-            }
-
             var appointments = [];
             for (var i = 0; i < obj.appointments.length; i++) {
                 appointments.push({
@@ -468,7 +468,7 @@ var appointmentUtil = {
                 infoUrl: getCustomerUrl(that.req, 'edit'),
                 isAppointmentsActive: true,
                 appointmentsUrl: getCustomerUrl(that.req, 'appointments'),
-                workers: resp.docs[1]._source['workers'],
+                workers: resp.docs[1]._source.workers,
                 date: that.req.body.date
             };
 
@@ -562,11 +562,11 @@ router.get('/:id/appointments/new', function(req, res, next) {
             ]
         }
     }, function(err, resp, respcode) {
-        var firstWorker = resp.docs[0]._source['workers'][0];
+        var firstWorker = resp.docs[0]._source.workers[0];
         var services = [];
-        for (var i = 0; i < resp.docs[1]._source['names'].length; i++) {
+        for (var i = 0; i < resp.docs[1]._source.names.length; i++) {
             services.push({
-                description: resp.docs[1]._source['names'][i],
+                description: resp.docs[1]._source.names[i],
                 worker: firstWorker,
                 checked: false
             });
@@ -581,7 +581,7 @@ router.get('/:id/appointments/new', function(req, res, next) {
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
-            workers: resp.docs[0]._source['workers'],
+            workers: resp.docs[0]._source.workers,
             date: toLocalFormattedDate(req, moment()),
             services: services
         });
@@ -611,7 +611,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
         }
 
         var appointment = resp.docs[0]._source.appointments[req.params.appnum];
-        var workers = resp.docs[1]._source['workers'];
+        var workers = resp.docs[1]._source.workers;
         var services = [];
 
         for (var i = 0; i < appointment.services.length; i++)
