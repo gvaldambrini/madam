@@ -36,5 +36,8 @@
 	"Edit": "Modifica",
 	"Edit appointment": "Modifica appuntamento",
 	"Update": "Modifica",
-	"Save": "Salva"
+	"Save": "Salva",
+	"Notes": "Note",
+	"Add service": "Aggiungi servizio",
+	"Submit": "Salva"
 }

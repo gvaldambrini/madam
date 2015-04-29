@@ -36,5 +36,8 @@
 	"Edit": "Edit",
 	"Edit appointment": "Edit appointment",
 	"Update": "Update",
-	"Save": "Save"
+	"Save": "Save",
+	"Notes": "Notes",
+	"Add service": "Add service",
+	"Submit": "Submit"
 }

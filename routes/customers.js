@@ -174,16 +174,17 @@ var customerUtils = {
 
     formNames: function() {
         return {
-            'name': this.req.i18n.__('Name'),
-            'surname': this.req.i18n.__('Surname'),
-            'mobile_phone': this.req.i18n.__('Mobile Phone'),
-            'allow_sms': this.req.i18n.__('Allow sms'),
-            'phone': this.req.i18n.__('Phone'),
-            'email': this.req.i18n.__('Email'),
-            'allow_email': this.req.i18n.__('Allow email'),
-            'first_see': this.req.i18n.__('First see'),
-            'last_see': this.req.i18n.__('Last see'),
-            'discount': this.req.i18n.__('Discount')
+            name: this.req.i18n.__('Name'),
+            surname: this.req.i18n.__('Surname'),
+            mobile_phone: this.req.i18n.__('Mobile Phone'),
+            allow_sms: this.req.i18n.__('Allow sms'),
+            phone: this.req.i18n.__('Phone'),
+            email: this.req.i18n.__('Email'),
+            allow_email: this.req.i18n.__('Allow email'),
+            first_see: this.req.i18n.__('First see'),
+            last_see: this.req.i18n.__('Last see'),
+            discount: this.req.i18n.__('Discount'),
+            submit: this.req.i18n.__('Submit')
         };
     },
 
@@ -463,7 +464,10 @@ var appointmentUtil = {
                     title: title,
                     info: that.req.i18n.__('Info'),
                     appointments: that.req.i18n.__('Appointments'),
-                    date: that.req.i18n.__('Date')
+                    date: that.req.i18n.__('Date'),
+                    notes: that.req.i18n.__('Notes'),
+                    addService: that.req.i18n.__('Add service'),
+                    submit: that.req.i18n.__('Submit')
                 },
                 infoUrl: getCustomerUrl(that.req, 'edit'),
                 isAppointmentsActive: true,
@@ -492,7 +496,8 @@ var appointmentUtil = {
 
             var appointment = {
                 date: toISODate(that.req, that.req.body.date),
-                services: filterServices(that.req)
+                services: filterServices(that.req),
+                notes: that.req.body.notes
             };
 
             if (typeof that.req.params.appnum == 'undefined') {
@@ -576,14 +581,18 @@ router.get('/:id/appointments/new', function(req, res, next) {
                 title: req.i18n.__('New appointment'),
                 info: req.i18n.__('Info'),
                 appointments: req.i18n.__('Appointments'),
-                date: req.i18n.__('Date')
+                date: req.i18n.__('Date'),
+                notes: req.i18n.__('Notes'),
+                addService: req.i18n.__('Add service'),
+                submit: req.i18n.__('Submit')
             },
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
             workers: resp.docs[0]._source.workers,
             date: toLocalFormattedDate(req, moment()),
-            services: services
+            services: services,
+            notes: ''
         });
     });
 });
@@ -629,14 +638,18 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
                 title: req.i18n.__('Edit appointment'),
                 info: req.i18n.__('Info'),
                 appointments: req.i18n.__('Appointments'),
-                date: req.i18n.__('Date')
+                date: req.i18n.__('Date'),
+                notes: req.i18n.__('Notes'),
+                addService: req.i18n.__('Add service'),
+                submit: req.i18n.__('Submit')
             },
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
             workers: workers,
             date: toLocalFormattedDate(req, appointment.date),
-            services: services
+            services: services,
+            notes: appointment.notes
         });
     });
 });

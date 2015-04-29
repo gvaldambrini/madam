@@ -7,7 +7,7 @@
     <form id="form" class="form-horizontal" method="post">
         {{> input_date name='date' label=i18n.date}}
         {{#each services}}
-        <div class="form-group">
+        <div class="form-group service">
           <div class="col-sm-12">
             <div class="input-group">
               <span class="input-group-addon">
@@ -30,11 +30,24 @@
           </div>
         </div>
         {{/each}}
+        <div id="dynamic-fields-container"></div>
+        <div class="form-group pull-right">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-default btn-add" name="submit">{{i18n.addService}}</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-12">
+                <label>{{i18n.notes}}</label>
+                <textarea name="notes" class="form-control" rows="5">{{notes}}</textarea>
+            </div>
+        </div>
 
         <input type='hidden' name="_csrf" value="{{csrftoken}}">
         <div class="form-group">
-            <div class="col-sm-10">
-                <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary" name="submit">{{i18n.submit}}</button>
             </div>
         </div>
     </form>
