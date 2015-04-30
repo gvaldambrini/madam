@@ -440,7 +440,7 @@ var appointmentUtil = {
 
             function filterServices(req) {
                 function filterFn(item, index) {
-                    return that.req.body.enabled.indexOf(index.toString()) != -1;
+                    return that.req.body.enabled.indexOf(index.toString()) != -1 && item.trim().length > 0;
                 }
 
                 var descriptions = that.req.body.service.filter(filterFn);
