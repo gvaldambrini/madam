@@ -6,5 +6,9 @@
         <li role="presentation" {{#if isAppointmentsActive}}class="active"{{/if}}{{#if isAppointmentsDisabled}}class="disabled"{{/if}}>
             <a href="{{appointmentsUrl}}">{{i18n.appointments}}</a>
         </li>
+        {{#if customer}}
+        <li role="presentation" class="pull-right customer-name">{{customer}}</li>
+        {{/if}}
     </ul>
 </div>
+

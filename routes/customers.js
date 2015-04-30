@@ -25,6 +25,13 @@ function getCustomersUrl(req, route) {
     return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
 }
 
+function getCustomerName(obj) {
+    if (typeof obj.surname !== 'undefined') {
+        return obj.name + ' ' + obj.surname;
+    }
+    return obj.name;
+}
+
 // Middleware to expose shared templates to the client side.
 function exposeTemplates(req, res, next) {
 
@@ -338,13 +345,6 @@ router.post('/new', function(req, res, next) {
     customerUtils.handleForm(req.i18n.__('Create new customer'));
 });
 
-function getTitle(req, esObj) {
-    if (esObj.name && esObj.surname)
-        return req.i18n.__('Edit') + ' ' + esObj.name + ' ' + esObj.surname;
-
-    return req.i18n.__('Edit') + ' ' + esObj.name;
-}
-
 router.get('/:id/edit', function(req, res, next) {
     client.get({
         index: 'main',
@@ -352,7 +352,7 @@ router.get('/:id/edit', function(req, res, next) {
         id: req.params.id
     }, function(err, resp, respcode) {
         var i18n = customerUtils.formNames();
-        i18n.title = getTitle(req, resp._source);
+        i18n.title = req.i18n.__('Edit') + ' ' + getCustomerName(resp._source);
         i18n.info = req.i18n.__('Info');
         i18n.appointments = req.i18n.__('Appointments');
 
@@ -372,7 +372,7 @@ router.post('/:id/edit', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
-        customerUtils.handleForm(getTitle(req, resp._source));
+        customerUtils.handleForm(req.i18n.__('Edit') + ' ' + getCustomerName(resp._source));
     });
 });
 
@@ -412,7 +412,8 @@ router.get('/:id/appointments', function(req, res, next) {
                 isAppointmentsActive: true,
                 appointmentsUrl: getCustomerUrl(req, 'appointments'),
                 urlNew: getCustomerUrl(req, 'appointments/new'),
-                appointments: appointments
+                appointments: appointments,
+                customer: getCustomerName(obj)
             });
         }
     });
@@ -473,7 +474,8 @@ var appointmentUtil = {
                 isAppointmentsActive: true,
                 appointmentsUrl: getCustomerUrl(that.req, 'appointments'),
                 workers: resp.docs[1]._source.workers,
-                date: that.req.body.date
+                date: that.req.body.date,
+                customer: getCustomerName(obj)
             };
 
             if (typeof that.req.body.enabled == 'undefined' || that.req.body.enabled.length === 0) {
@@ -562,16 +564,17 @@ router.get('/:id/appointments/new', function(req, res, next) {
     client.mget({
         body: {
             docs: [
+                {_index: 'main', _type: 'customer', _id: req.params.id},
                 {_index: 'main', _type: 'workers', _id: utils.workersDocId},
                 {_index: 'main', _type: 'services', _id: utils.servicesDocId}
             ]
         }
     }, function(err, resp, respcode) {
-        var firstWorker = resp.docs[0]._source.workers[0];
+        var firstWorker = resp.docs[1]._source.workers[0];
         var services = [];
-        for (var i = 0; i < resp.docs[1]._source.names.length; i++) {
+        for (var i = 0; i < resp.docs[2]._source.names.length; i++) {
             services.push({
-                description: resp.docs[1]._source.names[i],
+                description: resp.docs[2]._source.names[i],
                 worker: firstWorker,
                 checked: false
             });
@@ -589,10 +592,11 @@ router.get('/:id/appointments/new', function(req, res, next) {
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
-            workers: resp.docs[0]._source.workers,
+            workers: resp.docs[1]._source.workers,
             date: toLocalFormattedDate(req, moment()),
             services: services,
-            notes: ''
+            notes: '',
+            customer: getCustomerName(resp.docs[0]._source)
         });
     });
 });
@@ -649,7 +653,8 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
             workers: workers,
             date: toLocalFormattedDate(req, appointment.date),
             services: services,
-            notes: appointment.notes
+            notes: appointment.notes,
+            customer: getCustomerName(resp.docs[0]._source)
         });
     });
 });
