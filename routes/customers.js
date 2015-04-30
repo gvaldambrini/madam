@@ -163,174 +163,174 @@ function toLocalFormattedDate(req, ISODate) {
     return moment.utc(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
 }
 
-var customerUtils = {
-    init: function(req, res) {
-        this.req = req;
-        this.res = res;
-    },
 
-    toISODate: function(localFormattedDate) {
-        return toISODate(this.req, localFormattedDate);
-    },
+var CustomerUtils = function(req, res) {
+    this.req = req;
+    this.res = res;
+};
 
-    toLocalFormattedDate: function(ISODate) {
-        return toLocalFormattedDate(this.req, ISODate);
-    },
+CustomerUtils.formFields = [
+    'name', 'surname', 'mobile_phone', 'phone', 'email',
+    'first_see', 'last_see', 'allow_sms', 'allow_email'];
 
-    formFields: ['name', 'surname', 'mobile_phone', 'phone', 'email', 'first_see', 'last_see', 'allow_sms', 'allow_email'],
+CustomerUtils.prototype.toISODate = function(localFormattedDate) {
+    return toISODate(this.req, localFormattedDate);
+};
 
-    formNames: function() {
-        return {
-            name: this.req.i18n.__('Name'),
-            surname: this.req.i18n.__('Surname'),
-            mobile_phone: this.req.i18n.__('Mobile Phone'),
-            allow_sms: this.req.i18n.__('Allow sms'),
-            phone: this.req.i18n.__('Phone'),
-            email: this.req.i18n.__('Email'),
-            allow_email: this.req.i18n.__('Allow email'),
-            first_see: this.req.i18n.__('First see'),
-            last_see: this.req.i18n.__('Last see'),
-            discount: this.req.i18n.__('Discount'),
-            submit: this.req.i18n.__('Submit')
-        };
-    },
+CustomerUtils.prototype.toLocalFormattedDate = function(ISODate) {
+    return toLocalFormattedDate(this.req, ISODate);
+};
 
-    toElasticsearchFormat: function(sourceObj) {
-        var obj = {};
-        for (var i = 0; i < this.formFields.length; i++) {
-            var field = this.formFields[i];
-            if (sourceObj[field]) {
-                if (field == 'first_see' || field == 'last_see')
-                    obj[field] = this.toISODate(sourceObj[field]);
-                else if (field == 'allow_sms' || field == 'allow_email')
-                    obj[field] = sourceObj[field] == 'on';
-                else
-                    obj[field] = sourceObj[field];
-            }
+CustomerUtils.prototype.formNames = function() {
+    return {
+        name: this.req.i18n.__('Name'),
+        surname: this.req.i18n.__('Surname'),
+        mobile_phone: this.req.i18n.__('Mobile Phone'),
+        allow_sms: this.req.i18n.__('Allow sms'),
+        phone: this.req.i18n.__('Phone'),
+        email: this.req.i18n.__('Email'),
+        allow_email: this.req.i18n.__('Allow email'),
+        first_see: this.req.i18n.__('First see'),
+        last_see: this.req.i18n.__('Last see'),
+        discount: this.req.i18n.__('Discount'),
+        submit: this.req.i18n.__('Submit')
+    };
+};
+
+CustomerUtils.prototype.toElasticsearchFormat = function(sourceObj) {
+    var obj = {};
+    for (var i = 0; i < CustomerUtils.formFields.length; i++) {
+        var field = CustomerUtils.formFields[i];
+        if (sourceObj[field]) {
+            if (field == 'first_see' || field == 'last_see')
+                obj[field] = this.toISODate(sourceObj[field]);
+            else if (field == 'allow_sms' || field == 'allow_email')
+                obj[field] = sourceObj[field] == 'on';
+            else
+                obj[field] = sourceObj[field];
         }
-        return obj;
-    },
+    }
+    return obj;
+};
 
-    toViewFormat: function(sourceObj) {
-        var obj = {};
-        for (var i = 0; i < this.formFields.length; i++) {
-            var field = this.formFields[i];
-            if (sourceObj[field]) {
-                if (field == 'first_see' || field == 'last_see')
-                    obj[field] = this.toLocalFormattedDate(sourceObj[field]);
-                else
-                    obj[field] = sourceObj[field];
-            }
+CustomerUtils.prototype.toViewFormat = function(sourceObj) {
+    var obj = {};
+    for (var i = 0; i < CustomerUtils.formFields.length; i++) {
+        var field = CustomerUtils.formFields[i];
+        if (sourceObj[field]) {
+            if (field == 'first_see' || field == 'last_see')
+                obj[field] = this.toLocalFormattedDate(sourceObj[field]);
+            else
+                obj[field] = sourceObj[field];
         }
-        return obj;
-    },
+    }
+    return obj;
+};
 
-    handleForm: function(title) {
-        // Trim all the fields that allow the user write text
-        for (var i = 0; i < this.formFields.length; i++)
-            this.req.sanitize(this.formFields[i]).trim();
+CustomerUtils.prototype.handleForm = function(title) {
+    // Trim all the fields that allow the user write text
+    for (var i = 0; i < CustomerUtils.formFields.length; i++)
+        this.req.sanitize(CustomerUtils.formFields[i]).trim();
 
-        this.req.checkBody('name', this.req.i18n.__('The name is mandatory')).notEmpty();
+    this.req.checkBody('name', this.req.i18n.__('The name is mandatory')).notEmpty();
 
-        if (!this.req.body.mobile_phone)
-            this.req.checkBody(
-                'allow_sms', this.req.i18n.__(
-                    'To set allow sms, you must specify a mobile phone')).optional().isEmpty();
+    if (!this.req.body.mobile_phone)
+        this.req.checkBody(
+            'allow_sms', this.req.i18n.__(
+                'To set allow sms, you must specify a mobile phone')).optional().isEmpty();
 
-        if (!this.req.body.email) {
-            this.req.checkBody('allow_email', this.req.i18n.__(
-                'To set allow email, you must specify an email')).optional().isEmpty();
+    if (!this.req.body.email) {
+        this.req.checkBody('allow_email', this.req.i18n.__(
+            'To set allow email, you must specify an email')).optional().isEmpty();
+    }
+    else {
+        this.req.checkBody('email', this.req.i18n.__(
+            'The email does not seem a valid email')).isEmail();
+    }
+
+    if (this.req.body.first_see) {
+        this.req.checkBody('first_see', this.req.i18n.__(
+            'The first date does not seem a valid date')).isValidDate();
+    }
+    if (this.req.body.last_see) {
+        this.req.checkBody('last_see', this.req.i18n.__(
+            'The last date does not seem a valid date')).isValidDate();
+    }
+
+    var errors = this.req.validationErrors();
+    if (errors) {
+        var appDisabled = typeof this.req.params.id == 'undefined';
+        var i18n = this.formNames();
+        i18n.title = title;
+        i18n.info = this.req.i18n.__('Info');
+        i18n.appointments = this.req.i18n.__('Appointments');
+
+        this.res.render('customer', {
+            i18n: i18n,
+            isInfoActive: true,
+            isAppointmentsDisabled: appDisabled,
+            appointmentsUrl: appDisabled ? '#' :
+                getCustomerUrl(this.req, 'appointments'),
+            flash: { type: 'alert-danger', messages: errors},
+            obj: this.req.body
+        });
+        return;
+    }
+
+    var args = {
+        index: 'main',
+        type: 'customer',
+        refresh: true,
+        body: this.toElasticsearchFormat(this.req.body)
+    };
+    if (typeof this.req.params.id != 'undefined')
+        args.id = this.req.params.id;
+
+    var that = this;  // workaround for the this visibility problem inside inner functions.
+    client.index(args, function(err, resp, respcode) {
+        if (!err) {
+            // redirect does not take into account being in inside a router
+            that.res.redirect(customersPath);
         }
         else {
-            this.req.checkBody('email', this.req.i18n.__(
-                'The email does not seem a valid email')).isEmail();
-        }
+            var messages;
+            if (err instanceof esErrors.NoConnections)
+                messages = [{msg: that.req.i18n.__('Database connection error')}];
+            else
+                messages = [{msg: that.req.i18n.__('Database error')}];
+            console.error(err);
 
-        if (this.req.body.first_see) {
-            this.req.checkBody('first_see', this.req.i18n.__(
-                'The first date does not seem a valid date')).isValidDate();
-        }
-        if (this.req.body.last_see) {
-            this.req.checkBody('last_see', this.req.i18n.__(
-                'The last date does not seem a valid date')).isValidDate();
-        }
-
-        var errors = this.req.validationErrors();
-        if (errors) {
-            var appDisabled = typeof this.req.params.id == 'undefined';
+            var appDisabled = typeof that.req.params.id == 'undefined';
             var i18n = this.formNames();
             i18n.title = title;
-            i18n.info = this.req.i18n.__('Info');
-            i18n.appointments = this.req.i18n.__('Appointments');
+            i18n.info = that.req.i18n.__('Info');
+            i18n.appointments = that.req.i18n.__('Appointments');
 
-            this.res.render('customer', {
+
+            that.res.render('customer', {
                 i18n: i18n,
                 isInfoActive: true,
                 isAppointmentsDisabled: appDisabled,
                 appointmentsUrl: appDisabled ? '#' :
-                    getCustomerUrl(this.req, 'appointments'),
-                flash: { type: 'alert-danger', messages: errors},
-                obj: this.req.body
+                    getCustomerUrl(that.req, 'appointments'),
+                flash: { type: 'alert-danger', messages: messages},
+                obj: that.req.body
             });
-            return;
         }
-
-        var args = {
-            index: 'main',
-            type: 'customer',
-            refresh: true,
-            body: this.toElasticsearchFormat(this.req.body)
-        };
-        if (typeof this.req.params.id != 'undefined')
-            args.id = this.req.params.id;
-
-        var that = this;  // workaround for the this visibility problem inside inner functions.
-        client.index(args, function(err, resp, respcode) {
-            if (!err) {
-                // redirect does not take into account being in inside a router
-                that.res.redirect(customersPath);
-            }
-            else {
-                var messages;
-                if (err instanceof esErrors.NoConnections)
-                    messages = [{msg: that.req.i18n.__('Database connection error')}];
-                else
-                    messages = [{msg: that.req.i18n.__('Database error')}];
-                console.error(err);
-
-                var appDisabled = typeof that.req.params.id == 'undefined';
-                var i18n = this.formNames();
-                i18n.title = title;
-                i18n.info = that.req.i18n.__('Info');
-                i18n.appointments = that.req.i18n.__('Appointments');
-
-
-                that.res.render('customer', {
-                    i18n: i18n,
-                    isInfoActive: true,
-                    isAppointmentsDisabled: appDisabled,
-                    appointmentsUrl: appDisabled ? '#' :
-                        getCustomerUrl(that.req, 'appointments'),
-                    flash: { type: 'alert-danger', messages: messages},
-                    obj: that.req.body
-                });
-            }
-        });
-    }
+    });
 };
 
 
 router.use(['/new', '*edit'], function (req, res, next) {
-    customerUtils.init(req, res);
+    req.utils = new CustomerUtils(req, res);
     next();
 });
 
 router.get('/new', function(req, res, next) {
-    var i18n = customerUtils.formNames();
+    var i18n = req.utils.formNames();
     i18n.title = req.i18n.__('Create new customer');
     i18n.info = req.i18n.__('Info');
     i18n.appointments = req.i18n.__('Appointments');
-
 
     res.render('customer', {
         i18n: i18n,
@@ -342,7 +342,7 @@ router.get('/new', function(req, res, next) {
 });
 
 router.post('/new', function(req, res, next) {
-    customerUtils.handleForm(req.i18n.__('Create new customer'));
+    req.utils.handleForm(req.i18n.__('Create new customer'));
 });
 
 router.get('/:id/edit', function(req, res, next) {
@@ -351,7 +351,7 @@ router.get('/:id/edit', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
-        var i18n = customerUtils.formNames();
+        var i18n = req.utils.formNames();
         i18n.title = req.i18n.__('Edit') + ' ' + getCustomerName(resp._source);
         i18n.info = req.i18n.__('Info');
         i18n.appointments = req.i18n.__('Appointments');
@@ -361,7 +361,7 @@ router.get('/:id/edit', function(req, res, next) {
             isInfoActive: true,
             isAppointmentsDisabled: false,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
-            obj: customerUtils.toViewFormat(resp._source)
+            obj: req.utils.toViewFormat(resp._source)
         });
     });
 });
@@ -372,7 +372,7 @@ router.post('/:id/edit', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
-        customerUtils.handleForm(req.i18n.__('Edit') + ' ' + getCustomerName(resp._source));
+        req.utils.handleForm(req.i18n.__('Edit') + ' ' + getCustomerName(resp._source));
     });
 });
 
@@ -420,143 +420,141 @@ router.get('/:id/appointments', function(req, res, next) {
 });
 
 
-var appointmentUtil = {
-    init: function(req, res) {
-        this.req = req;
-        this.res = res;
-    },
+var AppointmentUtils = function(req, res) {
+    this.req = req;
+    this.res = res;
+};
 
-    handleForm: function(title) {
-        var that = this;
-        // starting from es 1.4.3 groovy dynamic scripting is no longer available
-        // by default, so we fallback to a get/update implementation.
-        client.mget({
+AppointmentUtils.prototype.handleForm = function(title) {
+    var that = this;
+    // starting from es 1.4.3 groovy dynamic scripting is no longer available
+    // by default, so we fallback to a get/update implementation.
+    client.mget({
+        body: {
+            docs: [
+                {_index: 'main', _type: 'customer', _id: this.req.params.id},
+                {_index: 'main', _type: 'workers', _id: utils.workersDocId}
+            ]
+        }
+    }, function(err, resp, respcode) {
+
+        function filterServices(req) {
+            function filterFn(item, index) {
+                return that.req.body.enabled.indexOf(index.toString()) != -1 && item.trim().length > 0;
+            }
+
+            var descriptions = that.req.body.service.filter(filterFn);
+            var workers = that.req.body.worker.filter(filterFn);
+
+            var services = [];
+            for (var i = 0; i < descriptions.length; i++) {
+                services.push({
+                    description: descriptions[i],
+                    worker: workers[i]
+                });
+            }
+            return services;
+        }
+
+        var version = resp.docs[0]._version;
+        var obj = resp.docs[0]._source;
+
+        var params = {
+            i18n: {
+                title: title,
+                info: that.req.i18n.__('Info'),
+                appointments: that.req.i18n.__('Appointments'),
+                date: that.req.i18n.__('Date'),
+                notes: that.req.i18n.__('Notes'),
+                addService: that.req.i18n.__('Add service'),
+                submit: that.req.i18n.__('Submit')
+            },
+            infoUrl: getCustomerUrl(that.req, 'edit'),
+            isAppointmentsActive: true,
+            appointmentsUrl: getCustomerUrl(that.req, 'appointments'),
+            workers: resp.docs[1]._source.workers,
+            date: that.req.body.date,
+            customer: getCustomerName(obj)
+        };
+
+        if (typeof that.req.body.enabled == 'undefined' || that.req.body.enabled.length === 0) {
+            var services = [];
+            for (var i = 0; i < that.req.body.service.length; i++) {
+                services.push({
+                    description: that.req.body.service[i],
+                    worker: that.req.body.worker[i],
+                    checked: false
+                });
+            }
+            params.services = services;
+            params.flash = {
+                type: 'alert-danger',
+                messages: [{msg: that.req.i18n.__('At least one service is mandatory')}]
+            };
+            that.res.render('appointment', params);
+            return;
+        }
+
+        var appointment = {
+            date: toISODate(that.req, that.req.body.date),
+            services: filterServices(that.req),
+            notes: that.req.body.notes
+        };
+
+        if (typeof that.req.params.appnum == 'undefined') {
+            if (typeof obj.appointments == 'undefined')
+                obj.appointments = [];
+
+            obj.appointments.push(appointment);
+        }
+        else {
+            obj.appointments[that.req.params.appnum] = appointment;
+        }
+
+        client.update({
+            index: 'main',
+            type: 'customer',
+            id: that.req.params.id,
+            version: version,
             body: {
-                docs: [
-                    {_index: 'main', _type: 'customer', _id: this.req.params.id},
-                    {_index: 'main', _type: 'workers', _id: utils.workersDocId}
-                ]
+                doc: obj
             }
         }, function(err, resp, respcode) {
 
-            function filterServices(req) {
-                function filterFn(item, index) {
-                    return that.req.body.enabled.indexOf(index.toString()) != -1 && item.trim().length > 0;
-                }
-
-                var descriptions = that.req.body.service.filter(filterFn);
-                var workers = that.req.body.worker.filter(filterFn);
-
-                var services = [];
-                for (var i = 0; i < descriptions.length; i++) {
-                    services.push({
-                        description: descriptions[i],
-                        worker: workers[i]
-                    });
-                }
-                return services;
+            if (!err) {
+                that.res.redirect(getCustomerUrl(that.req, 'appointments'));
             }
+            else {
+                console.log(err);
 
-            var version = resp.docs[0]._version;
-            var obj = resp.docs[0]._source;
+                if (err instanceof esErrors.NoConnections)
+                    messages = [{msg: that.req.i18n.__('Database connection error')}];
+                else
+                    messages = [{msg: that.req.i18n.__('Database error')}];
 
-            var params = {
-                i18n: {
-                    title: title,
-                    info: that.req.i18n.__('Info'),
-                    appointments: that.req.i18n.__('Appointments'),
-                    date: that.req.i18n.__('Date'),
-                    notes: that.req.i18n.__('Notes'),
-                    addService: that.req.i18n.__('Add service'),
-                    submit: that.req.i18n.__('Submit')
-                },
-                infoUrl: getCustomerUrl(that.req, 'edit'),
-                isAppointmentsActive: true,
-                appointmentsUrl: getCustomerUrl(that.req, 'appointments'),
-                workers: resp.docs[1]._source.workers,
-                date: that.req.body.date,
-                customer: getCustomerName(obj)
-            };
-
-            if (typeof that.req.body.enabled == 'undefined' || that.req.body.enabled.length === 0) {
                 var services = [];
                 for (var i = 0; i < that.req.body.service.length; i++) {
                     services.push({
                         description: that.req.body.service[i],
                         worker: that.req.body.worker[i],
-                        checked: false
+                        checked: that.req.body.enabled.indexOf(i.toString()) != -1
                     });
                 }
                 params.services = services;
                 params.flash = {
                     type: 'alert-danger',
-                    messages: [{msg: that.req.i18n.__('At least one service is mandatory')}]
+                    messages: messages
                 };
                 that.res.render('appointment', params);
-                return;
             }
-
-            var appointment = {
-                date: toISODate(that.req, that.req.body.date),
-                services: filterServices(that.req),
-                notes: that.req.body.notes
-            };
-
-            if (typeof that.req.params.appnum == 'undefined') {
-                if (typeof obj.appointments == 'undefined')
-                    obj.appointments = [];
-
-                obj.appointments.push(appointment);
-            }
-            else {
-                obj.appointments[that.req.params.appnum] = appointment;
-            }
-
-            client.update({
-                index: 'main',
-                type: 'customer',
-                id: that.req.params.id,
-                version: version,
-                body: {
-                    doc: obj
-                }
-            }, function(err, resp, respcode) {
-
-                if (!err) {
-                    that.res.redirect(getCustomerUrl(that.req, 'appointments'));
-                }
-                else {
-                    console.log(err);
-
-                    if (err instanceof esErrors.NoConnections)
-                        messages = [{msg: that.req.i18n.__('Database connection error')}];
-                    else
-                        messages = [{msg: that.req.i18n.__('Database error')}];
-
-                    var services = [];
-                    for (var i = 0; i < that.req.body.service.length; i++) {
-                        services.push({
-                            description: that.req.body.service[i],
-                            worker: that.req.body.worker[i],
-                            checked: that.req.body.enabled.indexOf(i.toString()) != -1
-                        });
-                    }
-                    params.services = services;
-                    params.flash = {
-                        type: 'alert-danger',
-                        messages: messages
-                    };
-                    that.res.render('appointment', params);
-                }
-            });
         });
-
-    }
+    });
 
 };
 
+
 router.use(['/:id/appointments/new', '/:id/appointments/*edit'], function (req, res, next) {
-    appointmentUtil.init(req, res);
+    req.utils = new AppointmentUtils(req, res);
     next();
 });
 
@@ -602,7 +600,7 @@ router.get('/:id/appointments/new', function(req, res, next) {
 });
 
 router.post('/:id/appointments/new', function(req, res, next) {
-    appointmentUtil.handleForm(req.i18n.__('New appointment'));
+    req.utils.handleForm(req.i18n.__('New appointment'));
 });
 
 router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
@@ -660,7 +658,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
 });
 
 router.post('/:id/appointments/:appnum/edit', function(req, res, next) {
-    appointmentUtil.handleForm(req.i18n.__('Edit appointment'));
+    req.utils.handleForm(req.i18n.__('Edit appointment'));
 });
 
 module.exports.router = router;
