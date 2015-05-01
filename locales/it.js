@@ -40,5 +40,7 @@
 	"Notes": "Note",
 	"Add service": "Aggiungi servizio",
 	"Submit": "Salva",
-	"No customers to display.": "Nessun cliente da mostrare."
+	"No customers to display.": "Nessun cliente da mostrare.",
+	"To create an appointment, you have first to <a href=\"%s\">define the workers.</a>": "Per creare un appuntamento, è necessario prima <a href=\"%s\">definire i lavoratori.</a>",
+	"To create an appointment, you have first to <a href=\"%s\">define the common services.</a>": "Per creare un appuntamento, è necessario prima <a href=\"%s\">definire i servizi comuni.</a>"
 }

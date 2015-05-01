@@ -40,5 +40,7 @@
 	"Notes": "Notes",
 	"Add service": "Add service",
 	"Submit": "Submit",
-	"No customers to display.": "No customers to display."
+	"No customers to display.": "No customers to display.",
+	"To create an appointment, you have first to <a href=\"%s\">define the workers.</a>": "To create an appointment, you have first to <a href=\"%s\">define the workers.</a>",
+	"To create an appointment, you have first to <a href=\"%s\">define the common services.</a>": "To create an appointment, you have first to <a href=\"%s\">define the common services.</a>"
 }

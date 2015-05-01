@@ -25,6 +25,10 @@ function getCustomersUrl(req, route) {
     return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
 }
 
+function getUrl(req, path) {
+    return req.protocol + "://" + req.get('host') + path;
+}
+
 function getCustomerName(obj) {
     if (typeof obj.surname !== 'undefined') {
         return obj.name + ' ' + obj.surname;
@@ -591,14 +595,19 @@ router.get('/:id/appointments/new', function(req, res, next) {
             ]
         }
     }, function(err, resp, respcode) {
-        var firstWorker = resp.docs[1]._source.workers[0];
+        var workers = [];
+        if (typeof resp.docs[1]._source !== 'undefined') {
+            workers = resp.docs[1]._source.workers;
+        }
         var services = [];
-        for (var i = 0; i < resp.docs[2]._source.names.length; i++) {
-            services.push({
-                description: resp.docs[2]._source.names[i],
-                worker: firstWorker,
-                checked: false
-            });
+        if (resp.docs[2]._source) {
+            for (var i = 0; i < resp.docs[2]._source.names.length; i++) {
+                services.push({
+                    description: resp.docs[2]._source.names[i],
+                    worker: workers[0],
+                    checked: false
+                });
+            }
         }
         res.render('appointment', {
             i18n: {
@@ -608,12 +617,18 @@ router.get('/:id/appointments/new', function(req, res, next) {
                 date: req.i18n.__('Date'),
                 notes: req.i18n.__('Notes'),
                 addService: req.i18n.__('Add service'),
-                submit: req.i18n.__('Submit')
+                submit: req.i18n.__('Submit'),
+                setWorkersMsg: req.i18n.__(
+                    'To create an appointment, you have first to <a href="%s">define the workers.</a>',
+                    getUrl(req, '/settings/workers')),
+                setServicesMsg: req.i18n.__(
+                    'To create an appointment, you have first to <a href="%s">define the common services.</a>',
+                    getUrl(req, '/settings/services'))
             },
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
-            workers: resp.docs[1]._source.workers,
+            workers: workers,
             date: toLocalFormattedDate(req, moment()),
             services: services,
             notes: '',
