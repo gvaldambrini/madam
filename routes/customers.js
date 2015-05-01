@@ -458,6 +458,7 @@ AppointmentUtils.prototype.handleForm = function(title) {
 
         var version = resp.docs[0]._version;
         var obj = resp.docs[0]._source;
+        var workers = resp.docs[1]._source.workers;
 
         var params = {
             i18n: {
@@ -472,7 +473,7 @@ AppointmentUtils.prototype.handleForm = function(title) {
             infoUrl: getCustomerUrl(that.req, 'edit'),
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(that.req, 'appointments'),
-            workers: resp.docs[1]._source.workers,
+            workers: workers,
             date: that.req.body.date,
             customer: getCustomerName(obj)
         };
@@ -482,7 +483,10 @@ AppointmentUtils.prototype.handleForm = function(title) {
             for (var i = 0; i < that.req.body.service.length; i++) {
                 services.push({
                     description: that.req.body.service[i],
-                    worker: that.req.body.worker[i],
+                    worker: {
+                        name: that.req.body.worker[i],
+                        color: that.getWorkerColor(that.req.body.worker[i], workers)
+                    },
                     checked: false
                 });
             }
@@ -536,7 +540,10 @@ AppointmentUtils.prototype.handleForm = function(title) {
                 for (var i = 0; i < that.req.body.service.length; i++) {
                     services.push({
                         description: that.req.body.service[i],
-                        worker: that.req.body.worker[i],
+                        worker: {
+                            name: that.req.body.worker[i],
+                            color: that.getWorkerColor(that.req.body.worker[i], workers)
+                        },
                         checked: that.req.body.enabled.indexOf(i.toString()) != -1
                     });
                 }
@@ -550,6 +557,15 @@ AppointmentUtils.prototype.handleForm = function(title) {
         });
     });
 
+};
+
+AppointmentUtils.prototype.getWorkerColor = function(worker, workers) {
+    for (var j = 0; j < workers.length; j++) {
+        if (workers[j].name == worker) {
+            return workers[j].color;
+        }
+    }
+    return this.req.config.defaultWorkerColor;
 };
 
 
@@ -612,15 +628,6 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
             ]
         }
     }, function(err, resp, respcode) {
-        function getColor(worker, workers) {
-            for (var j = 0; j < workers.length; j++) {
-                if (workers[j].name == worker) {
-                    return workers[j].color;
-                }
-            }
-            return req.config.defaultWorkerColor;
-        }
-
         var appointment = resp.docs[0]._source.appointments[req.params.appnum];
         var workers = resp.docs[1]._source.workers;
         var services = [];
@@ -630,7 +637,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
                 description: appointment.services[i].description,
                 worker: {
                     name: appointment.services[i].worker,
-                    color: getColor(appointment.services[i].worker, workers)
+                    color: req.utils.getWorkerColor(appointment.services[i].worker, workers)
                 },
                 checked: true
             });
