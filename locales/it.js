@@ -39,5 +39,6 @@
 	"Save": "Salva",
 	"Notes": "Note",
 	"Add service": "Aggiungi servizio",
-	"Submit": "Salva"
+	"Submit": "Salva",
+	"No customers to display.": "Nessun cliente da mostrare."
 }

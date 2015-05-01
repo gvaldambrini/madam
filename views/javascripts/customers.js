@@ -41,9 +41,9 @@ var Customers = (function(window, $) {
         $('.table tbody tr').on("click", goToEditForm);
     };
 
-    var init = function(_templates, _customers, _urlSearch) {
+    var init = function(_templates, _customersData, _urlSearch) {
         templates = _templates;
-        originalHtml = templates.customers_table(_customers);
+        originalHtml = templates.customers_table(_customersData);
         urlSearch = _urlSearch;
 
         $searchClear = $("#search-clear");

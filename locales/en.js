@@ -39,5 +39,6 @@
 	"Save": "Save",
 	"Notes": "Notes",
 	"Add service": "Add service",
-	"Submit": "Submit"
+	"Submit": "Submit",
+	"No customers to display.": "No customers to display."
 }

@@ -74,22 +74,19 @@ function processElasticsearchResults(req, hits) {
         var phone = getField(hits[i], 'phone', 'partial');
         var mobile = getField(hits[i], 'mobile_phone', 'partial');
 
-        var phone_mpbile;
+        var phone_mobile;
         if (phone && mobile)
-            phone_mpbile = mobile + ' / ' + phone;
+            phone_mobile = mobile + ' / ' + phone;
         else if (mobile)
-            phone_mpbile = mobile;
+            phone_mobile = mobile;
         else
-            phone_mpbile = phone;
+            phone_mobile = phone;
 
         results[results.length] = {
             urlEdit: getCustomerUrl(req, 'edit', hits[i]._id),
             name: getField(hits[i], 'name', 'autocomplete'),
             surname: getField(hits[i], 'surname', 'autocomplete'),
-            phone: phone_mpbile,
-            header_name: req.i18n.__('Name'),
-            header_surname: req.i18n.__('Surname'),
-            header_phone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
+            phone: phone_mobile
         };
     }
     return results;
@@ -124,8 +121,13 @@ router.get('/search', function(req, res, next) {
             }
         }
     }, function(err, resp, respcode) {
-        var results = processElasticsearchResults(req, resp.hits.hits);
-        res.json(results);
+        res.json({
+            headerName: req.i18n.__('Name'),
+            headerSurname: req.i18n.__('Surname'),
+            headerPhone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
+            emptyMsg: req.i18n.__('No customers to display.'),
+            customers: processElasticsearchResults(req, resp.hits.hits)
+        });
     });
 });
 
@@ -140,14 +142,19 @@ router.get('/', exposeTemplates, function(req, res, next) {
             }
         }
     }, function(err, resp, respcode) {
-        var results = processElasticsearchResults(req, resp.hits.hits);
         res.render('customers', {
             i18n: {
                 title: req.i18n.__('Customers'),
                 createNewCustomer: req.i18n.__('Create new customer'),
                 search: req.i18n.__('Search...'),
             },
-            customers: results,
+            customersData: {
+                headerName: req.i18n.__('Name'),
+                headerSurname: req.i18n.__('Surname'),
+                headerPhone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
+                emptyMsg: req.i18n.__('No customers to display.'),
+                customers: processElasticsearchResults(req, resp.hits.hits)
+            },
             urlNew: getCustomersUrl(req, 'new'),
             urlSearch: getCustomersUrl(req, 'search')
         });

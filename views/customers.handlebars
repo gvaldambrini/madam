@@ -14,7 +14,7 @@
     templates['{{{name}}}'] = Handlebars.template({{{template}}});
     {{/templates}}
 
-    var customers = {{{json customers}}};
+    var customersData = {{{json customersData}}};
     var urlSearch = '{{urlSearch}}';
-    $(document).ready(Customers.init(templates, customers, urlSearch));
+    $(document).ready(Customers.init(templates, customersData, urlSearch));
 </script>

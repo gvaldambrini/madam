@@ -1,11 +1,12 @@
+{{#if this.customers}}
 <table class='table table-hover'>
     <thead>
-        <th>{{this.[0].header_name}}</th>
-        <th>{{this.[0].header_surname}}</th>
-        <th>{{this.[0].header_phone}}</th>
+        <th>{{this.headerName}}</th>
+        <th>{{this.headerSurname}}</th>
+        <th>{{this.headerPhone}}</th>
     </thead>
     <tbody>
-        {{#each this}}
+        {{#each this.customers}}
             <tr data-edit-url='{{urlEdit}}'>
                 <td>{{{name}}}</td>
                 <td>{{{surname}}}</td>
@@ -14,3 +15,6 @@
         {{/each}}
     </tbody>
 </table>
+{{else}}
+    <div class="alert alert-info" role="alert">{{this.emptyMsg}}</div>
+{{/if}}
