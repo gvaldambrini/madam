@@ -225,6 +225,36 @@ function createServicesType(callback) {
     });
 }
 
+function createUsersType(callback) {
+    client.indices.putMapping({
+        index: 'main',
+        type: 'users',
+        body: {
+            users: {
+                properties: {
+                    username: {
+                        type: "string",
+                        index: "not_analyzed"
+                    },
+                    password: {
+                        type: "string",
+                        index: "not_analyzed"
+                    },
+                    role: {
+                        type: "string",
+                        index: "not_analyzed"
+                    }
+                }
+            }
+        }
+    }, function(err, resp, respcode) {
+        if (!err) {
+            console.log('Type users created');
+        }
+        callback(err, resp);
+    });
+}
+
 program
     .description('Generate elastisearch indices.')
     .option('-d, --delete', 'delete old indices')
@@ -240,6 +270,7 @@ tasks[tasks.length] = createIndex;
 tasks[tasks.length] = createCustomerType;
 tasks[tasks.length] = createWorkersType;
 tasks[tasks.length] = createServicesType;
+tasks[tasks.length] = createUsersType;
 
 async.series(
     tasks,
