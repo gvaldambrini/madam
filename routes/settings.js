@@ -5,10 +5,10 @@ var settingsPath = '/settings';
 
 var elasticsearch = require('elasticsearch');
 var esErrors = elasticsearch.errors;
-var utils = require('../utils');
-var client = utils.createClient();
+var common = require('../common');
+var client = common.createClient();
 
-router.use(utils.isAuthenticated);
+router.use(common.isAuthenticated);
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'settings'
   response.locals.isSettingsActive = true;
@@ -23,7 +23,7 @@ router.get('/workers', function(req, res, next) {
     client.get({
         index: 'main',
         type: 'workers',
-        id: utils.workersDocId
+        id: common.workersDocId
     }, function(err, resp, respcode) {
         var items;
         if (resp.found && resp._source.workers.length > 0) {
@@ -99,7 +99,7 @@ router.post('/workers', function(req, res, next) {
         index: 'main',
         type: 'workers',
         refresh: true,
-        id: utils.workersDocId,
+        id: common.workersDocId,
         body: {
             workers: workers
         }
@@ -143,7 +143,7 @@ router.get('/services', function(req, res, next) {
     client.get({
         index: 'main',
         type: 'services',
-        id: utils.servicesDocId
+        id: common.servicesDocId
     }, function(err, resp, respcode) {
         res.render('settings', {
             i18n: {
@@ -194,7 +194,7 @@ router.post('/services', function(req, res, next) {
         index: 'main',
         type: 'services',
         refresh: true,
-        id: utils.servicesDocId,
+        id: common.servicesDocId,
         body: {
             names: services
         }

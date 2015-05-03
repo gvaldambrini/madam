@@ -1,9 +1,9 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
-var utils = require('../utils');
+var common = require('../common');
 
-router.get('/', utils.isAuthenticated, function(req, res, next) {
+router.get('/', common.isAuthenticated, function(req, res, next) {
     res.render('index', {
         isHomeActive: true,
         title: req.i18n.__('Home')});

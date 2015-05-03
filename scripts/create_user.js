@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 var elasticsearch = require('elasticsearch');
-var utils = require('../utils');
-var client = utils.createClient();
+var common = require('../common');
+var client = common.createClient();
 var async = require('async');
 var promptly = require('promptly');
 var bcrypt = require('bcrypt-nodejs');
@@ -13,7 +13,7 @@ async.waterfall([
             client.get({
                 index: 'main',
                 type: 'users',
-                id: utils.usersDocId
+                id: common.usersDocId
             }, function(err, resp, respcode) {
                 var res;
                 if (err) {
@@ -105,7 +105,7 @@ async.waterfall([
             client.index({
                 index: 'main',
                 type: 'users',
-                id: utils.usersDocId,
+                id: common.usersDocId,
                 body: {
                     users: res.users
                 }

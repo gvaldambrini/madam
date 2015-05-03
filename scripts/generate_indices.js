@@ -3,8 +3,8 @@
 var program = require('commander');
 var async = require('async');
 var elasticsearch = require('elasticsearch');
-var utils = require('../utils');
-var client = utils.createClient();
+var common = require('../common');
+var client = common.createClient();
 
 
 function deleteIndex(callback) {

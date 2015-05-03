@@ -1,13 +1,13 @@
 var express = require('express');
 var elasticsearch = require('elasticsearch');
 var router = express.Router();
-var utils = require('../utils');
-var client = utils.createClient();
+var common = require('../common');
+var client = common.createClient();
 var esErrors = elasticsearch.errors;
 var customersPath = '/customers';
 var moment = require('moment');
 
-router.use(utils.isAuthenticated);
+router.use(common.isAuthenticated);
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'customers'
   response.locals.isCustomersActive = true;
@@ -445,7 +445,7 @@ AppointmentUtils.prototype.handleForm = function(title) {
         body: {
             docs: [
                 {_index: 'main', _type: 'customer', _id: this.req.params.id},
-                {_index: 'main', _type: 'workers', _id: utils.workersDocId}
+                {_index: 'main', _type: 'workers', _id: common.workersDocId}
             ]
         }
     }, function(err, resp, respcode) {
@@ -591,8 +591,8 @@ router.get('/:id/appointments/new', function(req, res, next) {
         body: {
             docs: [
                 {_index: 'main', _type: 'customer', _id: req.params.id},
-                {_index: 'main', _type: 'workers', _id: utils.workersDocId},
-                {_index: 'main', _type: 'services', _id: utils.servicesDocId}
+                {_index: 'main', _type: 'workers', _id: common.workersDocId},
+                {_index: 'main', _type: 'services', _id: common.servicesDocId}
             ]
         }
     }, function(err, resp, respcode) {
@@ -647,7 +647,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
         body: {
             docs: [
                 {_index: 'main', _type: 'customer', _id: req.params.id},
-                {_index: 'main', _type: 'workers', _id: utils.workersDocId}
+                {_index: 'main', _type: 'workers', _id: common.workersDocId}
             ]
         }
     }, function(err, resp, respcode) {

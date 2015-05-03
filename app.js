@@ -18,8 +18,8 @@ var i18n = require('i18n-2');
 var routes = require('./routes/index');
 var customers = require('./routes/customers');
 var settings = require('./routes/settings');
-var utils = require('./utils');
-var client = utils.createClient();
+var common = require('./common');
+var client = common.createClient();
 
 var app = express();
 
@@ -111,7 +111,7 @@ passport.use('login', new LocalStrategy({
       client.get({
           index: 'main',
           type: 'users',
-          id: utils.usersDocId
+          id: common.usersDocId
       }, function(err, resp, respcode) {
           function filterFn(item) {
               return item.username === username;
