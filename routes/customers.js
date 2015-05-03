@@ -182,7 +182,7 @@ var CustomerUtils = function(req, res) {
 
 CustomerUtils.formFields = [
     'name', 'surname', 'mobile_phone', 'phone', 'email',
-    'first_see', 'last_see', 'allow_sms', 'allow_email'];
+    'first_see', 'last_see', 'allow_sms', 'allow_email', 'notes'];
 
 CustomerUtils.prototype.toISODate = function(localFormattedDate) {
     return toISODate(this.req, localFormattedDate);
@@ -204,6 +204,7 @@ CustomerUtils.prototype.formNames = function() {
         first_see: this.req.i18n.__('First see'),
         last_see: this.req.i18n.__('Last see'),
         discount: this.req.i18n.__('Discount'),
+        notes: this.req.i18n.__('Notes'),
         submit: this.req.i18n.__('Submit')
     };
 };

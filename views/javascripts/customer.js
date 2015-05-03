@@ -11,7 +11,8 @@ var Customer = (function(window, $) {
         customerData = _customerData;
         $.fn.datepicker.defaults.format = dateFormat;
 
-        $('form input').each(function() {
+        $form = $('#form');
+        $form.find('input').each(function() {
             var name = $(this).attr('name');
             if (typeof customerData[name] !== 'undefined') {
                 if (name == 'first_see' || name == 'last_see') {
@@ -27,6 +28,7 @@ var Customer = (function(window, $) {
                 }
             }
         });
+        $form.find('textarea').val(customerData.notes);
         $('#first_see-container .input-group.date').datepicker({
             language: language,
             format: dateFormat,
