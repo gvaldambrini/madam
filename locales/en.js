@@ -42,5 +42,10 @@
 	"Submit": "Submit",
 	"No customers to display.": "No customers to display.",
 	"To create an appointment, you have first to <a href=\"%s\">define the workers.</a>": "To create an appointment, you have first to <a href=\"%s\">define the workers.</a>",
-	"To create an appointment, you have first to <a href=\"%s\">define the common services.</a>": "To create an appointment, you have first to <a href=\"%s\">define the common services.</a>"
+	"To create an appointment, you have first to <a href=\"%s\">define the common services.</a>": "To create an appointment, you have first to <a href=\"%s\">define the common services.</a>",
+	"Incorrect password.": "Incorrect password.",
+	"Incorrect username.": "Incorrect username.",
+	"Username": "Username",
+	"Password": "Password",
+	"Login": "Login"
 }

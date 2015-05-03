@@ -8,6 +8,7 @@ var esErrors = elasticsearch.errors;
 var utils = require('../utils');
 var client = utils.createClient();
 
+router.use(utils.isAuthenticated);
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'settings'
   response.locals.isSettingsActive = true;

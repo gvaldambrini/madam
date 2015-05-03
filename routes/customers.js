@@ -7,7 +7,7 @@ var esErrors = elasticsearch.errors;
 var customersPath = '/customers';
 var moment = require('moment');
 
-
+router.use(utils.isAuthenticated);
 router.use(function (request, response, next) {
   // everything inside this file is under the active view 'customers'
   response.locals.isCustomersActive = true;

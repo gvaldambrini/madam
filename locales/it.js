@@ -42,5 +42,10 @@
 	"Submit": "Salva",
 	"No customers to display.": "Nessun cliente da mostrare.",
 	"To create an appointment, you have first to <a href=\"%s\">define the workers.</a>": "Per creare un appuntamento, è necessario prima <a href=\"%s\">definire i lavoratori.</a>",
-	"To create an appointment, you have first to <a href=\"%s\">define the common services.</a>": "Per creare un appuntamento, è necessario prima <a href=\"%s\">definire i servizi comuni.</a>"
+	"To create an appointment, you have first to <a href=\"%s\">define the common services.</a>": "Per creare un appuntamento, è necessario prima <a href=\"%s\">definire i servizi comuni.</a>",
+	"Incorrect password.": "Password non valida.",
+	"Incorrect username.": "Username non valido.",
+	"Username": "Username",
+	"Password": "Password",
+	"Login": "Login"
 }

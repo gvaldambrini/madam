@@ -5,6 +5,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('cookie-session');
+var passport = require('passport');
+var LocalStrategy = require('passport-local');
+var bcrypt = require('bcrypt-nodejs');
+var elasticsearch = require('elasticsearch');
 var validator = require('express-validator');
 var csrf = require('csurf');
 var moment = require('moment');
@@ -13,6 +18,8 @@ var i18n = require('i18n-2');
 var routes = require('./routes/index');
 var customers = require('./routes/customers');
 var settings = require('./routes/settings');
+var utils = require('./utils');
+var client = utils.createClient();
 
 var app = express();
 
@@ -69,7 +76,68 @@ app.use(function (request, response, next) {
   return validator(validatorOptions)(request, response, next);
 });
 
-app.use(cookieParser());
+var cookieKey;
+var cookieSecret;
+if (process.env.NODE_ENV == 'production') {
+  cookieKey = process.env.COOKIE_KEY;
+  cookieSecret = process.env.COOKIE_SECRET;
+}
+else {
+  cookieKey = 'sid';
+  cookieSecret = 'secret';
+}
+
+app.use(cookieParser(cookieSecret));
+app.use(session({
+  key: cookieKey,
+  secret: cookieSecret,
+  maxAge: 1 * 60 * 60 * 1000 // 1 hour
+  })
+);
+
+// For now, there is no need of something more than the username.
+passport.serializeUser(function(username, done) {
+  done(null, username);
+});
+
+passport.deserializeUser(function(username, done) {
+  done(null, username);
+});
+
+passport.use('login', new LocalStrategy({
+    passReqToCallback : true
+  },
+  function(req, username, password, done) {
+      client.get({
+          index: 'main',
+          type: 'users',
+          id: utils.usersDocId
+      }, function(err, resp, respcode) {
+          function filterFn(item) {
+              return item.username === username;
+          }
+          if (err) {
+              return done(err);
+          }
+
+          var users = resp._source.users.filter(filterFn);
+          if (users.length === 0) {
+            req.session.error = req.i18n.__('Incorrect username.');
+            return done(null, false);
+          }
+
+          var user = users[0];
+          if (!bcrypt.compareSync(password, user.password)) {
+            req.session.error = req.i18n.__('Incorrect password.');
+            return done(null, false);
+          }
+
+          return done(null, username);
+      });
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(csrf({ cookie: true }));
 app.use(function (request, response, next) {
   response.locals.csrftoken = request.csrfToken();
