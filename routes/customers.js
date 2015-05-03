@@ -36,34 +36,6 @@ function getCustomerName(obj) {
     return obj.name;
 }
 
-// Middleware to expose shared templates to the client side.
-function exposeTemplates(req, res, next) {
-
-    req.app.hbs.getTemplates('views/shared/', {
-        cache: req.app.enabled('view cache'),
-        precompiled: true
-    }).then(function (templates) {
-        var extRegex = new RegExp(req.app.hbs.extname + '$');
-
-        // Creates an array of templates which are exposed via
-        // `res.locals.templates`.
-        templates = Object.keys(templates).map(function (name) {
-            return {
-                name: name.replace(extRegex, ''),
-                template: templates[name]
-            };
-        });
-
-        // Exposes the templates during view rendering.
-        if (templates.length) {
-            res.locals.templates = templates;
-        }
-
-        setImmediate(next);
-    })
-    .catch(next);
-}
-
 function processElasticsearchResults(req, hits) {
 
     function getField(hit, field, field_type) {
@@ -157,7 +129,7 @@ router.get('/search', function(req, res, next) {
     });
 });
 
-router.get('/', exposeTemplates, function(req, res, next) {
+router.get('/', common.exposeTemplates, function(req, res, next) {
     client.search({
         index: 'main',
         type: 'customer',
