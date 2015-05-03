@@ -73,6 +73,26 @@ function processElasticsearchResults(req, hits) {
         return hit._source[field];
     }
 
+    // sort by name & surname (ascending)
+    function sortFn(a, b) {
+        var aName = a.name.toLowerCase();
+        var bName = b.name.toLowerCase();
+
+        var aSurname = a.surname ? a.surname.toLowerCase() : '';
+        var bSurname = b.surname ? b.surname.toLowerCase() : '';
+
+        if (aName < bName)
+            return -1;
+        if (aName > bName)
+            return 1;
+
+        if (aSurname < bSurname)
+            return -1;
+        if (aSurname > bSurname)
+            return 1;
+        return 0;
+    }
+
     var results = [];
     for (var i = 0; i < hits.length; i++) {
         var phone = getField(hits[i], 'phone', 'partial');
@@ -93,6 +113,8 @@ function processElasticsearchResults(req, hits) {
             phone: phone_mobile
         };
     }
+
+    results.sort(sortFn);
     return results;
 }
 
@@ -398,6 +420,15 @@ router.get('/:id/appointments', function(req, res, next) {
             return item.description;
         }
 
+        // sort by date (descending)
+        function sortFn(a, b) {
+            if (a.date < b.date)
+                return 1;
+            if (a.date > b.date)
+                return -1;
+            return 0;
+        }
+
         var obj = resp._source;
         if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0)
             res.redirect(getCustomerUrl(req, 'appointments/new'));
@@ -410,6 +441,7 @@ router.get('/:id/appointments', function(req, res, next) {
                     urlEdit: getCustomerUrl(req, 'appointments/' + i + '/edit')
                 });
             }
+            appointments.sort(sortFn);
 
             res.render('appointments', {
                 i18n: {
