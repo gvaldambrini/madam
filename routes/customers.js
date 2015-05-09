@@ -410,7 +410,8 @@ router.get('/:id/appointments', function(req, res, next) {
                 appointments.push({
                     date: obj.appointments[i].date,
                     services: obj.appointments[i].services.map(descFn).join(' - '),
-                    urlEdit: getCustomerUrl(req, 'appointments/' + i + '/edit')
+                    urlEdit: getCustomerUrl(req, 'appointments/' + i + '/edit'),
+                    urlDelete: getCustomerUrl(req, 'appointments/' + i + '/delete')
                 });
             }
             appointments.sort(sortFn);
@@ -422,7 +423,11 @@ router.get('/:id/appointments', function(req, res, next) {
                     appointments: req.i18n.__('Appointments'),
                     date: req.i18n.__('Date'),
                     services: req.i18n.__('Services'),
-                    createNew: req.i18n.__('Create new')
+                    createNew: req.i18n.__('Create new'),
+                    btnConfirm: req.i18n.__('Confirm'),
+                    btnCancel: req.i18n.__('Cancel'),
+                    deleteTitle: req.i18n.__('Delete the appointment?'),
+                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?')
                 },
                 infoUrl: getCustomerUrl(req, 'edit'),
                 isAppointmentsActive: true,
@@ -693,6 +698,48 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
 
 router.post('/:id/appointments/:appnum/edit', function(req, res, next) {
     req.utils.handleForm(req.i18n.__('Edit appointment'));
+});
+
+router.post('/:id/appointments/:appnum/delete', function(req, res, next) {
+    client.get({
+        index: 'main',
+        type: 'customer',
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        var version = resp._version;
+        var obj = resp._source;
+        var index = req.params.appnum;
+
+        if (err) {
+            console.log(err);
+            res.status(400).end();
+            return;
+        }
+        if (index < 0 || index >= obj.appointments.length) {
+            console.log('Wrong index:', index, 'in removing appointment for customer:', req.params.id);
+            res.status(400).end();
+            return;
+        }
+        obj.appointments.splice(index, 1);
+
+        client.update({
+            index: 'main',
+            type: 'customer',
+            id: req.params.id,
+            version: version,
+            body: {
+                doc: obj
+            }
+        }, function(err, resp, respcode) {
+            if (err) {
+                console.log(err);
+                res.status(400).end();
+            }
+            else {
+                res.status(200).end();
+            }
+        });
+    });
 });
 
 module.exports.router = router;

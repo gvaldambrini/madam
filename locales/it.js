@@ -47,5 +47,9 @@
 	"Incorrect username.": "Username non valido.",
 	"Username": "Username",
 	"Password": "Password",
-	"Login": "Login"
+	"Login": "Login",
+	"Confirm": "Conferma",
+	"Cancel": "Annulla",
+	"Delete the appointment?": "Eliminare l'appuntamento?",
+	"The operation cannot be undone. Continue?": "L'operazione non è reversibile. Continuare?"
 }

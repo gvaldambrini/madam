@@ -3,22 +3,34 @@
 <div class="appointments-content">
     <a href='{{urlNew}}' class='btn btn-primary'>{{i18n.createNew}}</a>
 
-    <table class='table table-hover'>
+    <table class='table table-hover' id="appointments-table">
         <thead>
             <th>{{i18n.date}}</th>
             <th>{{i18n.services}}</th>
+            <th></th>
         </thead>
         <tbody>
             {{#each appointments}}
                 <tr data-edit-url='{{urlEdit}}'>
                     <td>{{{date}}}</td>
                     <td>{{{services}}}</td>
+                    <td class="no-padding">
+                        <span class="pull-right glyphicon glyphicon-trash" data-delete-url='{{urlDelete}}'></span>
+                    </td>
                 </tr>
             {{/each}}
         </tbody>
     </table>
 </div>
 
+<script id="popover-template" type="text/x-handlebars-template">
+    {{>popover confirm=i18n.btnConfirm cancel=i18n.btnCancel}}
+</script>
+
 <script type='text/javascript'>
-    $(document).ready(Appointments.init());
+    $(document).ready(Appointments.init({
+        csrfToken: '{{csrftoken}}',
+        confirmTitle: '{{i18n.deleteTitle}}',
+        confirmMsg: '{{i18n.deleteMsg}}',
+    }));
 </script>

@@ -47,5 +47,9 @@
 	"Incorrect username.": "Incorrect username.",
 	"Username": "Username",
 	"Password": "Password",
-	"Login": "Login"
+	"Login": "Login",
+	"Confirm": "Confirm",
+	"Cancel": "Cancel",
+	"Delete the appointment?": "Delete the appointment?",
+	"The operation cannot be undone. Continue?": "The operation cannot be undone. Continue?"
 }
