@@ -80,6 +80,7 @@ function processElasticsearchResults(req, hits) {
 
         results[results.length] = {
             urlEdit: getCustomerUrl(req, 'edit', hits[i]._id),
+            urlDelete: getCustomerUrl(req, 'delete', hits[i]._id),
             name: getField(hits[i], 'name', 'autocomplete'),
             surname: getField(hits[i], 'surname', 'autocomplete'),
             phone: phone_mobile
@@ -145,6 +146,11 @@ router.get('/', common.exposeTemplates, function(req, res, next) {
                 title: req.i18n.__('Customers'),
                 createNewCustomer: req.i18n.__('Create new customer'),
                 search: req.i18n.__('Search...'),
+                btnConfirm: req.i18n.__('Confirm'),
+                btnCancel: req.i18n.__('Cancel'),
+                deleteTitle: req.i18n.__('Delete the customer?'),
+                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?')
+
             },
             customersData: {
                 headerName: req.i18n.__('Name'),
@@ -440,6 +446,22 @@ router.get('/:id/appointments', function(req, res, next) {
     });
 });
 
+router.post('/:id/delete', function(req, res, next) {
+    client.delete({
+        index: 'main',
+        type: 'customer',
+        refresh: true,
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        if (err) {
+            console.log(err);
+            res.status(400).end();
+        }
+        else {
+            res.status(200).end();
+        }
+    });
+});
 
 var AppointmentUtils = function(req, res) {
     this.req = req;

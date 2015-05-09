@@ -2,10 +2,23 @@ var Customers = (function(window, $) {
     /// Private variables and functions
     var templates;
     var originalHtml;
-    var urlSearch;
+    var options;
     var $searchClear;
     var $searchInput;
     var $tableContainer;
+
+    var deleteCustomer = function($target) {
+        $.ajax({
+            url: $target.data('delete-url'),
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': options.csrfToken
+            },
+            complete: function(data) {
+                window.location.reload();
+            }
+        });
+    };
 
     var goToEditForm = function(event) {
         window.location.href = $(this).data('edit-url');
@@ -16,7 +29,7 @@ var Customers = (function(window, $) {
         var text = $(this).val();
         if (text) {
             $.ajax({
-                url: urlSearch,
+                url: options.urlSearch,
                 data: {
                     text: text
                 },
@@ -37,14 +50,32 @@ var Customers = (function(window, $) {
     };
 
     var renderTable = function(html) {
+        var $trash;
+
         $tableContainer.html(html);
-        $('.table tbody tr').on("click", goToEditForm);
+        $tableContainer.find('tbody tr').on("click", goToEditForm);
+        $trash = $tableContainer.find('.glyphicon-trash');
+        $trash.on('click', function(event) {
+            event.stopPropagation();
+        });
+        $trash.map(function(index, item) {
+            var $item = $(item);
+            $item.confirmPopover({
+                template: '#popover-template',
+                title: options.confirmTitle,
+                content: options.confirmMsg,
+                $rootContainer: $tableContainer,
+                onConfirm: function() {
+                    return deleteCustomer($item);
+                }
+            });
+        });
     };
 
-    var init = function(_templates, _customersData, _urlSearch) {
+    var init = function(_templates, _customersData, _options) {
         templates = _templates;
         originalHtml = templates.customers_table(_customersData);
-        urlSearch = _urlSearch;
+        options = _options;
 
         $searchClear = $("#search-clear");
         $searchInput = $("#search-input");

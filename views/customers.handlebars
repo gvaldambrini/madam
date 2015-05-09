@@ -8,6 +8,10 @@
 </div>
 
 <div id="customers-table-container"></div>
+<script id="popover-template" type="text/x-handlebars-template">
+    {{>popover confirm=i18n.btnConfirm cancel=i18n.btnCancel}}
+</script>
+
 <script type='text/javascript'>
     var templates = Handlebars.templates = Handlebars.templates || {};
     {{#templates}}
@@ -15,6 +19,10 @@
     {{/templates}}
 
     var customersData = {{{json customersData}}};
-    var urlSearch = '{{urlSearch}}';
-    $(document).ready(Customers.init(templates, customersData, urlSearch));
+    $(document).ready(Customers.init(templates, customersData, {
+        urlSearch: '{{urlSearch}}',
+        confirmTitle: '{{i18n.deleteTitle}}',
+        confirmMsg: '{{i18n.deleteMsg}}',
+        csrfToken: '{{csrftoken}}'
+    }));
 </script>

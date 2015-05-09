@@ -51,5 +51,6 @@
 	"Confirm": "Confirm",
 	"Cancel": "Cancel",
 	"Delete the appointment?": "Delete the appointment?",
-	"The operation cannot be undone. Continue?": "The operation cannot be undone. Continue?"
+	"The operation cannot be undone. Continue?": "The operation cannot be undone. Continue?",
+	"Delete the customer?": "Delete the customer?"
 }

@@ -51,5 +51,6 @@
 	"Confirm": "Conferma",
 	"Cancel": "Annulla",
 	"Delete the appointment?": "Eliminare l'appuntamento?",
-	"The operation cannot be undone. Continue?": "L'operazione non è reversibile. Continuare?"
+	"The operation cannot be undone. Continue?": "L'operazione non è reversibile. Continuare?",
+	"Delete the customer?": "Eliminare il cliente?"
 }

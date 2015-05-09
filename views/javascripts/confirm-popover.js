@@ -11,7 +11,10 @@
         // Create the container fro all the popovers if not exists.
         var $mainContainer = $('#popovers-container');
         if ($mainContainer.length === 0) {
-            $('body').append('<div id="popovers-container"></div>');
+            if (typeof options.$rootContainer == 'undefined') {
+                options.$rootContainer = $('body');
+            }
+            options.$rootContainer.append('<div id="popovers-container"></div>');
             $mainContainer = $('#popovers-container');
         }
 
