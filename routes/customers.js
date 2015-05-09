@@ -92,11 +92,9 @@ function processElasticsearchResults(req, hits) {
 }
 
 router.get('/search', function(req, res, next) {
-    client.search({
-        index: 'main',
-        type: 'customer',
-        size: 50,
-        body: {
+    var queryBody;
+    if (req.query.text.trim()) {
+        queryBody = {
             query: {
                 multi_match: {
                     query: req.query.text,
@@ -118,7 +116,21 @@ router.get('/search', function(req, res, next) {
                     }
                 }
             }
-        }
+        };
+    }
+    else {
+        queryBody = {
+            query: {
+                match_all: {}
+            }
+        };
+    }
+
+    client.search({
+        index: 'main',
+        type: 'customer',
+        size: 50,
+        body: queryBody
     }, function(err, resp, respcode) {
         res.json({
             headerName: req.i18n.__('Name'),
