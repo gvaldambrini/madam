@@ -91,9 +91,18 @@ app.use(cookieParser(cookieSecret));
 app.use(session({
   key: cookieKey,
   secret: cookieSecret,
-  maxAge: 1 * 60 * 60 * 1000 // 1 hour
+  maxAge: 1 * 60 * 60 * 1000 // 1 hour (rolling)
   })
 );
+
+app.get('*', function (req, res, next) {
+    // To update the session expiration time we need to send the new
+    // expiration in the response cookie.
+    // To send again the response cookie to the client we need to
+    // update the session object.
+    req.session.fake = Date.now();
+    next();
+});
 
 // For now, there is no need of something more than the username.
 passport.serializeUser(function(username, done) {
