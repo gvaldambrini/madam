@@ -62,7 +62,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(function (request, response, next) {
+app.use(function(request, response, next) {
   var validatorOptions = {
     customValidators: {
       isEmpty: function(value) {
@@ -95,7 +95,7 @@ app.use(session({
   })
 );
 
-app.get('*', function (req, res, next) {
+app.get('*', function(req, res, next) {
     // To update the session expiration time we need to send the new
     // expiration in the response cookie.
     // To send again the response cookie to the client we need to
@@ -125,17 +125,24 @@ passport.use('login', new LocalStrategy({
           function filterFn(item) {
               return item.username === username;
           }
+          var users, user;
+
           if (err) {
               return done(err);
           }
 
-          var users = resp._source.users.filter(filterFn);
+          if (typeof resp._source == 'undefined') {
+            console.log('Users document not found');
+            req.session.error = req.i18n.__('Incorrect username.');
+            return done(null, false);
+          }
+          users = resp._source.users.filter(filterFn);
           if (users.length === 0) {
             req.session.error = req.i18n.__('Incorrect username.');
             return done(null, false);
           }
 
-          var user = users[0];
+          user = users[0];
           if (!bcrypt.compareSync(password, user.password)) {
             req.session.error = req.i18n.__('Incorrect password.');
             return done(null, false);
@@ -147,8 +154,13 @@ passport.use('login', new LocalStrategy({
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(function(req, resp, next) {
+  resp.locals.username = req.user;
+  next();
+});
+
 app.use(csrf({ cookie: true }));
-app.use(function (request, response, next) {
+app.use(function(request, response, next) {
   response.locals.csrftoken = request.csrfToken();
   next();
 });

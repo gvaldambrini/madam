@@ -1,7 +1,8 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-        <div class="navbar-logo">
-            <a href="/"><img src="/images/logo.png"></a>
-        </div>
+    <div class="navbar-logo">
+        <a href="/"><img src="/images/logo.png"></a>
     </div>
+    {{#if username}}
+    <div class="navbar-user">{{username}}<div><a href="/logout">logout</a><div></div>
+    {{/if}}
 </nav>

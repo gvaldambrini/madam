@@ -16,8 +16,21 @@ body {
 }
 
 .navbar-logo {
+  margin-left: 15px;
   padding-top: 4px;
   float: left;
+}
+
+.navbar-user {
+  font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;
+  float: right;
+  text-align: right;
+  margin-right: 25px;
+  margin-top: 10px;
+  color: #dddddd;
+  a {
+    color: #dddddd;
+  }
 }
 
 /*
