@@ -5,42 +5,8 @@ var uglify = require('gulp-uglify');
 var minifycss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var nodemon = require('gulp-nodemon');
-
-if (process.env.NODE_ENV === 'production') {
-    console.log('*** production ***');
-    gulp.task('sass', function () {
-        gulp.src('views/stylesheets/*.scss')
-            .pipe(sass())
-            .pipe(concat('main.css'))
-            .pipe(rename({ suffix: '.min' }))
-            .pipe(minifycss())
-            .pipe(gulp.dest('public/stylesheets'));
-    });
-
-    gulp.task('scripts', function() {
-        return gulp.src('views/javascripts/*.js')
-          .pipe(concat('main.js'))
-          .pipe(uglify())
-          .pipe(rename('main.min.js'))
-          .pipe(gulp.dest('public/javascripts'));
-    });
-}
-else {
-    console.log('*** development ***');
-    gulp.task('sass', function () {
-        gulp.src('views/stylesheets/*.scss')
-            .pipe(sass())
-            .pipe(concat('main.css'))
-            .pipe(gulp.dest('public/stylesheets'));
-    });
-
-    gulp.task('scripts', function() {
-        return gulp.src('views/javascripts/*.js')
-          .pipe(concat('main.js'))
-          .pipe(gulp.dest('public/javascripts'));
-    });
-
-}
+var browserSync = require('browser-sync');
+var reload = browserSync.reload;
 
 gulp.task('vendorscripts', function() {
     return gulp.src([
@@ -66,15 +32,80 @@ gulp.task('images', function() {
       .pipe(gulp.dest('public/images'));
 });
 
-var buildTasks = ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images'];
+if (process.env.NODE_ENV === 'production') {
+    console.log('*** production ***');
 
-gulp.task('default', buildTasks);
+    gulp.task('sass', function () {
+        gulp.src('views/stylesheets/*.scss')
+            .pipe(sass())
+            .pipe(concat('main.css'))
+            .pipe(rename({ suffix: '.min' }))
+            .pipe(minifycss())
+            .pipe(gulp.dest('public/stylesheets'));
+    });
 
-gulp.task('start', function () {
-  nodemon({
-    script: 'bin/www',
-    ignore: ['public/*'],
-    ext: 'handlebars js scss',
-    tasks: buildTasks
-  });
-});
+    gulp.task('scripts', function() {
+        return gulp.src('views/javascripts/*.js')
+          .pipe(concat('main.js'))
+          .pipe(uglify())
+          .pipe(rename('main.min.js'))
+          .pipe(gulp.dest('public/javascripts'));
+    });
+
+    gulp.task('build', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images']);
+}
+else {
+    console.log('*** development ***');
+
+    gulp.task('sass', function () {
+        gulp.src('views/stylesheets/*.scss')
+            .pipe(sass())
+            .pipe(concat('main.css'))
+            .pipe(gulp.dest('public/stylesheets'))
+            .pipe(reload({stream:true}));
+    });
+
+    gulp.task('scripts', function() {
+        return gulp.src('views/javascripts/*.js')
+          .pipe(concat('main.js'))
+          .pipe(gulp.dest('public/javascripts'));
+    });
+
+    gulp.task('build', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images']);
+    gulp.task('scripts-watch', ['scripts'], reload);
+
+    gulp.task('browser-sync', ['nodemon'], function() {
+      browserSync.init(null, {
+        proxy: "http://localhost:3000",
+        browser: ['google chrome'],
+        port: 4000
+      });
+    });
+
+    gulp.task('nodemon', function (cb) {
+      var called = false;
+      return nodemon({
+        script: 'bin/www',
+        ext: 'js',
+        ignore: ['public/*', 'views/*']
+      }).on('start', function () {
+        if (!called) {
+          called = true;
+          cb();
+        }
+      });
+    });
+
+    gulp.task('default', ['build', 'browser-sync'], function () {
+      gulp.watch("views/stylesheets/*.scss", ['sass']);
+      gulp.watch("views/javascripts/*.js", ['scripts-watch']);
+      gulp.watch([
+        "views/*.handlebars",
+        'views/partials/*.handlebars',
+        'views/layouts/*.handlebars',
+        'views/shared/*.handlebars'], reload);
+    });
+}
+
+
+
