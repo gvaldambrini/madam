@@ -39,5 +39,7 @@
     "promptly": "^0.2.1",
     "serve-favicon": "~2.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "selenium-server-standalone-jar": "^2.45.0"
+  }
 }
