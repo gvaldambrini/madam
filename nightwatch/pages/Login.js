@@ -9,4 +9,9 @@ module.exports = function (browser) {
 
         return browser;
     };
+
+    this.alertContains = function(message) {
+        return browser
+          .assert.containsText('#login-box .alert', message);
+    };
 };
