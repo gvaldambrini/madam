@@ -1,6 +1,6 @@
 {
   "date_format": "DD/MM/YYYY",
-  "language": "it",
+  "language": "en",
   "defaultWorkerColor": "#000000",
-  "mainIndex": "main"
+  "mainIndex": "main_test"
 }

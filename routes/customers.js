@@ -127,7 +127,7 @@ router.get('/search', function(req, res, next) {
     }
 
     client.search({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'customer',
         size: 50,
         body: queryBody
@@ -144,7 +144,7 @@ router.get('/search', function(req, res, next) {
 
 router.get('/', common.exposeTemplates, function(req, res, next) {
     client.search({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'customer',
         size: 50,
         body: {
@@ -302,7 +302,7 @@ CustomerUtils.prototype.handleForm = function(title) {
     }
 
     var args = {
-        index: 'main',
+        index: this.req.config.mainIndex,
         type: 'customer',
         refresh: true,
         body: this.toElasticsearchFormat(this.req.body)
@@ -371,7 +371,7 @@ router.post('/new', function(req, res, next) {
 
 router.get('/:id/edit', function(req, res, next) {
     client.get({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
@@ -392,7 +392,7 @@ router.get('/:id/edit', function(req, res, next) {
 
 router.post('/:id/edit', function(req, res, next) {
     client.get({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
@@ -402,7 +402,7 @@ router.post('/:id/edit', function(req, res, next) {
 
 router.get('/:id/appointments', function(req, res, next) {
     client.get({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
@@ -460,7 +460,7 @@ router.get('/:id/appointments', function(req, res, next) {
 
 router.post('/:id/delete', function(req, res, next) {
     client.delete({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'customer',
         refresh: true,
         id: req.params.id
@@ -487,8 +487,8 @@ AppointmentUtils.prototype.handleForm = function(title) {
     client.mget({
         body: {
             docs: [
-                {_index: 'main', _type: 'customer', _id: this.req.params.id},
-                {_index: 'main', _type: 'workers', _id: common.workersDocId}
+                {_index: this.req.config.mainIndex, _type: 'customer', _id: this.req.params.id},
+                {_index: this.req.config.mainIndex, _type: 'workers', _id: common.workersDocId}
             ]
         }
     }, function(err, resp, respcode) {
@@ -571,7 +571,7 @@ AppointmentUtils.prototype.handleForm = function(title) {
         }
 
         client.update({
-            index: 'main',
+            index: that.req.config.mainIndex,
             type: 'customer',
             id: that.req.params.id,
             version: version,
@@ -633,9 +633,9 @@ router.get('/:id/appointments/new', function(req, res, next) {
     client.mget({
         body: {
             docs: [
-                {_index: 'main', _type: 'customer', _id: req.params.id},
-                {_index: 'main', _type: 'workers', _id: common.workersDocId},
-                {_index: 'main', _type: 'services', _id: common.servicesDocId}
+                {_index: req.config.mainIndex, _type: 'customer', _id: req.params.id},
+                {_index: req.config.mainIndex, _type: 'workers', _id: common.workersDocId},
+                {_index: req.config.mainIndex, _type: 'services', _id: common.servicesDocId}
             ]
         }
     }, function(err, resp, respcode) {
@@ -689,8 +689,8 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
     client.mget({
         body: {
             docs: [
-                {_index: 'main', _type: 'customer', _id: req.params.id},
-                {_index: 'main', _type: 'workers', _id: common.workersDocId}
+                {_index: req.config.mainIndex, _type: 'customer', _id: req.params.id},
+                {_index: req.config.mainIndex, _type: 'workers', _id: common.workersDocId}
             ]
         }
     }, function(err, resp, respcode) {
@@ -736,7 +736,7 @@ router.post('/:id/appointments/:appnum/edit', function(req, res, next) {
 
 router.post('/:id/appointments/:appnum/delete', function(req, res, next) {
     client.get({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
@@ -757,7 +757,7 @@ router.post('/:id/appointments/:appnum/delete', function(req, res, next) {
         obj.appointments.splice(index, 1);
 
         client.update({
-            index: 'main',
+            index: req.config.mainIndex,
             type: 'customer',
             id: req.params.id,
             version: version,

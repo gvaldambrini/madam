@@ -28,7 +28,12 @@ i18n.expressBind(app, {
 });
 
 app.use(function(request, response, next) {
-  request.config = require('./config.json');
+  if (typeof process.env.NODE_CONFIG_FILE != 'undefined') {
+    request.config = require(process.env.NODE_CONFIG_FILE);
+  }
+  else {
+    request.config = require('./config.json');
+  }
   request.i18n.setLocale(request.config.language);
   // Let the configuration available also in templates.
   response.locals.config = request.config;
@@ -118,7 +123,7 @@ passport.use('login', new LocalStrategy({
   },
   function(req, username, password, done) {
       client.get({
-          index: 'main',
+          index: req.config.mainIndex,
           type: 'users',
           id: common.usersDocId
       }, function(err, resp, respcode) {

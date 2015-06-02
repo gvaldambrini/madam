@@ -21,7 +21,7 @@ router.get('/', function(req, res, next) {
 
 router.get('/workers', function(req, res, next) {
     client.get({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'workers',
         id: common.workersDocId
     }, function(err, resp, respcode) {
@@ -96,7 +96,7 @@ router.post('/workers', function(req, res, next) {
     }
 
     var args = {
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'workers',
         refresh: true,
         id: common.workersDocId,
@@ -141,7 +141,7 @@ router.post('/workers', function(req, res, next) {
 
 router.get('/services', function(req, res, next) {
     client.get({
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'services',
         id: common.servicesDocId
     }, function(err, resp, respcode) {
@@ -191,7 +191,7 @@ router.post('/services', function(req, res, next) {
     }
 
     var args = {
-        index: 'main',
+        index: req.config.mainIndex,
         type: 'services',
         refresh: true,
         id: common.servicesDocId,
