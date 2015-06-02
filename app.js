@@ -63,7 +63,13 @@ app.set('view engine', 'handlebars');
 
 // Avoid 404 errors on favicon requests
 app.use(favicon(__dirname + '/public/images/blank-favicon.ico'));
-app.use(logger('dev'));
+
+app.use(logger('dev', {
+  skip: function(req, res) {
+    return !req.config.logger;
+  }
+}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 

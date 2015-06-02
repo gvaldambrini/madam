@@ -2,5 +2,6 @@
   "date_format": "DD/MM/YYYY",
   "language": "it",
   "defaultWorkerColor": "#000000",
-  "mainIndex": "main"
+  "mainIndex": "main",
+  "logger": true
 }
