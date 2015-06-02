@@ -40,6 +40,7 @@
     "serve-favicon": "~2.2.0"
   },
   "devDependencies": {
+    "nightwatch-custom-commands-assertions": "^1.0.2",
     "selenium-server-standalone-jar": "^2.45.0"
   }
 }
