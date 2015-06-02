@@ -61,8 +61,8 @@ app.hbs = hbs;
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
+// Avoid 404 errors on favicon requests
+app.use(favicon(__dirname + '/public/images/blank-favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
