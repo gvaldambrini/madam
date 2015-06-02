@@ -14,4 +14,9 @@ module.exports = function (browser) {
         return browser
           .assert.containsText('#login-box .alert', message);
     };
+
+    this.isLoginPage = function() {
+        return browser
+          .assert.elementPresent('#login-box');
+    };
 };
