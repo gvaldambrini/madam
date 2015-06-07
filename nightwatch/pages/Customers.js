@@ -1,22 +1,30 @@
 var util = require('util');
 
 module.exports = function (browser) {
-    this.createCustomer = function(obj) {
-        function toText(field) {
-          return typeof field == 'undefined' ? '' : field;
-        }
 
+    this.createCustomer = function() {
         browser
           .waitForElementVisible('.main .btn-primary', 1000)
-          .click('.main .btn-primary')
-          .waitForElementVisible('form', 1000)
-          .setValue('input[name=name]', obj.name)
-          .setValue('input[name=surname]', obj.surname)
-          .setValue('input[name=mobile_phone]', toText(obj.mobile))
-          .setValue('input[name=phone]', toText(obj.phone))
-          .click('button[name=submit]');
+          .click('.main .btn-primary');
 
         return browser;
+    };
+
+    this.editCustomer = function(index) {
+      return browser
+        .click('tbody tr:nth-of-type(' + (index + 1) + ')');
+    };
+
+    this.deleteCustomer = function(index) {
+      browser
+        .click('tbody tr:nth-of-type(' +
+          (index + 1) + ') span.glyphicon-trash');
+
+      browser
+        .waitForElementVisible('#popovers-container button.btn-confirm', 1000)
+        .click('#popovers-container button.btn-confirm');
+
+      return browser;
     };
 
     this.alertContains = function(message) {
@@ -58,18 +66,6 @@ module.exports = function (browser) {
                   phone || ''));
 
         return browser;
-    };
-
-    this.deleteCustomer = function(index) {
-      browser
-        .click('tbody tr:nth-of-type(' +
-          (index + 1) + ') span.glyphicon-trash');
-
-      browser
-        .waitForElementVisible('#popovers-container button.btn-confirm', 1000)
-        .click('#popovers-container button.btn-confirm');
-
-      return browser;
     };
 
     this.tableCount = function(count) {
