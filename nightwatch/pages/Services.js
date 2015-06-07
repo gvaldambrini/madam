@@ -37,8 +37,13 @@ module.exports = function (browser) {
     };
 
     this.count = function(count) {
-      return browser
-        .assert.jqueryLengthIs('form input[type=text]', count, 'workers');
+        browser.execute(function() {
+            return $('form input[type=text]').length;
+        }, [], function(result) {
+            browser.assert.equal(result.value, count);
+        });
+
+      return browser;
     };
 
     this.alertContains = function(message) {

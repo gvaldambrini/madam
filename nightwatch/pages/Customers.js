@@ -69,9 +69,13 @@ module.exports = function (browser) {
     };
 
     this.tableCount = function(count) {
-      return browser
-        .assert.jqueryLengthIs(
-          'tbody tr', count, 'customers');
+        browser.execute(function() {
+            return $('tbody tr').length;
+        }, [], function(result) {
+            browser.assert.equal(result.value, count);
+        });
+
+      return browser;
     };
 
     this.search = function(text) {
