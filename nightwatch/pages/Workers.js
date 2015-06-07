@@ -53,4 +53,12 @@ module.exports = function (browser) {
           .waitForElementVisible('.alert', 1000)
           .assert.containsText('.alert', message);
     };
+
+    this.goToServices = function() {
+        browser
+          .waitForElementVisible('.content-header', 1000)
+          .jqueryClick('.content-header a:contains("Services")');
+
+        return browser;
+    };
 };
