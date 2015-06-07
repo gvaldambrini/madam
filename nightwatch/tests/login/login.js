@@ -3,13 +3,17 @@ module.exports = {
     browser.globals.startServer(done);
   },
 
-  after : function(browser, done) {
+  after: function(browser, done) {
     browser.globals.stopServer(done);
   },
 
-  'Failed Login' : function(browser) {
+  beforeEach: function(browser) {
     browser
-      .url('http://localhost:7890')
+      .url('http://localhost:7890');
+  },
+
+  'Failed login': function(browser) {
+    browser
       .page.Login().authenticate('admin', 'wrong')
       .page.Login().alertContains('Incorrect password.')
       .page.Login().authenticate('admina', 'pwdadmin')
@@ -17,9 +21,8 @@ module.exports = {
       .end();
   },
 
-  'Successfully Login' : function(browser) {
+  'Successfully login': function(browser) {
     browser
-      .url('http://localhost:7890')
       .page.Login().authenticate('admin', 'pwdadmin')
       .page.Navbar().loggedUserIs('admin')
       .end();
@@ -27,7 +30,6 @@ module.exports = {
 
   'Logout': function(browser) {
     browser
-      .url('http://localhost:7890')
       .page.Login().authenticate('admin', 'pwdadmin')
       .page.Navbar().logout()
       .page.Login().isLoginPage()
