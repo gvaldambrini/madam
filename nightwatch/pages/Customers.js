@@ -1,13 +1,9 @@
-var util = require('util');
-
 module.exports = function (browser) {
 
     this.createCustomer = function() {
-        browser
+        return browser
           .waitForElementVisible('.main .btn-primary', 1000)
           .click('.main .btn-primary');
-
-        return browser;
     };
 
     this.editCustomer = function(index) {
@@ -39,40 +35,26 @@ module.exports = function (browser) {
     };
 
     this.tableContains = function(index, name, surname, phone) {
-        browser
-            .assert.containsText(
-              'tbody tr:nth-of-type(' + (index + 1) + ') td:nth-of-type(1)',
-              name,
-              util.format(
-                'Testing if the name of the customer n. %s contains text: "%s"',
-                index,
-                name));
-        browser
-            .assert.containsText(
-              'tbody tr:nth-of-type(' + (index + 1) + ') td:nth-of-type(2)',
-              surname,
-              util.format(
-                'Testing if the surname of the customer n. %s contains text: "%s"',
-                index,
-                surname));
 
-        browser
-            .assert.containsText(
-                'tbody tr:nth-of-type(' + (index + 1) + ') td:nth-of-type(3)',
-                phone || '',
-                util.format(
-                  'Testing if the phone of the customer n. %s contains text: "%s"',
-                  index,
-                  phone || ''));
-
-        return browser;
+        return browser.execute(function(index) {
+            var row = $('tbody tr:eq(' + index + ')');
+            return {
+              name: row.find('td:eq(0)').text(),
+              surname: row.find('td:eq(1)').text(),
+              phone: row.find('td:eq(2)').text()
+            }
+        }, [index], function(result) {
+            browser.assert.equal(result.value.name, name, 'Test the customer name');
+            browser.assert.equal(result.value.surname, surname || '', 'Test the customer surname');
+            browser.assert.equal(result.value.phone, phone || '', 'Test the customer phone');
+        });
     };
 
     this.tableCount = function(count) {
         browser.execute(function() {
             return $('tbody tr').length;
         }, [], function(result) {
-            browser.assert.equal(result.value, count);
+            browser.assert.equal(result.value, count, 'Test the table length');
         });
 
       return browser;
@@ -81,7 +63,7 @@ module.exports = function (browser) {
     this.search = function(text) {
         browser.clearValue('#search-input');
         // ugly hack to workaround the fact that the setValue for the search
-        // input field do not send every keyboard event as needed to update
+        // input field does not trigger the keyboard events needed to update
         // the results.
         for (var i = 0; i < text.length; i++) {
           browser
