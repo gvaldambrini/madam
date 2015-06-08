@@ -29,4 +29,12 @@ module.exports = function (browser) {
     this.submit = function() {
         return browser.click('button[name=submit]');
     };
+
+    this.goToAppointments = function() {
+        browser
+          .waitForElementVisible('.content-header', 1000)
+          .jqueryClick('.content-header a:contains("Appointments")');
+
+        return browser;
+    };
 };
