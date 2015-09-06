@@ -8,16 +8,16 @@
         <div class="form-controls" id="form-controls">
             {{#each items}}
             <div class="form-group">
-                <label class="control-label col-sm-2" for="name">{{i18n.name}}</label>
+                <label class="control-label col-sm-2" for="name">{{../i18n.name}}</label>
                 <div class="col-sm-8">
                     {{#if ../hasColorpicker}}
                     <div class="input-group">
-                        <input class="form-control" type="text" name="name" placeholder="{{i18n.name}}" value="{{this.name}}" disabled="disabled">
+                        <input class="form-control" type="text" name="name" value="{{this.name}}" disabled="disabled">
                         <input type="hidden" name="color" class="colorpicker-field" value="{{this.color}}">
                         <span class="input-group-addon colorpicker-selector disabled"><i></i></span>
                     </div>
                     {{else}}
-                    <input class="form-control" type="text" name="name" placeholder="{{i18n.name}}" value="{{this}}" disabled="disabled">
+                    <input class="form-control" type="text" name="name" value="{{this}}" disabled="disabled">
                     {{/if}}
                 </div>
                 {{#if @first}}
