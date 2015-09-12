@@ -1,8 +1,18 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-logo">
-        <a href="/"><img src="/images/logo.png"></a>
+        <a class="logo" href="/"></a>
     </div>
+
     {{#if username}}
-    <div class="navbar-user">{{username}}<div><a href="/logout">logout</a><div></div>
+    <div class="navbar-user">{{username}}<div><a href="/logout">logout</a></div></div>
     {{/if}}
+
+    {{#show-toggle}}
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+    {{/show-toggle}}
 </nav>

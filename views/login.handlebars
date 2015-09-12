@@ -2,6 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
     {{#if isProduction}}
     <link rel="stylesheet" href="/stylesheets/main.min.css">
@@ -10,7 +12,7 @@
     {{/if}}
 </head>
 <body>
-    {{> navbar}}
+    {{> navbar show-toggle=false}}
     <div class="container-fluid">
         <div class="row col-sm-8 col-sm-offset-2">
             <div id="login-box">

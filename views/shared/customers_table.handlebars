@@ -3,7 +3,7 @@
     <thead>
         <th>{{this.headerName}}</th>
         <th>{{this.headerSurname}}</th>
-        <th>{{this.headerPhone}}</th>
+        <th class="hidden-xs">{{this.headerPhone}}</th>
         <th></th>
     </thead>
     <tbody>
@@ -11,7 +11,7 @@
             <tr data-edit-url='{{urlEdit}}'>
                 <td>{{{name}}}</td>
                 <td>{{{surname}}}</td>
-                <td>{{{phone}}}</td>
+                <td class="hidden-xs">{{{phone}}}</td>
                 <td class="no-padding">
                     <span class="pull-right glyphicon glyphicon-trash" data-delete-url='{{urlDelete}}'></span>
                 </td>
