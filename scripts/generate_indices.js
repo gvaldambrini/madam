@@ -86,12 +86,9 @@
                 customer: {
                     properties: {
                         name: {
-                            type: 'multi_field',
+                            type: 'string',
+                            analyzer: 'searchable_text',
                             fields: {
-                                name: {
-                                    type: 'string',
-                                    analyzer: 'searchable_text'
-                                },
                                 autocomplete: {
                                     type: 'string',
                                     search_analyzer: 'searchable_text',
@@ -101,12 +98,9 @@
                             }
                         },
                         surname: {
-                            type: 'multi_field',
+                            type: 'string',
+                            analyzer: 'searchable_text',
                             fields: {
-                                surname: {
-                                    type: 'string',
-                                    analyzer: 'searchable_text'
-                                },
                                 autocomplete: {
                                     type: 'string',
                                     search_analyzer: 'searchable_text',
@@ -116,12 +110,9 @@
                             }
                         },
                         mobile_phone: {
-                            type: 'multi_field',
+                            type: 'string',
+                            analyzer: 'searchable_text',
                             fields: {
-                                mobile_phone: {
-                                    type: 'string',
-                                    analyzer: 'searchable_text'
-                                },
                                 partial: {
                                     type: 'string',
                                     search_analyzer: 'searchable_text',
@@ -132,12 +123,9 @@
                         },
                         allow_sms: {type: 'boolean'},
                         phone: {
-                            type: 'multi_field',
+                            type: 'string',
+                            analyzer: 'searchable_text',
                             fields: {
-                                phone: {
-                                    type: 'string',
-                                    analyzer: 'searchable_text'
-                                },
                                 partial: {
                                     type: 'string',
                                     search_analyzer: 'searchable_text',
