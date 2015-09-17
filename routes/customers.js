@@ -177,16 +177,6 @@ router.get('/', common.exposeTemplates, function(req, res, next) {
     });
 });
 
-
-function toISODate(req, localFormattedDate) {
-    return moment.utc(localFormattedDate, req.config.date_format).format('YYYY-MM-DD');
-}
-
-function toLocalFormattedDate(req, ISODate) {
-    return moment.utc(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
-}
-
-
 var CustomerUtils = function(req, res) {
     this.req = req;
     this.res = res;
@@ -197,11 +187,11 @@ CustomerUtils.formFields = [
     'first_see', 'last_see', 'allow_sms', 'allow_email', 'notes'];
 
 CustomerUtils.prototype.toISODate = function(localFormattedDate) {
-    return toISODate(this.req, localFormattedDate);
+    return common.toISODate(this.req, localFormattedDate);
 };
 
 CustomerUtils.prototype.toLocalFormattedDate = function(ISODate) {
-    return toLocalFormattedDate(this.req, ISODate);
+    return common.toLocalFormattedDate(this.req, ISODate);
 };
 
 CustomerUtils.prototype.formNames = function() {
@@ -252,7 +242,7 @@ CustomerUtils.prototype.toViewFormat = function(sourceObj) {
 };
 
 CustomerUtils.prototype.handleForm = function(title) {
-    // Trim all the fields that allow the user write text
+    // Trim all the fields that allow the user to write text
     for (var i = 0; i < CustomerUtils.formFields.length; i++)
         this.req.sanitize(CustomerUtils.formFields[i]).trim();
 
@@ -325,7 +315,7 @@ CustomerUtils.prototype.handleForm = function(title) {
             console.error(err);
 
             var appDisabled = typeof that.req.params.id == 'undefined';
-            var i18n = this.formNames();
+            var i18n = that.formNames();
             i18n.title = title;
             i18n.info = that.req.i18n.__('Info');
             i18n.appointments = that.req.i18n.__('Appointments');
@@ -555,7 +545,7 @@ AppointmentUtils.prototype.handleForm = function(title) {
         }
 
         var appointment = {
-            date: toISODate(that.req, that.req.body.date),
+            date: common.toISODate(that.req, that.req.body.date),
             services: filterServices(that.req),
             notes: that.req.body.notes
         };
@@ -673,7 +663,7 @@ router.get('/:id/appointments/new', function(req, res, next) {
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
             workers: workers,
-            date: toLocalFormattedDate(req, moment()),
+            date: common.toLocalFormattedDate(req, moment()),
             services: services,
             notes: '',
             customer: getCustomerName(resp.docs[0]._source)
@@ -722,7 +712,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
             isAppointmentsActive: true,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
             workers: workers,
-            date: toLocalFormattedDate(req, appointment.date),
+            date: common.toLocalFormattedDate(req, appointment.date),
             services: services,
             notes: appointment.notes,
             customer: getCustomerName(resp.docs[0]._source)
