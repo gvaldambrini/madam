@@ -216,6 +216,17 @@ $sidebar-padding: 20px;
 }
 
 /*
+ * Products page
+ */
+
+#products-table-container {
+  span.glyphicon-plus {
+    padding-right: 10px;
+    padding-top: 10px;
+  }
+}
+
+/*
  * Settings page
  */
 

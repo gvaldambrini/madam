@@ -52,5 +52,10 @@
 	"Cancel": "Cancel",
 	"Delete the appointment?": "Delete the appointment?",
 	"The operation cannot be undone. Continue?": "The operation cannot be undone. Continue?",
-	"Delete the customer?": "Delete the customer?"
+	"Delete the customer?": "Delete the customer?",
+	"Brand": "Brand",
+	"Sold date": "Sold date",
+	"No products to display.": "No products to display.",
+	"Sold": "Sold",
+	"Add product": "Add product"
 }

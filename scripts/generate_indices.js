@@ -65,6 +65,13 @@
                                 ],
                                 type: 'custom',
                                 tokenizer: 'edge_ngram_tokenizer'
+                            },
+                            lower_text: {
+                                filter: [
+                                    'lowercase'
+                                ],
+                                type: 'custom',
+                                tokenizer: 'keyword'
                             }
                         }
                     }
@@ -165,6 +172,54 @@
         });
     }
 
+    function createProductType(callback) {
+        client.indices.putMapping({
+            index: mainIndex,
+            type: 'product',
+            body: {
+                product: {
+                    properties: {
+                        name: {
+                            type: 'string',
+                            analyzer: 'searchable_text',
+                            fields: {
+                                autocomplete: {
+                                    type: 'string',
+                                    search_analyzer: 'searchable_text',
+                                    index_analyzer: 'searchable_text_autocomplete',
+                                    term_vector: 'with_positions_offsets'
+                                }
+                            }
+                        },
+                        brand: {
+                            type: 'string',
+                            analyzer: 'searchable_text',
+                            fields: {
+                                autocomplete: {
+                                    type: 'string',
+                                    search_analyzer: 'searchable_text',
+                                    index_analyzer: 'searchable_text_autocomplete',
+                                    term_vector: 'with_positions_offsets'
+                                }
+                            }
+                        },
+                        sold_date: {type: 'date'},
+                        notes: {type: 'string'},
+                        complete_name: {
+                            type: 'string',
+                            analyzer: 'lower_text'
+                        }
+                    }
+                }
+            }
+        }, function(err, resp, respcode) {
+            if (!err) {
+                console.log('Type product created');
+            }
+            callback(err, resp);
+        });
+    }
+
     function createWorkersType(callback) {
         client.indices.putMapping({
             index: mainIndex,
@@ -254,6 +309,7 @@
             createCustomerType,
             createWorkersType,
             createServicesType,
+            createProductType,
             createUsersType
         ], cb);
     }

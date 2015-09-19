@@ -32,8 +32,8 @@
                     <li {{#if isCustomersActive}}class="active"{{/if}}>
                         <a href="/customers">{{{__ 'Customers'}}}</a>
                     </li>
-                    <li>
-                        <a href="#">{{{__ 'Products'}}}</a>
+                    <li {{#if isProductsActive}}class="active"{{/if}}>
+                        <a href="/products">{{{__ 'Products'}}}</a>
                     </li>
                     <li {{#if isSettingsActive}}class="active"{{/if}}>
                         <a href="/settings">{{{__ 'Settings'}}}</a>

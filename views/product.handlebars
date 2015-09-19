@@ -1,0 +1,28 @@
+<div class="content-body">
+    {{> form_errors}}
+
+    <form id="form" class="form-horizontal" method="post" {{#if actionUrl}}action='{{actionUrl}}'{{/if}}>
+        {{> input type='text' name='name' label=i18n.name }}
+        {{> input type='text' name='brand' label=i18n.brand }}
+        {{> input_date name='sold_date' label=i18n.sold_date}}
+        <div class="form-group">
+            <label class="control-label col-sm-2">{{i18n.notes}}</label>
+            <div class="col-sm-10">
+                <textarea name="notes" class="form-control" rows="5">{{notes}}</textarea>
+            </div>
+        </div>
+        <input type='hidden' name="_csrf" value="{{csrftoken}}">
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" name="submit">{{i18n.submit}}</button>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var productData = {{{json obj}}};
+            var dateFormat = "{{config.date_format}}".toLowerCase();
+            var language = '{{config.language}}';
+            $(document).ready(Product.init(language, dateFormat, productData));
+        </script>
+    </form>
+</div>
+

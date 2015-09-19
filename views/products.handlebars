@@ -1,0 +1,25 @@
+
+<div class="content-header">
+<a href='{{urlNew}}' class='btn btn-primary'>{{i18n.addNewProduct}}</a>
+<form class="search-form">
+    <input id="search-input" type="text" placeholder="{{i18n.search}}" class="form-control">
+    <span id="search-clear" class="glyphicon glyphicon-remove-circle"></span>
+</form>
+</div>
+
+<div id="products-table-container" class="content-body"></div>
+
+<script type='text/javascript'>
+    var templates = Handlebars.templates = Handlebars.templates || {};
+    {{#templates}}
+    templates['{{{name}}}'] = Handlebars.template({{{template}}});
+    {{/templates}}
+
+    var productsData = {{{json productsData}}};
+    $(document).ready(Products.init(templates, productsData, {
+        urlSearch: '{{urlSearch}}',
+        confirmTitle: '{{i18n.deleteTitle}}',
+        confirmMsg: '{{i18n.deleteMsg}}',
+        csrfToken: '{{csrftoken}}'
+    }));
+</script>
