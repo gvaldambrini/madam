@@ -8,6 +8,9 @@
 </div>
 
 <div id="products-table-container" class="content-body"></div>
+<script id="popover-template" type="text/x-handlebars-template">
+    {{>popover confirm=i18n.btnConfirm cancel=i18n.btnCancel}}
+</script>
 
 <script type='text/javascript'>
     var templates = Handlebars.templates = Handlebars.templates || {};

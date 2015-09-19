@@ -57,5 +57,8 @@
 	"Sold date": "Sold date",
 	"No products to display.": "No products to display.",
 	"Sold": "Sold",
-	"Add product": "Add product"
+	"Add product": "Add product",
+	"Clone product": "Clone product",
+	"Edit product": "Edit product",
+	"Delete the product?": "Delete the product?"
 }

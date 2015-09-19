@@ -43,13 +43,31 @@ function processElasticsearchResults(req, resp) {
 
     var results = [];
     var obj;
+    var j;
+    var objects;
+
     for (i = 0; i < aggregations.length; i++) {
+        objects = [];
+        for (j = 0; j < aggregations[i].hits.hits.hits.length; j++) {
+            obj = lookup[aggregations[i].hits.hits.hits[j]._id];
+
+            objects[objects.length] = {
+                urlDelete: getProductUrl(req, 'delete', obj._id),
+                urlEdit: getProductUrl(req, 'edit', obj._id),
+                date: obj._source.sold_date ? common.toLocalFormattedDate(req, obj._source.sold_date) : '-',
+                notes: obj._source.notes ? obj._source.notes : '-'
+            };
+        }
+
         obj = lookup[aggregations[i].hits.hits.hits[0]._id];
         results[results.length] = {
             urlClone: getProductUrl(req, 'clone', obj._id),
             name: getField(obj, 'name', 'autocomplete'),
             brand: getField(obj, 'brand', 'autocomplete'),
-            count: aggregations[i].doc_count
+            count: aggregations[i].doc_count,
+            headerDate: req.i18n.__('Sold date'),
+            headerNotes: req.i18n.__('Notes'),
+            objects: objects
         };
     }
 
@@ -90,7 +108,11 @@ router.get('/', common.exposeTemplates, function(req, res, next) {
             i18n: {
                 title: req.i18n.__('Products'),
                 addNewProduct: req.i18n.__('Add product'),
-                search: req.i18n.__('Search...')
+                search: req.i18n.__('Search...'),
+                btnConfirm: req.i18n.__('Confirm'),
+                btnCancel: req.i18n.__('Cancel'),
+                deleteTitle: req.i18n.__('Delete the product?'),
+                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?')
             },
             productsData: {
                 headerName: req.i18n.__('Name'),
@@ -276,7 +298,7 @@ ProductUtils.prototype.handleForm = function(title) {
 };
 
 
-router.use(['/new', '*clone'], function (req, res, next) {
+router.use(['/new', '*clone', '*edit'], function (req, res, next) {
     req.utils = new ProductUtils(req, res);
     next();
 });
@@ -313,6 +335,48 @@ router.get('/:id/clone', function(req, res, next) {
     });
 });
 
+router.get('/:id/edit', function(req, res, next) {
+    client.get({
+        index: req.config.mainIndex,
+        type: 'product',
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        var i18n = req.utils.formNames();
+        i18n.title = req.i18n.__('Edit product');
+
+        res.render('product', {
+            i18n: i18n,
+            obj: req.utils.toViewFormat(resp._source)
+        });
+    });
+});
+
+router.post('/:id/edit', function(req, res, next) {
+    client.get({
+        index: req.config.mainIndex,
+        type: 'product',
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        req.utils.handleForm(req.i18n.__('Edit product'));
+    });
+});
+
+router.post('/:id/delete', function(req, res, next) {
+    client.delete({
+        index: req.config.mainIndex,
+        type: 'product',
+        refresh: true,
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        if (err) {
+            console.log(err);
+            res.status(400).end();
+        }
+        else {
+            res.status(200).end();
+        }
+    });
+});
 
 module.exports.router = router;
 module.exports.path = productsPath;

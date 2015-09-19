@@ -220,9 +220,18 @@ $sidebar-padding: 20px;
  */
 
 #products-table-container {
-  span.glyphicon-plus {
-    padding-right: 10px;
+  .glyphicon-plus {
+    padding-right: 14px;
     padding-top: 10px;
+  }
+
+  .hidden-row {
+    padding: 0;
+    border-top: 0px;
+
+    .table {
+      border-top: 1px $primary-color solid;
+    }
   }
 }
 

@@ -8,7 +8,7 @@
     </thead>
     <tbody>
         {{#each this.products}}
-            <tr>
+            <tr data-toggle="collapse" data-target="#expanded-row{{@index}}">
                 <td>{{{name}}}</td>
                 <td>{{{brand}}}</td>
                 <td>{{{count}}}</td>
@@ -16,6 +16,28 @@
                     <span class="pull-right glyphicon glyphicon-plus" data-clone-url='{{urlClone}}'></span>
                 </td>
             </tr>
+            <tr><td colspan=4 class="hidden-row">
+                <div id="expanded-row{{@index}}" class="collapse">
+                    <table class='table table-hover'>
+                        <thead data-toggle="collapse" data-target="#expanded-row{{@index}}">
+                            <th>{{headerDate}}</th>
+                            <th>{{headerNotes}}</th>
+                            <th></th>
+                        </thead>
+                        <tbody>
+                        {{#each objects}}
+                        <tr data-edit-url='{{urlEdit}}'>
+                            <td>{{{date}}}</td>
+                            <td>{{{notes}}}</td>
+                            <td class="no-padding">
+                                <span class="pull-right glyphicon glyphicon-trash" data-delete-url='{{urlDelete}}'></span>
+                            </td>
+                        </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </td></tr>
         {{/each}}
     </tbody>
 </table>

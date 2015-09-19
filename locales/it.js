@@ -58,5 +58,7 @@
 	"No products to display.": "Nessun prodotto da mostrare.",
 	"Sold": "Venduti",
 	"Add product": "Aggiungi prodotto",
-	"Clone product": "Clone product"
+	"Clone product": "Copia prodotto",
+	"Edit product": "Modifica prodotto",
+	"Delete the product?": "Eliminare il prodotto?"
 }

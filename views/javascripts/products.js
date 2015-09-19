@@ -6,6 +6,21 @@ var Products = (function(window, $) {
     var $searchInput;
     var $tableContainer;
 
+    var deleteProduct = function($target) {
+        $.ajax({
+            url: $target.data('delete-url'),
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': options.csrfToken
+            },
+            complete: search
+        });
+    };
+
+    var goToEditForm = function(event) {
+        window.location.href = $(this).data('edit-url');
+    };
+
     var search = function() {
         var text = $searchInput.val();
         $searchClear.toggle(Boolean(text));
@@ -20,10 +35,6 @@ var Products = (function(window, $) {
         });
     };
 
-    var goToCloneForm = function(event) {
-        window.location.href = $(this).data('clone-url');
-    };
-
     var resetSearch = function() {
         $searchInput.val('').focus();
         $(this).hide();
@@ -32,7 +43,31 @@ var Products = (function(window, $) {
 
     var renderTable = function(html) {
         $tableContainer.html(html);
-        $tableContainer.find('.glyphicon-plus').on("click", goToCloneForm);
+
+        $clone = $tableContainer.find('.glyphicon-plus');
+        $clone.on('click', function(event) {
+            window.location.href = $(this).data('clone-url');
+            event.stopPropagation();
+        });
+
+        $tableContainer.find('.hidden-row tbody tr').on("click", goToEditForm);
+
+        $trash = $tableContainer.find('.glyphicon-trash');
+        $trash.on('click', function(event) {
+            event.stopPropagation();
+        });
+        $trash.map(function(index, item) {
+            var $item = $(item);
+            $item.confirmPopover({
+                template: '#popover-template',
+                title: options.confirmTitle,
+                content: options.confirmMsg,
+                $rootContainer: $tableContainer,
+                onConfirm: function() {
+                    return deleteProduct($item);
+                }
+            });
+        });
     };
 
     var init = function(_templates, _productsData, _options) {
