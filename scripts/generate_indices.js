@@ -208,7 +208,8 @@
                         complete_name: {
                             type: 'string',
                             analyzer: 'lower_text'
-                        }
+                        },
+                        created_at: {type: 'date'}
                     }
                 }
             }

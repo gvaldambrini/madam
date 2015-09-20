@@ -85,6 +85,9 @@ var aggregate_product = {
             size: 10000,
             _source: {
               include: "_id"
+            },
+            sort: {
+                created_at: { order: "asc" }
             }
           }
         }
@@ -266,13 +269,12 @@ ProductUtils.prototype.handleForm = function(title) {
         index: this.req.config.mainIndex,
         type: 'product',
         refresh: true,
-        body: this.toElasticsearchFormat(this.req.body)
     };
-    if (typeof this.req.params.id != 'undefined')
-        args.id = this.req.params.id;
+
+    var obj = this.toElasticsearchFormat(this.req.body);
 
     var that = this;  // workaround for the this visibility problem inside inner functions.
-    client.index(args, function(err, resp, respcode) {
+    var cb = function(err, resp, respcode) {
         if (!err) {
             // redirect does not take into account being in inside a router
             that.res.redirect(productsPath);
@@ -294,7 +296,18 @@ ProductUtils.prototype.handleForm = function(title) {
                 obj: that.req.body
             });
         }
-    });
+    };
+
+    if (typeof this.req.params.id != 'undefined') {
+        args.id = this.req.params.id;
+        args.body = {doc: obj};
+        client.update(args, cb);
+    }
+    else {
+        args.body = obj;
+        args.body.created_at = new Date().toISOString();
+        client.index(args, cb);
+    }
 };
 
 
