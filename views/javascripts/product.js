@@ -2,14 +2,17 @@ var Product = (function(window, $) {
     /// Private variables and functions
 
     var productData;
-    var dateFormat;
-    var language;
 
     var init = function(_language, _dateFormat, _productData) {
-        language = _language;
-        dateFormat = _dateFormat;
         productData = _productData;
-        $.fn.datepicker.defaults.format = dateFormat;
+        $.fn.datepicker.defaults.language = _language;
+        $.fn.datepicker.defaults.orientation = "top";
+        $.fn.datepicker.defaults.daysOfWeekDisabled = "0";
+        $.fn.datepicker.defaults.format = _dateFormat;
+        $.fn.datepicker.defaults.autoclose = true;
+        $.fn.datepicker.defaults.weekStart = 1;
+        $.fn.datepicker.defaults.todayHighlight = true;
+        $.fn.datepicker.defaults.endDate = "0d";
 
         $form = $('#form');
         $form.find('input').each(function() {
@@ -25,16 +28,7 @@ var Product = (function(window, $) {
             }
         });
         $form.find('textarea').val(productData.notes);
-        $('#sold_date-container .input-group.date').datepicker({
-            language: language,
-            format: dateFormat,
-            weekStart: 1,
-            daysOfWeekDisabled: "0",
-            autoclose: true,
-            todayHighlight: true,
-            orientation: "top",
-            endDate: "0d"
-        });
+        $('#sold_date-container .input-group.date').datepicker();
     };
 
     /// Public API

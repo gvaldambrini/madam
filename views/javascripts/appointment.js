@@ -1,8 +1,6 @@
 var Appointment = (function(window, $) {
     /// Private variables and functions
     var $form;
-    var dateFormat;
-    var language;
     var date;
 
     var switchWorker = function() {
@@ -56,24 +54,19 @@ var Appointment = (function(window, $) {
     };
 
     var init = function(_language, _date, _dateFormat) {
-        language = _language;
         date = _date;
-        dateFormat = _dateFormat;
         $form = $('#form');
-        $.fn.datepicker.defaults.format = dateFormat;
+        $.fn.datepicker.defaults.language = _language;
+        $.fn.datepicker.defaults.daysOfWeekDisabled = "0";
+        $.fn.datepicker.defaults.format = _dateFormat;
+        $.fn.datepicker.defaults.autoclose = true;
+        $.fn.datepicker.defaults.weekStart = 1;
+        $.fn.datepicker.defaults.todayHighlight = true;
+        $.fn.datepicker.defaults.endDate = "0d";
 
         $form.find('.input-group-btn button.btn-click').on('click', switchWorker);
         $form.find('.input-group-btn ul a').on('click', selectWorker);
-        $form.find('#date-container .input-group.date').datepicker({
-            orientation: "top left",
-            language: language,
-            format: dateFormat,
-            weekStart: 1,
-            daysOfWeekDisabled: "0",
-            autoclose: true,
-            todayHighlight: true,
-            endDate: "0d"
-        });
+        $form.find('#date-container .input-group.date').datepicker();
 
         $form.find('#date-container .input-group.date').datepicker('setDate', date);
         $form.find('.btn-add').on('click', addInput);

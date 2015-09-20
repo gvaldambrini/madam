@@ -2,14 +2,16 @@ var Customer = (function(window, $) {
     /// Private variables and functions
 
     var customerData;
-    var dateFormat;
-    var language;
 
     var init = function(_language, _dateFormat, _customerData) {
-        language = _language;
-        dateFormat = _dateFormat;
         customerData = _customerData;
-        $.fn.datepicker.defaults.format = dateFormat;
+        $.fn.datepicker.defaults.language = _language;
+        $.fn.datepicker.defaults.daysOfWeekDisabled = "0";
+        $.fn.datepicker.defaults.format = _dateFormat;
+        $.fn.datepicker.defaults.autoclose = true;
+        $.fn.datepicker.defaults.weekStart = 1;
+        $.fn.datepicker.defaults.todayHighlight = true;
+        $.fn.datepicker.defaults.endDate = "0d";
 
         $form = $('#form');
         $form.find('input').each(function() {
@@ -29,24 +31,8 @@ var Customer = (function(window, $) {
             }
         });
         $form.find('textarea').val(customerData.notes);
-        $('#first_see-container .input-group.date').datepicker({
-            language: language,
-            format: dateFormat,
-            weekStart: 1,
-            daysOfWeekDisabled: "0",
-            autoclose: true,
-            todayHighlight: true,
-            endDate: "0d"
-        });
-        $('#last_see-container .input-group.date').datepicker({
-            language: language,
-            format: dateFormat,
-            weekStart: 1,
-            daysOfWeekDisabled: "0",
-            autoclose: true,
-            todayHighlight: true,
-            endDate: "0d"
-        });
+        $('#first_see-container .input-group.date').datepicker();
+        $('#last_see-container .input-group.date').datepicker();
     };
 
     /// Public API
