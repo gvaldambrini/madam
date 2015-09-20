@@ -5,7 +5,7 @@ var common = require('../common');
 var client = common.createClient();
 var esErrors = elasticsearch.errors;
 var productsPath = '/products';
-
+var moment = require('moment');
 
 router.use(common.isAuthenticated);
 router.use(function (request, response, next) {
@@ -321,7 +321,9 @@ router.get('/new', function(req, res, next) {
     i18n.title = req.i18n.__('Add product');
     res.render('product', {
         i18n: i18n,
-        obj: {}
+        obj: {
+            sold_date: common.toLocalFormattedDate(req, moment()),
+        }
     });
 });
 
