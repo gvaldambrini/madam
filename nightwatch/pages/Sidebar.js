@@ -14,4 +14,12 @@ module.exports = function (browser) {
 
         return browser;
     };
+
+    this.goToProducts = function() {
+        browser
+          .waitForElementVisible('.nav-sidebar', 1000)
+          .jqueryClick('.nav-sidebar a:contains("Products")');
+
+        return browser;
+    };
 };
