@@ -1,0 +1,8 @@
+{
+  "source": {
+    "include": ["app.js", "common.js", "./routes"]
+  },
+  "opts": {
+    "destination": "./docs/"
+  }
+}

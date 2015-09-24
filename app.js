@@ -22,6 +22,10 @@ var settings = require('./routes/settings');
 var common = require('./common');
 var client = common.createClient();
 
+/**
+ * The {@link http://expressjs.com/4x/api.html#app|express application}.
+ * @var {object}
+ */
 var app = express();
 
 i18n.expressBind(app, {

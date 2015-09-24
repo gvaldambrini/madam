@@ -1,3 +1,8 @@
+/**
+ * Products module, contains all the views and code related to products.
+ * @module
+ */
+
 var express = require('express');
 var elasticsearch = require('elasticsearch');
 var router = express.Router();
@@ -14,16 +19,37 @@ router.use(function (request, response, next) {
   next();
 });
 
-// Helper function to retrieve the url for a single product based route
+/**
+ * Helper function to build the url for a single product based route.
+ * @function
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {string} route the base route path.
+ * @param {string} [productId] the product id, which will be extracted from the request if not provided.
+ */
 function getProductUrl(req, route, productId) {
     var pid = typeof productId == 'undefined' ? req.params.id : productId;
     return getProductsUrl(req, pid + '/' + route);
 }
 
+/**
+ * Helper function to build the url for a product based route.
+ * @function
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {string} route the base route path.
+ */
 function getProductsUrl(req, route) {
     return req.protocol + "://" + req.get('host') + productsPath + '/' + route;
 }
 
+/**
+ * Parses the elasticsearch response and returns an array of objects that represent the products.
+ * @function
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {object} resp the elasticsearch response.
+ */
 function processElasticsearchResults(req, resp) {
 
     function getField(hit, field, field_type) {
@@ -74,6 +100,12 @@ function processElasticsearchResults(req, resp) {
     return results;
 }
 
+/**
+ * The elasticsearch aggregation logic for products. To maintain good performance, it
+ * contains the assumption that a product (name + brand) cannot be sold
+ * more than 10000 times.
+ * @var
+ */
 var aggregate_product = {
     prods: {
       terms: {
@@ -181,21 +213,51 @@ router.get('/search', function(req, res, next) {
     });
 });
 
+/**
+ * Creates a new ProductUtils object, which encapsulates some common utility
+ * functions and properties to handle the Product form and the related documents
+ * on elasticsearch.
+ * @class ProductUtils
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
+ */
 var ProductUtils = function(req, res) {
     this.req = req;
     this.res = res;
 };
 
+/**
+ * The fields of the Product form.
+ * @var
+ */
 ProductUtils.formFields = ['name', 'brand', 'sold_date', 'notes'];
 
+/**
+ * Transforms a local formatted date to the iso format.
+ * @method
+ *
+ * @param {string} localFormattedDate the local formatted date.
+ */
 ProductUtils.prototype.toISODate = function(localFormattedDate) {
     return common.toISODate(this.req, localFormattedDate);
 };
 
+/**
+ * Transforms an iso format date to the local format defined in the configuration.
+ * @method
+ *
+ * @param {string} ISODate the iso date.
+ */
 ProductUtils.prototype.toLocalFormattedDate = function(ISODate) {
     return common.toLocalFormattedDate(this.req, ISODate);
 };
 
+/**
+ * Returns an object which maps the form fields and buttons of the Product form
+ * with the related translated names.
+ * @method
+ */
 ProductUtils.prototype.formNames = function() {
     return {
         name: this.req.i18n.__('Name'),
@@ -206,6 +268,13 @@ ProductUtils.prototype.formNames = function() {
     };
 };
 
+/**
+ * Converts the source object to the format used to save the related document
+ * on elasticsearch.
+ * @method
+ *
+ * @param {object} sourceObj the source object originated from the Product form.
+ */
 ProductUtils.prototype.toElasticsearchFormat = function(sourceObj) {
     var obj = {};
     for (var i = 0; i < ProductUtils.formFields.length; i++) {
@@ -226,6 +295,13 @@ ProductUtils.prototype.toElasticsearchFormat = function(sourceObj) {
     return obj;
 };
 
+/**
+ * Converts the source object to the format used to present the data in the
+ * Product form.
+ * @method
+ *
+ * @param {object} sourceObj the source object originated from the elasticsearch response.
+ */
 ProductUtils.prototype.toViewFormat = function(sourceObj) {
     var obj = {};
     for (var i = 0; i < ProductUtils.formFields.length; i++) {
@@ -240,6 +316,13 @@ ProductUtils.prototype.toViewFormat = function(sourceObj) {
     return obj;
 };
 
+/**
+ * Handles the Product form, creating / updating a new document if the form
+ * content validation passes, or displaying the proper error messages if not.
+ * @method
+ *
+ * @param {string} title the title of the form.
+ */
 ProductUtils.prototype.handleForm = function(title) {
     // Trim all the fields that allow the user to write text
     for (var i = 0; i < ProductUtils.formFields.length; i++)
@@ -393,5 +476,7 @@ router.post('/:id/delete', function(req, res, next) {
     });
 });
 
+/** The products router. */
 module.exports.router = router;
+/** The product routes base path. */
 module.exports.path = productsPath;

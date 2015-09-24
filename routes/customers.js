@@ -1,3 +1,8 @@
+/**
+ * Customers module, contains all the views and code related to customers (and appointments).
+ * @module
+ */
+
 var express = require('express');
 var elasticsearch = require('elasticsearch');
 var router = express.Router();
@@ -14,21 +19,47 @@ router.use(function (request, response, next) {
   next();
 });
 
-// Helper function to retrieve the url for a single customer based route
+/**
+ * Helper function to build the url for a single customer based route.
+ * @function
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {string} route the base route path.
+ * @param {string} [customerId] the customer id, which will be extracted from the request if not provided.
+ */
 function getCustomerUrl(req, route, customerId) {
     var cid = typeof customerId == 'undefined' ? req.params.id : customerId;
     return getCustomersUrl(req, cid + '/' + route);
 }
 
-// Helper function to retrieve the url for a customers based route
+/**
+ * Helper function to build the url for a customer based route.
+ * @function
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {string} route the base route path.
+ */
 function getCustomersUrl(req, route) {
     return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
 }
 
+/**
+ * Helper function to build an arbitrary url.
+ * @function
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {string} the path.
+ */
 function getUrl(req, path) {
     return req.protocol + "://" + req.get('host') + path;
 }
 
+/**
+ * Return the full name of the customer.
+ * @function
+ *
+ * @param {object} obj the customer object fetched from elasticsearch
+ */
 function getCustomerName(obj) {
     if (typeof obj.surname !== 'undefined') {
         return obj.name + ' ' + obj.surname;
@@ -36,6 +67,13 @@ function getCustomerName(obj) {
     return obj.name;
 }
 
+/**
+ * Parses the elasticsearch response and returns an array of objects that represent the customers.
+ * @function
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {object} hits the hits from the elasticsearch response.
+ */
 function processElasticsearchResults(req, hits) {
 
     function getField(hit, field, field_type) {
@@ -177,23 +215,53 @@ router.get('/', common.exposeTemplates, function(req, res, next) {
     });
 });
 
+/**
+ * Creates a new CustomerUtils object, which encapsulates some common utility
+ * functions and properties to handle the Customer form and the related documents
+ * on elasticsearch.
+ * @class CustomerUtils
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
+ */
 var CustomerUtils = function(req, res) {
     this.req = req;
     this.res = res;
 };
 
+/**
+ * The fields of the Customer form.
+ * @var
+ */
 CustomerUtils.formFields = [
     'name', 'surname', 'mobile_phone', 'phone', 'email',
     'first_see', 'last_see', 'allow_sms', 'allow_email', 'notes'];
 
+/**
+ * Transforms a local formatted date to the iso format.
+ * @method
+ *
+ * @param {string} localFormattedDate the local formatted date.
+ */
 CustomerUtils.prototype.toISODate = function(localFormattedDate) {
     return common.toISODate(this.req, localFormattedDate);
 };
 
+/**
+ * Transforms an iso format date to the local format defined in the configuration.
+ * @method
+ *
+ * @param {string} ISODate the iso date.
+ */
 CustomerUtils.prototype.toLocalFormattedDate = function(ISODate) {
     return common.toLocalFormattedDate(this.req, ISODate);
 };
 
+/**
+ * Returns an object which maps the form fields and buttons of the Customer form
+ * with the related translated names.
+ * @method
+ */
 CustomerUtils.prototype.formNames = function() {
     return {
         name: this.req.i18n.__('Name'),
@@ -211,6 +279,13 @@ CustomerUtils.prototype.formNames = function() {
     };
 };
 
+/**
+ * Converts the source object to the format used to save the related document
+ * on elasticsearch.
+ * @method
+ *
+ * @param {object} sourceObj the source object originated from the Customer form.
+ */
 CustomerUtils.prototype.toElasticsearchFormat = function(sourceObj) {
     var obj = {};
     for (var i = 0; i < CustomerUtils.formFields.length; i++) {
@@ -227,6 +302,13 @@ CustomerUtils.prototype.toElasticsearchFormat = function(sourceObj) {
     return obj;
 };
 
+/**
+ * Converts the source object to the format used to present the data in the
+ * Customer form.
+ * @method
+ *
+ * @param {object} sourceObj the source object originated from the elasticsearch response.
+ */
 CustomerUtils.prototype.toViewFormat = function(sourceObj) {
     var obj = {};
     for (var i = 0; i < CustomerUtils.formFields.length; i++) {
@@ -241,6 +323,13 @@ CustomerUtils.prototype.toViewFormat = function(sourceObj) {
     return obj;
 };
 
+/**
+ * Handles the Customer form, creating / updating a new document if the form
+ * content validation passes, or displaying the proper error messages if not.
+ * @method
+ *
+ * @param {string} title the title of the form.
+ */
 CustomerUtils.prototype.handleForm = function(title) {
     // Trim all the fields that allow the user to write text
     for (var i = 0; i < CustomerUtils.formFields.length; i++)
@@ -465,11 +554,27 @@ router.post('/:id/delete', function(req, res, next) {
     });
 });
 
+/**
+ * Creates a new AppointmentUtils object, which encapsulates some common utility
+ * functions and properties to handle the Appointment form and the related documents
+ * on elasticsearch.
+ * @class AppointmentUtils
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
+ */
 var AppointmentUtils = function(req, res) {
     this.req = req;
     this.res = res;
 };
 
+/**
+ * Handles the Appointment form, creating / updating a new document if the form
+ * content validation passes, or displaying the proper error messages if not.
+ * @method
+ *
+ * @param {string} title the title of the form.
+ */
 AppointmentUtils.prototype.handleForm = function(title) {
     var that = this;
     // starting from es 1.4.3 groovy dynamic scripting is no longer available
@@ -604,6 +709,13 @@ AppointmentUtils.prototype.handleForm = function(title) {
 
 };
 
+/**
+ * Returns the color associated to the given worker.
+ * @method
+ *
+ * @param {string} worker the name of the worker.
+ * @param {object} workers the list of the workers extracted from elasticsearch.
+ */
 AppointmentUtils.prototype.getWorkerColor = function(worker, workers) {
     for (var j = 0; j < workers.length; j++) {
         if (workers[j].name == worker) {
@@ -766,5 +878,7 @@ router.post('/:id/appointments/:appnum/delete', function(req, res, next) {
     });
 });
 
+/** The customers router. */
 module.exports.router = router;
+/** The customer routes base path. */
 module.exports.path = customersPath;

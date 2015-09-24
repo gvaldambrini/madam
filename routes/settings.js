@@ -1,3 +1,8 @@
+/**
+ * Settings module, contains all the views and code related to settings
+ * (workers and services).
+ * @module
+ */
 var express = require('express');
 var router = express.Router();
 
@@ -233,5 +238,7 @@ router.post('/services', function(req, res, next) {
     });
 });
 
+/** The settings router. */
 module.exports.router = router;
+/** The settings routes base path. */
 module.exports.path = settingsPath;

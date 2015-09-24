@@ -1,3 +1,7 @@
+/**
+ * Index module, contains all the homepage and the login/logout views.
+ * @module
+ */
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
@@ -42,4 +46,5 @@ router.get('/logout', function(req, res, next) {
   res.redirect('/login');
 });
 
+/** The index router. */
 module.exports = router;
