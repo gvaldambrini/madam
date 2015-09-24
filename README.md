@@ -1,5 +1,5 @@
-General overview
-----------------
+## General overview
+
 A management software for the hair salon "MadamPettine".
 
 This web application is not intended to be generic for every salon, but in fact is
@@ -7,8 +7,8 @@ very specific to the hair salon for which it was designed. The code is still rel
 under an open source license ([Apache 2](http://www.apache.org/licenses/LICENSE-2.0))
 to allow reusing snippets of the code in other projects (even completely unrelated!).
 
-System architecture
--------------------
+## System architecture
+
 The backend code is written in [Node.js](https://nodejs.org) 0.12.x, and it is based
 on the version 4 of the web framework [Express.js](http://expressjs.com/).
 [Passport](http://passportjs.org/) with local strategy is used as the authentication
@@ -21,3 +21,24 @@ is written using plain [jQuery](https://jquery.com/) and styled with
 is the task runner & build system.
 Finally, [Nightwatch.js](http://nightwatchjs.org/) is used to perform end-to-end
 tests and [JSDoc](https://github.com/jsdoc3/jsdoc) to generate the documentation.
+
+
+## Setting up the application
+
+The application is written to run in development mode on a local environment
+and in production mode (`NODE_ENV == 'production'`) on [Heroku](https://www.heroku.com/).
+
+#### Development mode
+1. [Download elasticsearch](https://www.elastic.co/downloads/elasticsearch) and launch it.
+2. Generate indices and mappings running:
+```
+node ./scripts/create_indices.js
+```
+3. Create one or more users in the database executing:
+```
+node ./scripts/create_user.js
+```
+4. Launch the application with [browsersync](http://www.browsersync.io/) enabled:
+```
+gulp
+```
