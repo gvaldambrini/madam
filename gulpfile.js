@@ -7,6 +7,7 @@ var rename = require('gulp-rename');
 var nodemon = require('gulp-nodemon');
 var browserSync = require('browser-sync');
 var shell = require('gulp-shell');
+var jshint = require('gulp-jshint');
 var reload = browserSync.reload;
 
 gulp.task('vendorscripts', function() {
@@ -75,7 +76,13 @@ else {
     gulp.task('doc', shell.task([
       './node_modules/.bin/jsdoc -c jsdoc.json -r README.md']));
 
-    gulp.task('build', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images', 'doc']);
+    gulp.task('lint', function() {
+      return gulp.src(["*.js", "routes/*.js", "views/javascripts/*.js"])
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'));
+    });
+
+    gulp.task('build', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images', 'doc', 'lint']);
     gulp.task('scripts-watch', ['scripts'], reload);
 
     gulp.task('browser-sync', ['nodemon'], function() {
@@ -101,6 +108,7 @@ else {
     });
 
     gulp.task('default', ['build', 'browser-sync'], function () {
+      gulp.watch(["*.js", "routes/*.js", "views/javascripts/*.js"], ['lint']);
       gulp.watch(["*.js", "routes/*.js", "README.md", "jsdoc.json"], ['doc']);
       gulp.watch("views/stylesheets/*.scss", ['sass']);
       gulp.watch("views/javascripts/*.js", ['scripts-watch']);
