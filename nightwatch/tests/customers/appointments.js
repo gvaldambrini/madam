@@ -61,9 +61,10 @@ module.exports = {
 
       .page.Appointment().toggleService(0)
       .page.Appointment().toggleService(1)
+      .page.Appointment().setDate('20/09/2015')
       .page.Appointment().submit()
       .page.Appointments().tableCount(1)
-      .page.Appointments().tableContains(0, 'shampoo - haircut')
+      .page.Appointments().tableContains(0, '20/09/2015', 'shampoo - haircut')
 
       .page.Appointments().createAppointment()
       .page.Appointment().addService()
@@ -74,9 +75,10 @@ module.exports = {
       .page.Appointment().toggleService(1)
       .page.Appointment().toggleService(2)
       .page.Appointment().selectWorker(2, 'Margaery')
+      .page.Appointment().setDate('14/09/2015')
       .page.Appointment().submit()
       .page.Appointments().tableCount(2)
-      .page.Appointments().tableContains(1, 'shampoo - super haircut - permanent')
+      .page.Appointments().tableContains(1, '14/09/2015', 'shampoo - super haircut - permanent')
       .end();
   },
 
@@ -92,8 +94,10 @@ module.exports = {
       .page.Appointment().addService()
       .page.Appointment().setService(2, 'strong permanent')
       .page.Appointment().setService(3, 'color')
+      .page.Appointment().setDate('21/09/2015')
       .page.Appointment().submit()
-      .page.Appointments().tableContains(1, 'shampoo - strong permanent - color')
+      .page.Appointments().tableContains(0, '21/09/2015', 'shampoo - strong permanent - color')
+      .page.Appointments().tableContains(1, '20/09/2015', 'shampoo - haircut')
       .page.Appointments().tableCount(2)
       .end();
   },
@@ -102,9 +106,9 @@ module.exports = {
     browser
       .page.Customers().editCustomer(0)
       .page.Customer().goToAppointments()
-      .page.Appointments().deleteAppointment(0)
+      .page.Appointments().deleteAppointment(1)
       .page.Appointments().tableCount(1)
-      .page.Appointments().tableContains(0, 'shampoo - strong permanent - color')
+      .page.Appointments().tableContains(0, '21/09/2015', 'shampoo - strong permanent - color')
       .end();
   }
 };

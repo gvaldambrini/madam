@@ -4,6 +4,7 @@
         <th>{{this.headerName}}</th>
         <th>{{this.headerSurname}}</th>
         <th class="hidden-xs">{{this.headerPhone}}</th>
+        <th class="hidden-xs">{{this.headerLastSeen}}</th>
         <th></th>
     </thead>
     <tbody>
@@ -12,6 +13,7 @@
                 <td>{{{name}}}</td>
                 <td>{{{surname}}}</td>
                 <td class="hidden-xs">{{{phone}}}</td>
+                <td class="hidden-xs">{{{last_seen}}}</td>
                 <td class="no-padding">
                     <span class="pull-right glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="left" title="{{deleteText}}" data-delete-url='{{urlDelete}}'></span>
                 </td>

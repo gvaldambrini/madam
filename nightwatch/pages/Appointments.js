@@ -29,11 +29,15 @@ module.exports = function (browser) {
         });
     };
 
-    this.tableContains = function(index, services) {
+    this.tableContains = function(index, date, services) {
         return browser.execute(function(index) {
-            return $('tbody tr:eq(' + index + ')  td:eq(1)').text();
+            return {
+              date: $('tbody tr:eq(' + index + ') td:eq(0)').text(),
+              services: $('tbody tr:eq(' + index + ') td:eq(1)').text()
+            };
         }, [index], function(result) {
-            browser.assert.equal(result.value, services);
+            browser.assert.equal(result.value.date, date);
+            browser.assert.equal(result.value.services, services);
         });
     };
 

@@ -34,19 +34,21 @@ module.exports = function (browser) {
           .assert.elementNotPresent('#customers-table-container .alert');
     };
 
-    this.tableContains = function(index, name, surname, phone) {
+    this.tableContains = function(index, name, surname, phone, last_seen) {
 
         return browser.execute(function(index) {
             var row = $('tbody tr:eq(' + index + ')');
             return {
               name: row.find('td:eq(0)').text(),
               surname: row.find('td:eq(1)').text(),
-              phone: row.find('td:eq(2)').text()
-            }
+              phone: row.find('td:eq(2)').text(),
+              last_seen: row.find('td:eq(3)').text()
+            };
         }, [index], function(result) {
             browser.assert.equal(result.value.name, name, 'Test the customer name');
             browser.assert.equal(result.value.surname, surname || '', 'Test the customer surname');
             browser.assert.equal(result.value.phone, phone || '', 'Test the customer phone');
+            browser.assert.equal(result.value.last_seen, last_seen || '', 'Test the customer phone');
         });
     };
 

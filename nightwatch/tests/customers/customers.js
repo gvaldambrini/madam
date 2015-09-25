@@ -29,7 +29,7 @@ module.exports = {
       .page.Customers().alertNotPresent()
       .page.Customers().tableCount(1)
       .page.Customers().tableContains(
-        0, 'Jeor', 'Mormont', '3335544333 / 055055055')
+        0, 'Jeor', 'Mormont', '3335544333 / 055055055', '-')
 
       .page.Customers().createCustomer()
       .page.Customer().fillForm({
@@ -37,7 +37,7 @@ module.exports = {
         surname: 'Snow'})
       .page.Customer().submit()
       .page.Customers().tableCount(2)
-      .page.Customers().tableContains(1, 'Jon', 'Snow')
+      .page.Customers().tableContains(1, 'Jon', 'Snow', '-', '-')
       .end();
   },
 
@@ -48,7 +48,7 @@ module.exports = {
       .page.Customers().tableCount(2)
       .page.Customers().search('j sn')
       .page.Customers().tableCount(1)
-      .page.Customers().tableContains(0, 'Jon', 'Snow')
+      .page.Customers().tableContains(0, 'Jon', 'Snow', '-', '-')
       .page.Customers().resetSearch()
       .page.Customers().tableCount(2)
       .end();
@@ -64,7 +64,7 @@ module.exports = {
         surname: 'Stark',
         email: 'notanymore@bastard.com'})
       .page.Customer().submit()
-      .page.Customers().tableContains(1, 'Jon', 'Stark')
+      .page.Customers().tableContains(1, 'Jon', 'Stark', '-', '-')
       .end();
   },
 
@@ -73,7 +73,7 @@ module.exports = {
       .page.Customers().tableCount(2)
 
       .page.Customers().deleteCustomer(0)
-      .page.Customers().tableContains(0, 'Jon', 'Stark')
+      .page.Customers().tableContains(0, 'Jon', 'Stark', '-', '-')
       .page.Customers().tableCount(1)
 
       .page.Customers().deleteCustomer(0)

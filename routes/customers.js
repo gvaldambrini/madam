@@ -113,16 +113,23 @@ function processElasticsearchResults(req, hits) {
             phone_mobile = mobile + ' / ' + phone;
         else if (mobile)
             phone_mobile = mobile;
-        else
+        else if (phone)
             phone_mobile = phone;
+        else
+            phone_mobile = '-';
+
+        var surname = getField(hits[i], 'surname', 'autocomplete');
+        if (!surname)
+            surname = '-';
 
         results[results.length] = {
             urlEdit: getCustomerUrl(req, 'edit', hits[i]._id),
             urlDelete: getCustomerUrl(req, 'delete', hits[i]._id),
             deleteText: req.i18n.__('Delete customer'),
             name: getField(hits[i], 'name', 'autocomplete'),
-            surname: getField(hits[i], 'surname', 'autocomplete'),
-            phone: phone_mobile
+            surname: surname,
+            phone: phone_mobile,
+            last_seen: common.toLocalFormattedDate(req, hits[i]._source.last_seen)
         };
     }
 
@@ -175,6 +182,7 @@ router.get('/search', function(req, res, next) {
             headerName: req.i18n.__('Name'),
             headerSurname: req.i18n.__('Surname'),
             headerPhone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
+            headerLastSeen: req.i18n.__('Last seen'),
             emptyMsg: req.i18n.__('No customers to display.'),
             customers: processElasticsearchResults(req, resp.hits.hits)
         });
@@ -207,6 +215,7 @@ router.get('/', common.exposeTemplates, function(req, res, next) {
                 headerName: req.i18n.__('Name'),
                 headerSurname: req.i18n.__('Surname'),
                 headerPhone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
+                headerLastSeen: req.i18n.__('Last seen'),
                 emptyMsg: req.i18n.__('No customers to display.'),
                 customers: processElasticsearchResults(req, resp.hits.hits)
             },
@@ -235,8 +244,8 @@ var CustomerUtils = function(req, res) {
  * @var
  */
 CustomerUtils.formFields = [
-    'name', 'surname', 'mobile_phone', 'phone', 'email',
-    'first_see', 'last_see', 'allow_sms', 'allow_email', 'notes'];
+    'name', 'surname', 'mobile_phone', 'phone', 'email', 'first_seen',
+    'allow_sms', 'allow_email', 'notes'];
 
 /**
  * Transforms a local formatted date to the iso format.
@@ -274,8 +283,7 @@ CustomerUtils.prototype.formNames = function(editForm) {
         phone: this.req.i18n.__('Phone'),
         email: this.req.i18n.__('Email'),
         allow_email: this.req.i18n.__('Allow email'),
-        first_see: this.req.i18n.__('First see'),
-        last_see: this.req.i18n.__('Last see'),
+        first_seen: this.req.i18n.__('First seen'),
         discount: this.req.i18n.__('Discount'),
         notes: this.req.i18n.__('Notes'),
         submit: editForm ? this.req.i18n.__('Edit customer') : this.req.i18n.__('Create customer')
@@ -294,7 +302,7 @@ CustomerUtils.prototype.toElasticsearchFormat = function(sourceObj) {
     for (var i = 0; i < CustomerUtils.formFields.length; i++) {
         var field = CustomerUtils.formFields[i];
         if (sourceObj[field]) {
-            if (field == 'first_see' || field == 'last_see')
+            if (field == 'first_seen')
                 obj[field] = this.toISODate(sourceObj[field]);
             else if (field == 'allow_sms' || field == 'allow_email')
                 obj[field] = sourceObj[field] == 'on';
@@ -317,7 +325,7 @@ CustomerUtils.prototype.toViewFormat = function(sourceObj) {
     for (var i = 0; i < CustomerUtils.formFields.length; i++) {
         var field = CustomerUtils.formFields[i];
         if (sourceObj[field]) {
-            if (field == 'first_see' || field == 'last_see')
+            if (field == 'first_seen')
                 obj[field] = this.toLocalFormattedDate(sourceObj[field]);
             else
                 obj[field] = sourceObj[field];
@@ -356,13 +364,9 @@ CustomerUtils.prototype.handleForm = function(title, editForm) {
             'The email does not seem a valid email')).isEmail();
     }
 
-    if (this.req.body.first_see) {
-        this.req.checkBody('first_see', this.req.i18n.__(
-            'The first date does not seem a valid date')).isValidDate();
-    }
-    if (this.req.body.last_see) {
-        this.req.checkBody('last_see', this.req.i18n.__(
-            'The last date does not seem a valid date')).isValidDate();
+    if (this.req.body.first_seen) {
+        this.req.checkBody('first_seen', this.req.i18n.__(
+            'The first date seen does not seem a valid date')).isValidDate();
     }
 
     var errors = this.req.validationErrors();
@@ -413,7 +417,6 @@ CustomerUtils.prototype.handleForm = function(title, editForm) {
             i18n.title = title;
             i18n.info = that.req.i18n.__('Info');
             i18n.appointments = that.req.i18n.__('Appointments');
-
 
             that.res.render('customer', {
                 i18n: i18n,
@@ -496,9 +499,9 @@ router.get('/:id/appointments', function(req, res, next) {
 
         // sort by date (descending)
         function sortFn(a, b) {
-            if (a.date < b.date)
+            if (a._date < b._date)
                 return 1;
-            if (a.date > b.date)
+            if (a._date > b._date)
                 return -1;
             return 0;
         }
@@ -510,7 +513,8 @@ router.get('/:id/appointments', function(req, res, next) {
             var appointments = [];
             for (var i = 0; i < obj.appointments.length; i++) {
                 appointments.push({
-                    date: obj.appointments[i].date,
+                    _date: obj.appointments[i].date,
+                    date: common.toLocalFormattedDate(req, obj.appointments[i].date),
                     services: obj.appointments[i].services.map(descFn).join(' - '),
                     urlEdit: getCustomerUrl(req, 'appointments/' + i + '/edit'),
                     deleteText: req.i18n.__('Delete appointment'),
@@ -672,6 +676,18 @@ AppointmentUtils.prototype.handleForm = function(title, editForm) {
         }
         else {
             obj.appointments[that.req.params.appnum] = appointment;
+        }
+
+        if (obj.appointments.length == 1)
+            obj.last_seen = obj.appointments[0].date
+        else {
+            function reduceFn(previousValue, currentValue, index, array) {
+                if (typeof previousValue == 'undefined' || currentValue.date > previousValue.date)
+                    return currentValue.date;
+                return previousValue.date;
+            }
+
+            obj.last_seen = obj.appointments.reduce(reduceFn);
         }
 
         client.update({

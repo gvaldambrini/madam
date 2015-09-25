@@ -144,8 +144,8 @@
                         email: {type: 'string'},
                         allow_email: {type: 'boolean'},
                         discount: {type: 'integer'},
-                        first_see: {type: 'date'},
-                        last_see: {type: 'date'},
+                        first_seen: {type: 'date'},
+                        last_seen: {type: 'date'},
                         notes: {type: 'string'},
                         appointments: {
                             properties: {

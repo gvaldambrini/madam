@@ -16,6 +16,12 @@ module.exports = function (browser) {
         }, [index]);
     };
 
+    this.setDate = function(date) {
+        return browser.execute(function(date) {
+            $('input[name=date]').datepicker('setDate', date);
+        }, [date]);
+    };
+
     this.addService = function() {
         return browser
           .waitForElementVisible('#form .btn-add', 1000)

@@ -17,7 +17,7 @@ var Customer = (function(window, $) {
         $form.find('input').each(function() {
             var name = $(this).attr('name');
             if (typeof customerData[name] !== 'undefined') {
-                if (name == 'first_see' || name == 'last_see') {
+                if (name == 'first_seen') {
                     $('#' + name + '-container .input-group.date').datepicker(
                         'setDate', customerData[name]);
                 }
@@ -31,8 +31,7 @@ var Customer = (function(window, $) {
             }
         });
         $form.find('textarea').val(customerData.notes);
-        $('#first_see-container .input-group.date').datepicker();
-        $('#last_see-container .input-group.date').datepicker();
+        $('#first_seen-container .input-group.date').datepicker();
     };
 
     /// Public API
