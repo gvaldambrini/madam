@@ -96,6 +96,18 @@ Common.prototype.exposeTemplates = function(req, res, next) {
 };
 
 /**
+ * Converts the given container (array or string) into an array.
+ * @method
+ *
+ * @param {array|string} container the container to converts.
+ */
+Common.prototype.toArray = function(container) {
+    if (typeof container == 'string')
+        container = [container];
+    return container;
+};
+
+/**
  * The id of the workers document.
  * @var {string}
  */

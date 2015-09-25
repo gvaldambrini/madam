@@ -57,23 +57,16 @@ router.get('/workers', function(req, res, next) {
 });
 
 router.post('/workers', function(req, res, next) {
+    req.body.name = common.toArray(req.body.name);
+    req.body.color = common.toArray(req.body.color);
+
     var workers = [];
-    if (typeof req.body.name == 'string') {
-        if (req.body.name.trim()) {
-            workers = [{
-                name: req.body.name.trim(),
-                color: req.body.color
-            }];
-        }
-    }
-    else {
-        for (var i = 0; i < req.body.name.length; i++) {
-            if (req.body.name[i]) {
-                workers.push({
-                    name: req.body.name[i].trim(),
-                    color: req.body.color[i]
-                });
-            }
+    for (var i = 0; i < req.body.name.length; i++) {
+        if (req.body.name[i]) {
+            workers.push({
+                name: req.body.name[i].trim(),
+                color: req.body.color[i]
+            });
         }
     }
 
@@ -168,11 +161,7 @@ router.get('/services', function(req, res, next) {
 });
 
 router.post('/services', function(req, res, next) {
-    var names = req.body.name;
-    if (typeof names == 'string')
-        names = [names];
-
-    var services = names.filter(function(e) { return e; });
+    var services = common.toArray(req.body.name).filter(function(e) { return e; });
     if (services.length === 0) {
         res.render('settings', {
             i18n: {

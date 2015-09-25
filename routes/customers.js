@@ -577,6 +577,9 @@ var AppointmentUtils = function(req, res) {
  */
 AppointmentUtils.prototype.handleForm = function(title) {
     var that = this;
+    that.req.body.service = common.toArray(that.req.body.service);
+    that.req.body.worker = common.toArray(that.req.body.worker);
+
     // starting from es 1.4.3 groovy dynamic scripting is no longer available
     // by default, so we fallback to a get/update implementation.
     client.mget({
