@@ -33,10 +33,7 @@
 	"Create new": "Crea nuovo",
 	"New appointment": "Nuovo appuntamento",
 	"Date": "Data",
-	"Edit": "Modifica",
 	"Edit appointment": "Modifica appuntamento",
-	"Update": "Modifica",
-	"Save": "Salva",
 	"Notes": "Note",
 	"Add service": "Aggiungi servizio",
 	"Submit": "Salva",
@@ -60,5 +57,16 @@
 	"Add product": "Aggiungi prodotto",
 	"Clone product": "Copia prodotto",
 	"Edit product": "Modifica prodotto",
-	"Delete the product?": "Eliminare il prodotto?"
+	"Delete the product?": "Eliminare il prodotto?",
+	"Add another": "Aggiungi altro",
+	"Delete product": "Elimina il prodotto",
+	"Delete appointment": "Elimina l'appuntamento",
+	"Delete customer": "Elimina il cliente",
+	"Create customer": "Crea cliente",
+	"Edit customer": "Modifica cliente",
+	"Create appointment": "Crea appuntamento",
+	"Unlock": "Sblocca",
+	"Save services": "Salva servizi",
+	"Save workers": "Salva lavoratori",
+	"Edit": "Modifica"
 }

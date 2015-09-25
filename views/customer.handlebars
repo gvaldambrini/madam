@@ -4,8 +4,8 @@
     {{> form_errors}}
 
     <form id="form" class="form-horizontal" method="post" action=''>
-        {{> input type='text' name='name' label=i18n.name }}
-        {{> input type='text' name='surname' label=i18n.surname }}
+        {{> input type='text' name='name' label=i18n.name mandatory='1'}}
+        {{> input type='text' name='surname' label=i18n.surname}}
         {{> input_and_checkbox type='tel' name='mobile_phone' label=i18n.mobile_phone cbname='allow_sms' cblabel=i18n.allow_sms}}
 
         {{> input type='tel' name='phone' label=i18n.phone }}

@@ -13,7 +13,7 @@
                 <td>{{{brand}}}</td>
                 <td>{{{count}}}</td>
                 <td class="no-padding">
-                    <span class="pull-right glyphicon glyphicon-plus" data-clone-url='{{urlClone}}'></span>
+                    <span class="pull-right glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="left" title="{{cloneText}}" data-clone-url='{{urlClone}}'></span>
                 </td>
             </tr>
             <tr><td colspan=4 class="hidden-row">
@@ -30,7 +30,7 @@
                             <td>{{{date}}}</td>
                             <td>{{{notes}}}</td>
                             <td class="no-padding">
-                                <span class="pull-right glyphicon glyphicon-trash" data-delete-url='{{urlDelete}}'></span>
+                                <span class="pull-right glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="left" title="{{deleteText}}" data-delete-url='{{urlDelete}}'></span>
                             </td>
                         </tr>
                         {{/each}}

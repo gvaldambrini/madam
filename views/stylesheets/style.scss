@@ -11,6 +11,10 @@ body {
   padding-top: $navbar-height;
 }
 
+.mandatory {
+  color: red;
+}
+
 /*
  * Top navigation
  * Hide default border to remove 1px line.

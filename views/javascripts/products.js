@@ -49,6 +49,7 @@ var Products = (function(window, $) {
             window.location.href = $(this).data('clone-url');
             event.stopPropagation();
         });
+        $clone.tooltip();
 
         $tableContainer.find('.hidden-row tbody tr').on("click", goToEditForm);
 
@@ -56,6 +57,7 @@ var Products = (function(window, $) {
         $trash.on('click', function(event) {
             event.stopPropagation();
         });
+        $trash.tooltip();
         $trash.map(function(index, item) {
             var $item = $(item);
             $item.confirmPopover({

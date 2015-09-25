@@ -33,10 +33,7 @@
 	"Create new": "Create new",
 	"New appointment": "New appointment",
 	"Date": "Date",
-	"Edit": "Edit",
 	"Edit appointment": "Edit appointment",
-	"Update": "Update",
-	"Save": "Save",
 	"Notes": "Notes",
 	"Add service": "Add service",
 	"Submit": "Submit",
@@ -60,5 +57,16 @@
 	"Add product": "Add product",
 	"Clone product": "Clone product",
 	"Edit product": "Edit product",
-	"Delete the product?": "Delete the product?"
+	"Delete the product?": "Delete the product?",
+	"Add another": "Add another",
+	"Delete product": "Delete product",
+	"Delete appointment": "Delete appointment",
+	"Delete customer": "Delete customer",
+	"Create customer": "Create customer",
+	"Edit customer": "Edit customer",
+	"Create appointment": "Create appointment",
+	"Unlock": "Unlock",
+	"Save workers": "Save workers",
+	"Save services": "Save services",
+	"Edit": "Edit"
 }

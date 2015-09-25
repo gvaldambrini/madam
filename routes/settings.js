@@ -44,8 +44,8 @@ router.get('/workers', function(req, res, next) {
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
-                update: req.i18n.__('Update'),
-                save: req.i18n.__('Save')
+                unlock: req.i18n.__('Unlock'),
+                save: req.i18n.__('Save workers')
             },
             hasColorpicker: true,
             isWorkersActive: true,
@@ -77,8 +77,8 @@ router.post('/workers', function(req, res, next) {
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
-                update: req.i18n.__('Update'),
-                save: req.i18n.__('Save')
+                unlock: req.i18n.__('Unlock'),
+                save: req.i18n.__('Save workers')
             },
             hasColorpicker: true,
             isWorkersActive: true,
@@ -110,8 +110,8 @@ router.post('/workers', function(req, res, next) {
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
-                update: req.i18n.__('Update'),
-                save: req.i18n.__('Save')
+                unlock: req.i18n.__('Unlock'),
+                save: req.i18n.__('Save workers')
             },
             hasColorpicker: true,
             isWorkersActive: true,
@@ -149,8 +149,8 @@ router.get('/services', function(req, res, next) {
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
-                update: req.i18n.__('Update'),
-                save: req.i18n.__('Save')
+                unlock: req.i18n.__('Unlock'),
+                save: req.i18n.__('Save services')
             },
             isServicesActive: true,
             items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
@@ -169,8 +169,8 @@ router.post('/services', function(req, res, next) {
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
-                update: req.i18n.__('Update'),
-                save: req.i18n.__('Save')
+                unlock: req.i18n.__('Unlock'),
+                save: req.i18n.__('Save services')
             },
             isServicesActive: true,
             flash: {
@@ -201,8 +201,8 @@ router.post('/services', function(req, res, next) {
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
-                update: req.i18n.__('Update'),
-                save: req.i18n.__('Save')
+                unlock: req.i18n.__('Unlock'),
+                save: req.i18n.__('Save services')
             },
             isServicesActive: true,
             items: services.length > 0 ? services : [''],

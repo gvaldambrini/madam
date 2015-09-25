@@ -2,7 +2,7 @@
     {{> form_errors}}
 
     <form id="form" class="form-horizontal" method="post" {{#if actionUrl}}action='{{actionUrl}}'{{/if}}>
-        {{> input type='text' name='name' label=i18n.name }}
+        {{> input type='text' name='name' label=i18n.name mandatory='1'}}
         {{> input type='text' name='brand' label=i18n.brand }}
         {{> input_date name='sold_date' label=i18n.sold_date}}
         <div class="form-group">

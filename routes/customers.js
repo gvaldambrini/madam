@@ -119,6 +119,7 @@ function processElasticsearchResults(req, hits) {
         results[results.length] = {
             urlEdit: getCustomerUrl(req, 'edit', hits[i]._id),
             urlDelete: getCustomerUrl(req, 'delete', hits[i]._id),
+            deleteText: req.i18n.__('Delete customer'),
             name: getField(hits[i], 'name', 'autocomplete'),
             surname: getField(hits[i], 'surname', 'autocomplete'),
             phone: phone_mobile
@@ -261,8 +262,10 @@ CustomerUtils.prototype.toLocalFormattedDate = function(ISODate) {
  * Returns an object which maps the form fields and buttons of the Customer form
  * with the related translated names.
  * @method
+ *
+ * @param {bool} editForm true if the form is for edit.
  */
-CustomerUtils.prototype.formNames = function() {
+CustomerUtils.prototype.formNames = function(editForm) {
     return {
         name: this.req.i18n.__('Name'),
         surname: this.req.i18n.__('Surname'),
@@ -275,7 +278,7 @@ CustomerUtils.prototype.formNames = function() {
         last_see: this.req.i18n.__('Last see'),
         discount: this.req.i18n.__('Discount'),
         notes: this.req.i18n.__('Notes'),
-        submit: this.req.i18n.__('Submit')
+        submit: editForm ? this.req.i18n.__('Edit customer') : this.req.i18n.__('Create customer')
     };
 };
 
@@ -329,8 +332,10 @@ CustomerUtils.prototype.toViewFormat = function(sourceObj) {
  * @method
  *
  * @param {string} title the title of the form.
+ * @param {bool} editForm true if the form is for edit.
  */
-CustomerUtils.prototype.handleForm = function(title) {
+CustomerUtils.prototype.handleForm = function(title, editForm) {
+
     // Trim all the fields that allow the user to write text
     for (var i = 0; i < CustomerUtils.formFields.length; i++)
         this.req.sanitize(CustomerUtils.formFields[i]).trim();
@@ -363,7 +368,7 @@ CustomerUtils.prototype.handleForm = function(title) {
     var errors = this.req.validationErrors();
     if (errors) {
         var appDisabled = typeof this.req.params.id == 'undefined';
-        var i18n = this.formNames();
+        var i18n = this.formNames(editForm);
         i18n.title = title;
         i18n.info = this.req.i18n.__('Info');
         i18n.appointments = this.req.i18n.__('Appointments');
@@ -404,7 +409,7 @@ CustomerUtils.prototype.handleForm = function(title) {
             console.error(err);
 
             var appDisabled = typeof that.req.params.id == 'undefined';
-            var i18n = that.formNames();
+            var i18n = that.formNames(editForm);
             i18n.title = title;
             i18n.info = that.req.i18n.__('Info');
             i18n.appointments = that.req.i18n.__('Appointments');
@@ -430,7 +435,7 @@ router.use(['/new', '*edit'], function (req, res, next) {
 });
 
 router.get('/new', function(req, res, next) {
-    var i18n = req.utils.formNames();
+    var i18n = req.utils.formNames(false);
     i18n.title = req.i18n.__('Create new customer');
     i18n.info = req.i18n.__('Info');
     i18n.appointments = req.i18n.__('Appointments');
@@ -445,7 +450,7 @@ router.get('/new', function(req, res, next) {
 });
 
 router.post('/new', function(req, res, next) {
-    req.utils.handleForm(req.i18n.__('Create new customer'));
+    req.utils.handleForm(req.i18n.__('Create new customer'), false);
 });
 
 router.get('/:id/edit', function(req, res, next) {
@@ -454,7 +459,7 @@ router.get('/:id/edit', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
-        var i18n = req.utils.formNames();
+        var i18n = req.utils.formNames(true);
         i18n.title = req.i18n.__('Edit') + ' ' + getCustomerName(resp._source);
         i18n.info = req.i18n.__('Info');
         i18n.appointments = req.i18n.__('Appointments');
@@ -475,7 +480,7 @@ router.post('/:id/edit', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
-        req.utils.handleForm(req.i18n.__('Edit') + ' ' + getCustomerName(resp._source));
+        req.utils.handleForm(req.i18n.__('Edit') + ' ' + getCustomerName(resp._source), true);
     });
 });
 
@@ -508,6 +513,7 @@ router.get('/:id/appointments', function(req, res, next) {
                     date: obj.appointments[i].date,
                     services: obj.appointments[i].services.map(descFn).join(' - '),
                     urlEdit: getCustomerUrl(req, 'appointments/' + i + '/edit'),
+                    deleteText: req.i18n.__('Delete appointment'),
                     urlDelete: getCustomerUrl(req, 'appointments/' + i + '/delete')
                 });
             }
@@ -575,7 +581,7 @@ var AppointmentUtils = function(req, res) {
  *
  * @param {string} title the title of the form.
  */
-AppointmentUtils.prototype.handleForm = function(title) {
+AppointmentUtils.prototype.handleForm = function(title, editForm) {
     var that = this;
     that.req.body.service = common.toArray(that.req.body.service);
     that.req.body.worker = common.toArray(that.req.body.worker);
@@ -621,7 +627,7 @@ AppointmentUtils.prototype.handleForm = function(title) {
                 date: that.req.i18n.__('Date'),
                 notes: that.req.i18n.__('Notes'),
                 addService: that.req.i18n.__('Add service'),
-                submit: that.req.i18n.__('Submit')
+                submit: editForm ? that.req.i18n.__('Edit appointment') : that.req.i18n.__('Create appointment')
             },
             infoUrl: getCustomerUrl(that.req, 'edit'),
             isAppointmentsActive: true,
@@ -766,7 +772,7 @@ router.get('/:id/appointments/new', function(req, res, next) {
                 date: req.i18n.__('Date'),
                 notes: req.i18n.__('Notes'),
                 addService: req.i18n.__('Add service'),
-                submit: req.i18n.__('Submit'),
+                submit: req.i18n.__('Create appointment'),
                 setWorkersMsg: req.i18n.__(
                     'To create an appointment, you have first to <a href="%s">define the workers.</a>',
                     getUrl(req, '/settings/workers')),
@@ -787,7 +793,7 @@ router.get('/:id/appointments/new', function(req, res, next) {
 });
 
 router.post('/:id/appointments/new', function(req, res, next) {
-    req.utils.handleForm(req.i18n.__('New appointment'));
+    req.utils.handleForm(req.i18n.__('New appointment'), false);
 });
 
 router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
@@ -821,7 +827,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
                 date: req.i18n.__('Date'),
                 notes: req.i18n.__('Notes'),
                 addService: req.i18n.__('Add service'),
-                submit: req.i18n.__('Submit')
+                submit: req.i18n.__('Edit appointment')
             },
             infoUrl: getCustomerUrl(req, 'edit'),
             isAppointmentsActive: true,
@@ -836,7 +842,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
 });
 
 router.post('/:id/appointments/:appnum/edit', function(req, res, next) {
-    req.utils.handleForm(req.i18n.__('Edit appointment'));
+    req.utils.handleForm(req.i18n.__('Edit appointment'), true);
 });
 
 router.post('/:id/appointments/:appnum/delete', function(req, res, next) {

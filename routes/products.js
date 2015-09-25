@@ -79,6 +79,7 @@ function processElasticsearchResults(req, resp) {
 
             objects[objects.length] = {
                 urlDelete: getProductUrl(req, 'delete', obj._id),
+                deleteText: req.i18n.__('Delete product'),
                 urlEdit: getProductUrl(req, 'edit', obj._id),
                 date: obj._source.sold_date ? common.toLocalFormattedDate(req, obj._source.sold_date) : '-',
                 notes: obj._source.notes ? obj._source.notes : '-'
@@ -88,6 +89,7 @@ function processElasticsearchResults(req, resp) {
         obj = lookup[aggregations[i].hits.hits.hits[0]._id];
         results[results.length] = {
             urlClone: getProductUrl(req, 'clone', obj._id),
+            cloneText: req.i18n.__('Add another'),
             name: getField(obj, 'name', 'autocomplete'),
             brand: getField(obj, 'brand', 'autocomplete'),
             count: aggregations[i].doc_count,
@@ -257,14 +259,16 @@ ProductUtils.prototype.toLocalFormattedDate = function(ISODate) {
  * Returns an object which maps the form fields and buttons of the Product form
  * with the related translated names.
  * @method
+ *
+ * @param {bool} editForm true if the form is for edit.
  */
-ProductUtils.prototype.formNames = function() {
+ProductUtils.prototype.formNames = function(editForm) {
     return {
         name: this.req.i18n.__('Name'),
         brand: this.req.i18n.__('Brand'),
         sold_date: this.req.i18n.__('Sold date'),
         notes: this.req.i18n.__('Notes'),
-        submit: this.req.i18n.__('Submit')
+        submit: editForm ? this.req.i18n.__('Edit product') : this.req.i18n.__('Add product')
     };
 };
 
@@ -322,8 +326,9 @@ ProductUtils.prototype.toViewFormat = function(sourceObj) {
  * @method
  *
  * @param {string} title the title of the form.
+ * @param {bool} editForm true if the form is for edit.
  */
-ProductUtils.prototype.handleForm = function(title) {
+ProductUtils.prototype.handleForm = function(title, editForm) {
     // Trim all the fields that allow the user to write text
     for (var i = 0; i < ProductUtils.formFields.length; i++)
         this.req.sanitize(ProductUtils.formFields[i]).trim();
@@ -337,7 +342,7 @@ ProductUtils.prototype.handleForm = function(title) {
 
     var errors = this.req.validationErrors();
     if (errors) {
-        var i18n = this.formNames();
+        var i18n = this.formNames(editForm);
         i18n.title = title;
 
         this.res.render('product', {
@@ -370,7 +375,7 @@ ProductUtils.prototype.handleForm = function(title) {
                 messages = [{msg: that.req.i18n.__('Database error')}];
             console.error(err);
 
-            var i18n = that.formNames();
+            var i18n = that.formNames(editForm);
             i18n.title = title;
 
             that.res.render('product', {
@@ -400,7 +405,7 @@ router.use(['/new', '*clone', '*edit'], function (req, res, next) {
 });
 
 router.get('/new', function(req, res, next) {
-    var i18n = req.utils.formNames();
+    var i18n = req.utils.formNames(false);
     i18n.title = req.i18n.__('Add product');
     res.render('product', {
         i18n: i18n,
@@ -411,7 +416,7 @@ router.get('/new', function(req, res, next) {
 });
 
 router.post('/new', function(req, res, next) {
-    req.utils.handleForm(req.i18n.__('Add product'));
+    req.utils.handleForm(req.i18n.__('Add product'), false);
 });
 
 router.get('/:id/clone', function(req, res, next) {
@@ -420,7 +425,7 @@ router.get('/:id/clone', function(req, res, next) {
         type: 'product',
         id: req.params.id
     }, function(err, resp, respcode) {
-        var i18n = req.utils.formNames();
+        var i18n = req.utils.formNames(false);
         i18n.title = req.i18n.__('Add product');
         res.render('product', {
             i18n: i18n,
@@ -439,7 +444,7 @@ router.get('/:id/edit', function(req, res, next) {
         type: 'product',
         id: req.params.id
     }, function(err, resp, respcode) {
-        var i18n = req.utils.formNames();
+        var i18n = req.utils.formNames(true);
         i18n.title = req.i18n.__('Edit product');
 
         res.render('product', {
@@ -455,7 +460,7 @@ router.post('/:id/edit', function(req, res, next) {
         type: 'product',
         id: req.params.id
     }, function(err, resp, respcode) {
-        req.utils.handleForm(req.i18n.__('Edit product'));
+        req.utils.handleForm(req.i18n.__('Edit product'), true);
     });
 });
 

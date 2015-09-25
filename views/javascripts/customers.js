@@ -50,6 +50,7 @@ var Customers = (function(window, $) {
         $trash.on('click', function(event) {
             event.stopPropagation();
         });
+        $trash.tooltip();
         $trash.map(function(index, item) {
             var $item = $(item);
             $item.confirmPopover({

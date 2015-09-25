@@ -1,5 +1,5 @@
 <div class="form-group">
-    <label class="control-label col-sm-2" for="{{name}}">{{label}}</label>
+    <label class="control-label col-sm-2" for="{{name}}">{{label}}{{#if mandatory}}<span class="mandatory">*</span>{{/if}}</label>
     <div class="col-sm-10">
         <input class="form-control" type="{{type}}" name="{{name}}" placeholder="{{label}}"/>
     </div>

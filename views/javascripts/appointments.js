@@ -19,6 +19,7 @@ var Appointments = (function(window, $) {
         options = _options;
         var $table = $('#appointments-table');
         var $trash = $table.find('.glyphicon-trash');
+        $trash.tooltip();
 
         $table.find('tbody tr').on("click", function(event) {
             window.location.href = $(this).data('edit-url');
