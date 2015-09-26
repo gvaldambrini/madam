@@ -20,8 +20,8 @@ var Common = function() {};
  */
 Common.prototype.createClient = function() {
     if (process.env.NODE_ENV == 'production')
-        return new elasticsearch.Client({host: process.env.BONSAI_URL});
-    return new elasticsearch.Client();
+        return new elasticsearch.Client({host: process.env.BONSAI_URL, apiVersion: '1.5'});
+    return new elasticsearch.Client({apiVersion: '1.5'});
 };
 
 /**
