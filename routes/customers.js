@@ -389,17 +389,8 @@ CustomerUtils.prototype.handleForm = function(title, editForm) {
         return;
     }
 
-    var args = {
-        index: this.req.config.mainIndex,
-        type: 'customer',
-        refresh: true,
-        body: this.toElasticsearchFormat(this.req.body)
-    };
-    if (typeof this.req.params.id != 'undefined')
-        args.id = this.req.params.id;
-
     var that = this;  // workaround for the this visibility problem inside inner functions.
-    client.index(args, function(err, resp, respcode) {
+    var cb = function(err, resp, respcode) {
         if (!err) {
             // redirect does not take into account being in inside a router
             that.res.redirect(customersPath);
@@ -428,7 +419,34 @@ CustomerUtils.prototype.handleForm = function(title, editForm) {
                 obj: that.req.body
             });
         }
-    });
+    };
+
+    // We want to use the index API to update the document, in order to clear
+    // fields that were removed from the form. As consequnce, we need to add
+    // the parts of the object which are not in the Customer form (for example
+    // the appointments list).
+    var args = {
+        index: this.req.config.mainIndex,
+        type: 'customer',
+        refresh: true,
+        body: this.toElasticsearchFormat(this.req.body)
+    };
+    if (typeof this.req.params.id != 'undefined') {
+        args.id = this.req.params.id;
+
+        client.get({
+            index: this.req.config.mainIndex,
+            type: 'customer',
+            id: args.id
+        }, function(err, resp, respcode) {
+            args.body.appointments = resp._source.appointments;
+            args.body.last_seen = resp._source.last_seen;
+            client.index(args, cb);
+        });
+    }
+    else {
+        client.index(args, cb);
+    }
 };
 
 

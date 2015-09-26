@@ -52,6 +52,7 @@ module.exports = {
 
   'Create appointments': function(browser) {
     browser
+      .page.Customers().tableContains(0, 'Tyrion', 'Lannister', '-', '-')
       .page.Customers().editCustomer(0)
       .page.Customer().goToAppointments()
 
@@ -84,6 +85,7 @@ module.exports = {
 
   'Edit an appointment': function(browser) {
     browser
+      .page.Customers().tableContains(0, 'Tyrion', 'Lannister', '-', '20/09/2015')
       .page.Customers().editCustomer(0)
       .page.Customer().goToAppointments()
       .page.Appointments().editAppointment(1)
@@ -102,8 +104,26 @@ module.exports = {
       .end();
   },
 
+  'Edit the customer, the appointments are still there': function(browser) {
+    browser
+      .page.Customers().tableContains(0, 'Tyrion', 'Lannister', '-', '21/09/2015')
+      .page.Customers().editCustomer(0)
+      .page.Customer().fillForm({
+        name: 'Tyrion',
+        surname: 'Lannister',
+        email: 'tyrion@casterlyrock.com'})
+      .page.Customer().submit()
+      .page.Customers().editCustomer(0)
+      .page.Customer().goToAppointments()
+      .page.Appointments().tableContains(0, '21/09/2015', 'shampoo - strong permanent - color')
+      .page.Appointments().tableContains(1, '20/09/2015', 'shampoo - haircut')
+      .page.Appointments().tableCount(2)
+      .end();
+  },
+
   'Delete an appointment': function(browser) {
     browser
+      .page.Customers().tableContains(0, 'Tyrion', 'Lannister', '-', '21/09/2015')
       .page.Customers().editCustomer(0)
       .page.Customer().goToAppointments()
       .page.Appointments().deleteAppointment(1)
