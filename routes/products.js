@@ -431,7 +431,8 @@ router.get('/:id/clone', function(req, res, next) {
             i18n: i18n,
             obj: {
                 name: resp._source.name,
-                brand: resp._source.brand
+                brand: resp._source.brand,
+                sold_date: common.toLocalFormattedDate(req, moment())
             },
             actionUrl: getProductsUrl(req, 'new')
         });
