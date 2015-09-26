@@ -65,9 +65,7 @@ var hbs = exphbs.create({
 app.hbs = hbs;
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
-
-// Avoid 404 errors on favicon requests
-app.use(favicon(__dirname + '/public/images/blank-favicon.ico'));
+app.use(favicon(__dirname + '/public/images/favicon.ico'));
 
 app.use(logger('dev', {
   skip: function(req, res) {
