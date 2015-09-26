@@ -1,6 +1,7 @@
 node_modules*
 elasticsearch*
 *sublime*
-public/*
+public/javascripts/*
+public/stylesheets/*
 nightwatch/results/*
 docs/*
