@@ -29,14 +29,15 @@ The application is written to run in development mode on a local environment
 and in production mode (`NODE_ENV == 'production'`) on [Heroku](https://www.heroku.com/).
 
 #### Development mode
-1. [Download elasticsearch](https://www.elastic.co/downloads/elasticsearch) and launch it.
+1. [Download elasticsearch version 1.5.x](https://www.elastic.co/downloads/elasticsearch)
+and launch it.
 2. Generate indices and mappings running:
 ```
-node ./scripts/create_indices.js
+node ./scripts/generate_indices.js
 ```
-3. Create one or more users in the database executing:
+3. Generate demo data:
 ```
-node ./scripts/create_user.js
+node ./scripts/generate_data.js
 ```
 4. Launch the application with [browsersync](http://www.browsersync.io/) enabled:
 ```

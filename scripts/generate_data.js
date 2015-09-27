@@ -5,10 +5,33 @@
     var fs = require('fs');
     var path = require('path');
     var elasticsearch = require('elasticsearch');
+    var moment = require('moment');
+    var bcrypt = require('bcrypt-nodejs');
     var common = require('../common');
     var client = common.createClient();
 
     var mainIndex = 'main';
+    var workers = [];
+
+    // The services that will be created
+    var services = ['shampoo', 'conditioning', 'haircut', 'color', 'highlights'];
+
+    // The number of workers generated
+    var numWorkers = 4;
+
+    // The minimum number of appointments generated for each customer
+    var minApp = 0;
+    var maxApp = 5;
+
+    // The number of customers generated
+    var numCustomers = 20;
+
+    // The number of products created
+    var numProducts = 30;
+
+    // Username and password of the created user.
+    var username = "admin";
+    var password = "madam";
 
     function rainbow(numOfSteps, step) {
         // This function generates vibrant, "evenly spaced" colours (i.e. no clustering).
@@ -39,37 +62,94 @@
         return container[Math.floor(Math.random() * container.length)];
     }
 
+    function popRandomElement(container) {
+        var element = getRandomElement(container);
+        var index = container.indexOf(element);
+        container.splice(index, 1);
+        return element;
+    }
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     function readFileAsArray(filename) {
         var data = fs.readFileSync(filename, 'UTF-8');
         return data.split('\n');
     }
 
-    function populateCustomers(num) {
+    function populateCustomers() {
+        console.log('Populate customers...');
         var lastnames = readFileAsArray(path.join(__dirname, 'data', 'lastnames.txt'));
         var firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
         var body = [];
 
-        for (var i = 0; i < num; i++) {
+        for (var i = 0; i < numCustomers; i++) {
             body[body.length] = {index: {_index: mainIndex, _type: 'customer'}};
 
-            body[body.length] = {
+            var appointments = [];
+            for (var j = 0; j < getRandomInt(minApp, maxApp); j++) {
+                var appServices = [];
+                var serviceNames = services.slice();
+                for (var k = 0; k < getRandomInt(Math.floor(services.length / 2), services.length); k++) {
+                    appServices[appServices.length] = {
+                        description: popRandomElement(serviceNames),
+                        worker: getRandomElement(workers).name
+                    };
+                }
+                appointments[appointments.length] = {
+                    date: moment().subtract(j, 'days').format('YYYY-MM-DD'),
+                    services: appServices
+                };
+            }
+
+            var customer = {
                 name: getRandomElement(firstnames),
-                surname: getRandomElement(lastnames)
+                surname: getRandomElement(lastnames),
+                appointments: appointments
             };
+
+            if (appointments.length > 0)
+                customer.last_seen = appointments[0].date;
+            body[body.length] = customer;
+        }
+        client.bulk({body: body});
+    }
+
+    function populateProducts() {
+        console.log('Populate products...');
+        var products = ['shampoo', 'hairspray', 'argan oil', 'hair protection',
+            'conditioner', 'color protect shampoo', 'gel', 'ultra defining gel',
+            'volume mousse', 'silk therapy', 'scalp treatment', 'cure restorative masque',
+            'hair booster'];
+        var brands = ['kenra', 'wella', 'matrix', 'redken', 'oreal', 'pureology'];
+        var body = [];
+
+        for (var i = 0; i < numProducts; i++) {
+            body[body.length] = {index: {_index: mainIndex, _type: 'product'}};
+            var product = {
+                name: getRandomElement(products),
+                brand: getRandomElement(brands),
+                sold_date: moment().subtract(getRandomInt(0, 30), 'days').format('YYYY-MM-DD'),
+                created_at: new Date().toISOString()
+            };
+
+            product.complete_name = product.name;
+            if (product.brand) {
+                product.complete_name += product.brand;
+            }
+            body[body.length] = product;
         }
         client.bulk({body: body});
     }
 
     function populateSettings() {
+        console.log('Populate settings...');
         var body = [];
 
         // Workers
-        var numWorkers = 4;
         var firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
-
         body[body.length] = {index: {_index: mainIndex, _type: 'workers', _id: common.workersDocId}};
-        var workers = [];
-
         for (var i = 0; i < numWorkers; i++) {
             workers[workers.length] = {
                 name: getRandomElement(firstnames),
@@ -80,21 +160,35 @@
 
         // Services
         body[body.length] = {index: {_index: mainIndex, _type: 'services', _id: common.servicesDocId}};
-        body[body.length] = {
-            names: ['shampoo', 'conditioning', 'haircut', 'color', 'highlights']
+        body[body.length] = {names: services};
+        client.bulk({body: body});
+    }
+
+    function createUser() {
+        console.log('Create user...');
+        var body = [];
+
+        var user = {
+            username: username,
+            password: bcrypt.hashSync(password, bcrypt.genSaltSync(10))
         };
 
+        body[body.length] = {index: {_index: mainIndex, _type: 'users', _id: common.usersDocId}};
+        body[body.length] = {users: [user]};
         client.bulk({body: body});
     }
 
     module.exports = {
         populateSettings: populateSettings,
-        populateCustomers: populateCustomers
+        populateCustomers: populateCustomers,
+        populateProducts: populateProducts
     };
 
     if (!module.parent) {
         populateSettings();
-        populateCustomers(10);
+        populateCustomers();
+        populateProducts();
+        createUser();
     }
 }
 )();
