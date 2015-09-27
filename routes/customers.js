@@ -697,13 +697,13 @@ AppointmentUtils.prototype.handleForm = function(title, editForm) {
         }
 
         if (obj.appointments.length == 1)
-            obj.last_seen = obj.appointments[0].date
+            obj.last_seen = obj.appointments[0].date;
         else {
-            function reduceFn(previousValue, currentValue, index, array) {
+            var reduceFn = function (previousValue, currentValue, index, array) {
                 if (typeof previousValue == 'undefined' || currentValue.date > previousValue.date)
                     return currentValue.date;
                 return previousValue.date;
-            }
+            };
 
             obj.last_seen = obj.appointments.reduce(reduceFn);
         }
