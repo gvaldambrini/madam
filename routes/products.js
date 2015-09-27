@@ -120,9 +120,10 @@ var aggregate_product = {
             _source: {
               include: "_id"
             },
-            sort: {
-                created_at: { order: "asc" }
-            }
+            sort: [
+                {sold_date: { order: "desc" }},
+                {created_at: { order: "asc" }}
+            ]
           }
         }
       }

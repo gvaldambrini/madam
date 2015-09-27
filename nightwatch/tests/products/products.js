@@ -57,7 +57,7 @@ module.exports = {
       .page.Product().fillForm({
         name: 'shampoo',
         brand: 'wella',
-        sold_date: '20/09/2015',
+        sold_date: '15/09/2015',
         notes: 'third'})
       .page.Product().submit()
       .page.Products().tableCount(2)
@@ -85,19 +85,19 @@ module.exports = {
       .page.Products().toggleNestedTable(0)
       .page.Products().nestedTableContains(0, 0, '18/09/2015', 'first')
       .page.Products().nestedTableContains(0, 1, '15/09/2015', 'second')
-      .page.Products().nestedTableContains(0, 2, '20/09/2015', 'third')
-      .page.Products().editProduct(0, 1)
+      .page.Products().nestedTableContains(0, 2, '15/09/2015', 'third')
+      .page.Products().editProduct(0, 2)
       .page.Product().fillForm({
         name: 'shampoo',
         brand: 'wella',
-        sold_date: '19/09/2015',
-        notes: 'second'})
+        sold_date: '15/09/2015',
+        notes: 'third - else'})
       .page.Product().submit()
       .page.Products().toggleNestedTable(0)
       .page.Products().nestedTableCount(0, 3)
       .page.Products().nestedTableContains(0, 0, '18/09/2015', 'first')
-      .page.Products().nestedTableContains(0, 1, '19/09/2015', 'second')
-      .page.Products().nestedTableContains(0, 2, '20/09/2015', 'third')
+      .page.Products().nestedTableContains(0, 1, '15/09/2015', 'second')
+      .page.Products().nestedTableContains(0, 2, '15/09/2015', 'third - else')
       .end();
   },
 
@@ -111,8 +111,8 @@ module.exports = {
       .page.Products().tableCount(2)
       .page.Products().nestedTableCount(0, 2)
       .page.Products().toggleNestedTable(0)
-      .page.Products().nestedTableContains(0, 0, '19/09/2015', 'second')
-      .page.Products().nestedTableContains(0, 1, '20/09/2015', 'third')
+      .page.Products().nestedTableContains(0, 0, '15/09/2015', 'second')
+      .page.Products().nestedTableContains(0, 1, '15/09/2015', 'third - else')
       .page.Products().toggleNestedTable(0)
 
       .page.Products().toggleNestedTable(1)
