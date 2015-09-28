@@ -15,6 +15,12 @@ body {
   color: red;
 }
 
+.mandatory-fields {
+  @include font(12px);
+  color: #7a7a7a;
+  margin-bottom: 20px;
+}
+
 /*
  * Top navigation
  * Hide default border to remove 1px line.

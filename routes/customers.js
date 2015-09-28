@@ -286,7 +286,8 @@ CustomerUtils.prototype.formNames = function(editForm) {
         first_seen: this.req.i18n.__('First seen'),
         discount: this.req.i18n.__('Discount'),
         notes: this.req.i18n.__('Notes'),
-        submit: editForm ? this.req.i18n.__('Edit customer') : this.req.i18n.__('Create customer')
+        submit: editForm ? this.req.i18n.__('Edit customer') : this.req.i18n.__('Create customer'),
+        mandatoryFields: this.req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.')
     };
 };
 

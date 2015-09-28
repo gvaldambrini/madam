@@ -4,10 +4,13 @@
     {{> form_errors}}
 
     <form id="form" class="form-horizontal" method="post" action=''>
-        {{> input type='text' name='name' label=i18n.name mandatory='1'}}
+        <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2 mandatory-fields">{{{i18n.mandatoryFields}}}</div>
+        </div>
+        {{> input type='text' name='name' label=i18n.name mandatory=1 focus=1}}
         {{> input type='text' name='surname' label=i18n.surname}}
-        {{> input_and_checkbox type='tel' name='mobile_phone' label=i18n.mobile_phone cbname='allow_sms' cblabel=i18n.allow_sms}}
 
+        {{> input_and_checkbox type='tel' name='mobile_phone' label=i18n.mobile_phone cbname='allow_sms' cblabel=i18n.allow_sms}}
         {{> input type='tel' name='phone' label=i18n.phone }}
         {{> input_and_checkbox type='email' name='email' label=i18n.email cbname='allow_email' cblabel=i18n.allow_email}}
 

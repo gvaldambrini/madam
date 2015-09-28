@@ -67,5 +67,6 @@
 	"Unlock": "Unlock",
 	"Save workers": "Save workers",
 	"Save services": "Save services",
-	"Edit": "Edit"
+	"Edit": "Edit",
+	"Fields marked with <span class=\"mandatory\">*</span> are mandatory.": "Fields marked with <span class=\"mandatory\">*</span> are mandatory."
 }

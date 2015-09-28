@@ -19,7 +19,7 @@
             <h2 class="col-sm-offset-2">{{i18n.login}}</h2>
             {{> form_errors}}
             <form id="form" class="form-horizontal" method="post" action="/login">
-                {{> input type='text' name='username' label=i18n.username }}
+                {{> input type='text' name='username' label=i18n.username focus=1}}
                 {{> input type='password' name='password' label=i18n.password }}
                 <input type='hidden' name="_csrf" value="{{csrftoken}}">
                 <div class="form-group">

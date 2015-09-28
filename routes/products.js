@@ -269,7 +269,8 @@ ProductUtils.prototype.formNames = function(editForm) {
         brand: this.req.i18n.__('Brand'),
         sold_date: this.req.i18n.__('Sold date'),
         notes: this.req.i18n.__('Notes'),
-        submit: editForm ? this.req.i18n.__('Edit product') : this.req.i18n.__('Add product')
+        submit: editForm ? this.req.i18n.__('Edit product') : this.req.i18n.__('Add product'),
+        mandatoryFields: this.req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.')
     };
 };
 
