@@ -5,3 +5,4 @@ public/javascripts/*
 public/stylesheets/*
 nightwatch/results/*
 docs/*
+scripts/dropbox_app.env
