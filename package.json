@@ -10,6 +10,7 @@
     "postinstall": "gulp build"
   },
   "dependencies": {
+    "archiver": "^0.15.1",
     "async": "^1.4.2",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.13.3",
@@ -20,6 +21,7 @@
     "cookie-session": "^1.1.0",
     "csurf": "^1.7.0",
     "debug": "~2.2.0",
+    "dropbox": "^0.10.3",
     "elasticsearch": "^8.0.1",
     "express": "~4.13.3",
     "express-handlebars": "^2.0.0",
@@ -40,7 +42,8 @@
     "passport": "^0.3.0",
     "passport-local": "^1.0.0",
     "promptly": "^0.2.1",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "tar-stream": "^1.2.1"
   },
   "devDependencies": {
     "nightwatch-custom-commands-assertions": "^1.0.2",
