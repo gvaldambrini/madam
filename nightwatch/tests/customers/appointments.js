@@ -121,7 +121,7 @@ module.exports = {
       .end();
   },
 
-  'Delete an appointment': function(browser) {
+  'Delete all the appointments': function(browser) {
     browser
       .page.Customers().tableContains(0, 'Tyrion', 'Lannister', '-', '21/09/2015')
       .page.Customers().editCustomer(0)
@@ -129,6 +129,9 @@ module.exports = {
       .page.Appointments().deleteAppointment(1)
       .page.Appointments().tableCount(1)
       .page.Appointments().tableContains(0, '21/09/2015', 'shampoo - strong permanent - color')
+      .page.Appointments().deleteAppointment(0)
+      .page.Sidebar().goToCustomers()
+      .page.Customers().tableContains(0, 'Tyrion', 'Lannister', '-', '-')
       .end();
   }
 };

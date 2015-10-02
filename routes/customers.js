@@ -55,7 +55,7 @@ function getUrl(req, path) {
 }
 
 /**
- * Return the full name of the customer.
+ * Returns the full name of the customer.
  * @function
  *
  * @param {object} obj the customer object fetched from elasticsearch
@@ -65,6 +65,30 @@ function getCustomerName(obj) {
         return obj.name + ' ' + obj.surname;
     }
     return obj.name;
+}
+
+/**
+ * Updates the last_seen property of the given obj looping over the obj appointments.
+ * @function
+ *
+ * @param {object} obj the customer object fetched from elasticsearch
+ */
+function updateLastSeen(obj) {
+    if (obj.appointments.length === 0) {
+        obj.last_seen = null;
+    }
+    else if (obj.appointments.length === 1) {
+        obj.last_seen = obj.appointments[0].date;
+    }
+    else {
+        var reduceFn = function (previousValue, currentValue, index, array) {
+            if (typeof previousValue == 'undefined' || currentValue.date > previousValue.date)
+                return currentValue;
+            return previousValue;
+        };
+
+        obj.last_seen = obj.appointments.reduce(reduceFn).date;
+    }
 }
 
 /**
@@ -696,18 +720,7 @@ AppointmentUtils.prototype.handleForm = function(title, editForm) {
         else {
             obj.appointments[that.req.params.appnum] = appointment;
         }
-
-        if (obj.appointments.length == 1)
-            obj.last_seen = obj.appointments[0].date;
-        else {
-            var reduceFn = function (previousValue, currentValue, index, array) {
-                if (typeof previousValue == 'undefined' || currentValue.date > previousValue.date)
-                    return currentValue.date;
-                return previousValue.date;
-            };
-
-            obj.last_seen = obj.appointments.reduce(reduceFn);
-        }
+        updateLastSeen(obj);
 
         client.update({
             index: that.req.config.mainIndex,
@@ -901,12 +914,14 @@ router.post('/:id/appointments/:appnum/delete', function(req, res, next) {
             return;
         }
         obj.appointments.splice(index, 1);
+        updateLastSeen(obj);
 
         client.update({
             index: req.config.mainIndex,
             type: 'customer',
             id: req.params.id,
             version: version,
+            refresh: true,
             body: {
                 doc: obj
             }

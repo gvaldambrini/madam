@@ -57,7 +57,7 @@ Common.prototype.toISODate = function(req, localFormattedDate) {
  * @param {string} ISODate the iso date.
  */
 Common.prototype.toLocalFormattedDate = function(req, ISODate) {
-    if (typeof ISODate == 'undefined')
+    if (typeof ISODate == 'undefined' || !ISODate)
         return '-';
     return moment.utc(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
 };
