@@ -68,5 +68,6 @@
 	"Save workers": "Save workers",
 	"Save services": "Save services",
 	"Edit": "Edit",
-	"Fields marked with <span class=\"mandatory\">*</span> are mandatory.": "Fields marked with <span class=\"mandatory\">*</span> are mandatory."
+	"Fields marked with <span class=\"mandatory\">*</span> are mandatory.": "Fields marked with <span class=\"mandatory\">*</span> are mandatory.",
+	"Create customer and appointment": "Create customer and appointment"
 }

@@ -30,6 +30,10 @@ module.exports = function (browser) {
         return browser.click('button[name=submit]');
     };
 
+    this.submitAndAdd = function() {
+        return browser.click('button[name=submit_and_add]');
+    };
+
     this.goToAppointments = function() {
         browser
           .waitForElementVisible('.content-header', 1000)

@@ -311,6 +311,7 @@ CustomerUtils.prototype.formNames = function(editForm) {
         discount: this.req.i18n.__('Discount'),
         notes: this.req.i18n.__('Notes'),
         submit: editForm ? this.req.i18n.__('Edit customer') : this.req.i18n.__('Create customer'),
+        submit_and_add: this.req.i18n.__('Create customer and appointment'),
         mandatoryFields: this.req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.')
     };
 };
@@ -409,6 +410,7 @@ CustomerUtils.prototype.handleForm = function(title, editForm) {
             appointmentsUrl: appDisabled ? '#' :
                 getCustomerUrl(this.req, 'appointments'),
             flash: { type: 'alert-danger', messages: errors},
+            editForm: editForm,
             obj: this.req.body
         });
         return;
@@ -418,7 +420,12 @@ CustomerUtils.prototype.handleForm = function(title, editForm) {
     var cb = function(err, resp, respcode) {
         if (!err) {
             // redirect does not take into account being in inside a router
-            that.res.redirect(customersPath);
+            if (that.req.body.submit_and_add) {
+                that.res.redirect(getCustomerUrl(that.req, 'appointments', resp._id));
+            }
+            else {
+                that.res.redirect(customersPath);
+            }
         }
         else {
             var messages;
@@ -441,6 +448,7 @@ CustomerUtils.prototype.handleForm = function(title, editForm) {
                 appointmentsUrl: appDisabled ? '#' :
                     getCustomerUrl(that.req, 'appointments'),
                 flash: { type: 'alert-danger', messages: messages},
+                editForm: editForm,
                 obj: that.req.body
             });
         }
@@ -491,6 +499,7 @@ router.get('/new', function(req, res, next) {
         isInfoActive: true,
         isAppointmentsDisabled: true,
         appointmentsUrl: '#',
+        editForm: false,
         obj: {}
     });
 });
@@ -515,6 +524,7 @@ router.get('/:id/edit', function(req, res, next) {
             isInfoActive: true,
             isAppointmentsDisabled: false,
             appointmentsUrl: getCustomerUrl(req, 'appointments'),
+            editForm: true,
             obj: req.utils.toViewFormat(resp._source)
         });
     });

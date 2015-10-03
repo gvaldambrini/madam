@@ -21,9 +21,7 @@ module.exports = {
       .page.Customer().fillForm({
         name: 'Tyrion',
         surname: 'Lannister'})
-      .page.Customer().submit()
-      .page.Customers().editCustomer(0)
-      .page.Customer().goToAppointments()
+      .page.Customer().submitAndAdd()
 
       .page.Appointments().alertContains(
         'To create an appointment, you have first to define the workers.')
