@@ -11,14 +11,33 @@ body {
   padding-top: $navbar-height;
 }
 
-.mandatory {
-  color: red;
-}
 
-.mandatory-fields {
-  @include font(12px);
-  color: #7a7a7a;
-  margin-bottom: 20px;
+.form-container {
+  border: 1px #d0d0d0 solid;
+  border-radius: 8px;
+
+  #form {
+    margin-right: 15px;
+    margin-left: 15px;
+  }
+
+  .mandatory {
+    color: red;
+  }
+
+  .mandatory-fields {
+    @include font(12px);
+    color: #7a7a7a;
+  }
+
+  h4 {
+    margin-top: 10px;
+    margin-bottom: 0px;
+  }
+
+  .appointment h4, .settings h4 {
+    margin-bottom: 20px;
+  }
 }
 
 /*
@@ -171,7 +190,7 @@ $sidebar-padding: 20px;
 }
 
 .content-body {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 /*

@@ -3,56 +3,61 @@
 <div class="content-body">
     {{> form_errors}}
 
-    <form id="form" class="form-horizontal" method="post" action=''>
-        <div class="form-group">
-          <div class="col-sm-10 col-sm-offset-2 mandatory-fields">{{{i18n.mandatoryFields}}}</div>
-        </div>
-        {{> input type='text' name='name' label=i18n.name mandatory=1 focus=1}}
-        {{> input type='text' name='surname' label=i18n.surname}}
+    <div class="form-container">
+        <form id="form" class="form-horizontal customer" method="post" action=''>
+            <div class="form-group">
+              <h4 class="col-sm-10 col-sm-offset-2">{{{i18n.title}}}</h4>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-10 col-sm-offset-2 mandatory-fields">{{{i18n.mandatoryFields}}}</div>
+            </div>
+            {{> input type='text' name='name' label=i18n.name mandatory=1 focus=1}}
+            {{> input type='text' name='surname' label=i18n.surname}}
 
-        {{> input_and_checkbox type='tel' name='mobile_phone' label=i18n.mobile_phone cbname='allow_sms' cblabel=i18n.allow_sms}}
-        {{> input type='tel' name='phone' label=i18n.phone }}
-        {{> input_and_checkbox type='email' name='email' label=i18n.email cbname='allow_email' cblabel=i18n.allow_email}}
+            {{> input_and_checkbox type='tel' name='mobile_phone' label=i18n.mobile_phone cbname='allow_sms' cblabel=i18n.allow_sms}}
+            {{> input type='tel' name='phone' label=i18n.phone }}
+            {{> input_and_checkbox type='email' name='email' label=i18n.email cbname='allow_email' cblabel=i18n.allow_email}}
 
-        <div class="form-group">
-            <label class="control-label col-sm-2" for='discount'>{{i18n.discount}}</label>
-            <div class="col-sm-8">
-                <label class="radio-inline">
-                    <input type="radio" name="discount" value="0">0%</input>
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="discount" value="10">10%</input>
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="discount" value="20">20%</input>
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="discount" value="30">30%</input>
-                </label>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for='discount'>{{i18n.discount}}</label>
+                <div class="col-sm-8">
+                    <label class="radio-inline">
+                        <input type="radio" name="discount" value="0">0%</input>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="discount" value="10">10%</input>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="discount" value="20">20%</input>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="discount" value="30">30%</input>
+                    </label>
+                </div>
             </div>
-        </div>
-        {{> input_date name='first_seen' label=i18n.first_seen}}
-        <div class="form-group">
-            <label class="control-label col-sm-2">{{i18n.notes}}</label>
-            <div class="col-sm-10">
-                <textarea name="notes" class="form-control" rows="5">{{notes}}</textarea>
+            {{> input_date name='first_seen' label=i18n.first_seen}}
+            <div class="form-group">
+                <label class="control-label col-sm-2">{{i18n.notes}}</label>
+                <div class="col-sm-10">
+                    <textarea name="notes" class="form-control" rows="5">{{notes}}</textarea>
+                </div>
             </div>
-        </div>
-        <input type='hidden' name="_csrf" value="{{csrftoken}}">
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary" name="submit" value="1">{{i18n.submit}}</button>
-                {{#unless editForm}}
-                <button type="submit" class="btn btn-primary" name="submit_and_add" value="1">{{i18n.submit_and_add}}</button>
-                {{/unless}}
+            <input type='hidden' name="_csrf" value="{{csrftoken}}">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-primary" name="submit" value="1">{{i18n.submit}}</button>
+                    {{#unless editForm}}
+                    <button type="submit" class="btn btn-primary" name="submit_and_add" value="1">{{i18n.submit_and_add}}</button>
+                    {{/unless}}
+                </div>
             </div>
-        </div>
-        <script type="text/javascript">
-            var customerData = {{{json obj}}};
-            var dateFormat = "{{config.date_format}}".toLowerCase();
-            var language = '{{config.language}}';
-            $(document).ready(Customer.init(language, dateFormat, customerData));
-        </script>
-    </form>
+            <script type="text/javascript">
+                var customerData = {{{json obj}}};
+                var dateFormat = "{{config.date_format}}".toLowerCase();
+                var language = '{{config.language}}';
+                $(document).ready(Customer.init(language, dateFormat, customerData));
+            </script>
+        </form>
+    </div>
 </div>
 

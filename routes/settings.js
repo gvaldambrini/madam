@@ -40,7 +40,7 @@ router.get('/workers', function(req, res, next) {
 
         res.render('settings', {
             i18n: {
-                title: req.i18n.__('Settings'),
+                title: req.i18n.__('Set workers'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
@@ -73,7 +73,7 @@ router.post('/workers', function(req, res, next) {
     if (workers.length === 0) {
         res.render('settings', {
             i18n: {
-                title: req.i18n.__('Settings'),
+                title: req.i18n.__('Set workers'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
@@ -106,7 +106,7 @@ router.post('/workers', function(req, res, next) {
     client.index(args, function(err, resp, respcode) {
         var params = {
             i18n: {
-                title: req.i18n.__('Settings'),
+                title: req.i18n.__('Set workers'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
@@ -145,7 +145,7 @@ router.get('/services', function(req, res, next) {
     }, function(err, resp, respcode) {
         res.render('settings', {
             i18n: {
-                title: req.i18n.__('Settings'),
+                title: req.i18n.__('Set services'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
@@ -165,7 +165,7 @@ router.post('/services', function(req, res, next) {
     if (services.length === 0) {
         res.render('settings', {
             i18n: {
-                title: req.i18n.__('Settings'),
+                title: req.i18n.__('Set services'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
@@ -197,7 +197,7 @@ router.post('/services', function(req, res, next) {
     client.index(args, function(err, resp, respcode) {
         var params = {
             i18n: {
-                title: req.i18n.__('Settings'),
+                title: req.i18n.__('Set services'),
                 name: req.i18n.__('Name'),
                 workers: req.i18n.__('Workers'),
                 services: req.i18n.__('Services'),
