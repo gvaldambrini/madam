@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+/**
+ * @overview Generates demo content for all the document types managed by
+ * the application to make it easy testing the app with some content.
+ */
+
 (function() {
     var async = require('async');
     var fs = require('fs');

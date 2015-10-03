@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 
+/**
+ * @overview Create an user on elasticsearch.
+ *
+ * The script asks the name of the user to create and (twice) the password,
+ * which will be crypted using {@link https://www.npmjs.com/package/bcrypt-nodejs|bcrypt}.
+ */
+
 var elasticsearch = require('elasticsearch');
 var common = require('../common');
 var client = common.createClient();

@@ -10,6 +10,18 @@ var elasticsearch = require('elasticsearch');
 var common = require('../common');
 var client = common.createClient();
 
+/**
+ * @overview Restores document(s) on elasticsearch.
+ *
+ * The script asks the name of the archive that contains the document(s)
+ * to restore, and after downloading it from dropbox, it extracts the
+ * required document(s) and reindex the it/them on elasticsearch, asking
+ * for confirmation if the document(s) already exists on the database.
+ *
+ * Simmetric to the dump_es.js script which can be used to create the
+ * source archive.
+ */
+
 var mainIndex = 'main';
 
 var dboxClient = new dropbox.Client({

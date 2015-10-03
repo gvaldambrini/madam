@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": ["app.js", "common.js", "./routes"]
+    "include": ["app.js", "common.js", "./routes", "./scripts"]
   },
   "opts": {
     "destination": "./docs/"

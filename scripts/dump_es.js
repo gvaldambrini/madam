@@ -9,6 +9,17 @@ var moment = require('moment');
 var path = require('path');
 var util = require('util');
 
+/**
+ * @overview Dumps the mapping and the documents on elasticsearch on dropbox.
+ *
+ * The script fetches from elasticsearch the mapping definition and all the
+ * documents and create and archive which will be saved on dropbox under
+ * the name <archive_YYYY-MM-DD.tar.gz>.
+ *
+ * Simmetric to the restore_es.js script which can be used to restore one or
+ * more document from the generated archive.
+ */
+
 var mainIndex = 'main';
 
 var dboxClient = new dropbox.Client({
