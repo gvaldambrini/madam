@@ -1,11 +1,12 @@
 ## General overview
+[![License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://choosealicense.com/licenses/mit/)
 
 A management software for the hair salon "MadamPettine".
 
 This web application is not intended to be generic for every salon, but in fact is
 very specific to the hair salon for which it was designed. The code is still released
-under an open source license ([Apache 2](http://www.apache.org/licenses/LICENSE-2.0))
-to allow reusing snippets of the code in other projects (even completely unrelated!).
+under an open source license ([MIT](http://opensource.org/licenses/MIT)) to allow
+reusing snippets of the code in other projects (even completely unrelated!).
 
 ## System architecture
 
