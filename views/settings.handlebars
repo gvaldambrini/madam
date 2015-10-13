@@ -2,66 +2,269 @@
 
 <div class="content-body">
 
-    {{> form_errors}}
+  {{> form_errors}}
 
-    <div class="form-container">
-        <form class="form-horizontal settings" method="post" action='' id="form">
-            <div class="form-group">
-              <h4 class="col-sm-10 col-sm-offset-2">{{{i18n.title}}}</h4>
-            </div>
-            <div class="form-controls" id="form-controls">
-                {{#each items}}
-                <div class="form-group">
-                    <label class="control-label col-sm-2" for="name">{{../i18n.name}}</label>
-                    <div class="col-sm-10">
-                        <div class="settings-row">
-                            <div class="col-xs-10">
-                                {{#if ../hasColorpicker}}
-                                <div class="input-group">
-                                    <input class="form-control" type="text" name="name" value="{{this.name}}" disabled="disabled">
-                                    <input type="hidden" name="color" class="colorpicker-field" value="{{this.color}}">
-                                    <span class="input-group-addon colorpicker-selector disabled"><i></i></span>
-                                </div>
-                                {{else}}
-                                <input class="form-control" type="text" name="name" value="{{this}}" disabled="disabled">
-                                {{/if}}
-                            </div>
-                            <div class="col-xs-1">
-                                {{#if @first}}
-                                <button class="btn btn-default btn-add" disabled="disabled">
-                                    <i class="glyphicon glyphicon-plus"></i>
-                                </button>
-                                {{else}}
-                                <button class="btn btn-default btn-remove" disabled="disabled">
-                                    <i class="glyphicon glyphicon-minus"></i>
-                                </button>
-                                {{/if}}
-                            </div>
-                        </div>
-                    </div>
+  <div class="form-container" id="form-container"></div>
+  <script type="text/babel">
 
-                </div>
-                {{/each}}
-            </div>
+  var SettingsForm = React.createClass({
+    uuid4: function () {
+      //// return uuid of form xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+      var uuid = '', ii;
+      for (ii = 0; ii < 32; ii += 1) {
+        switch (ii) {
+        case 8:
+        case 20:
+          uuid += '-';
+          uuid += (Math.random() * 16 | 0).toString(16);
+          break;
+        case 12:
+          uuid += '-';
+          uuid += '4';
+          break;
+        case 16:
+          uuid += '-';
+          uuid += (Math.random() * 4 | 8).toString(16);
+          break;
+        default:
+          uuid += (Math.random() * 16 | 0).toString(16);
+        }
+      }
+      return uuid;
+    },
+    addRow: function() {
+      var items = this.state.items.slice();
+      var obj;
+      if (this.state.colorpicker) {
+        obj = {
+          name: '',
+          color: '{{config.defaultWorkerColor}}'
+        }
+      }
+      else {
+        obj = {
+          name: ''
+        }
+      }
 
-            <input type='hidden' name="_csrf" value="{{csrftoken}}">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary" name="submit" data-save-text='{{i18n.save}}'>{{i18n.unlock}}</button>
-                </div>
+      obj.id = this.uuid4();
+      items.push(obj);
+
+      this.setState({
+        items: items,
+        disabled: "",
+        colorpicker: this.state.colorpicker,
+        submitText: "{{i18n.save}}"
+      });
+    },
+    removeRow: function(index) {
+      var items = this.state.items.slice();
+      items.splice(index, 1);
+      this.setState({
+        items: items,
+        disabled: "",
+        colorpicker: this.state.colorpicker,
+        submitText: "{{i18n.save}}"
+      });
+    },
+    submit: function(event) {
+      if ($(event.target).text() === "{{i18n.unlock}}") {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.setState({
+          items: this.state.items,
+          disabled: "",
+          colorpicker: this.state.colorpicker,
+          submitText: "{{i18n.save}}"
+        });
+      }
+    },
+    getInitialState: function() {
+      // We need an unique and stable id so that React can perform
+      // the reconciliation to understand who is the child removed
+      // or added.
+      var items = [];
+      for (var i = 0; i < this.props.items.length; i++) {
+        items[items.length] = {
+        {{#if hasColorpicker}}
+          name: this.props.items[i].name,
+          color: this.props.items[i].color,
+        {{else}}
+          name: this.props.items[i],
+        {{/if}}
+          id: this.uuid4()
+        }
+      }
+      return {
+        items: items,
+        disabled: {{#if flash}}""{{else}}"disabled"{{/if}},
+        colorpicker: {{#if hasColorpicker}}true{{else}}false{{/if}},
+        submitText: {{#if flash}}"{{i18n.save}}"{{else}}"{{i18n.unlock}}"{{/if}}
+      };
+    },
+    render: function() {
+      var that = this;
+      var settingsItems;
+      if (this.state.colorpicker) {
+        settingsItems = this.state.items.map(function(item, index) {
+          return (
+            <SettingsForm.ColorRow item={item} index={index} key={item.id}
+              label='{{{i18n.name}}}'
+              addRow={that.addRow}
+              removeRow={that.removeRow}
+              disabled={that.state.disabled} />
+          );
+        });
+      }
+      else {
+        settingsItems = this.state.items.map(function(item, index) {
+          return (
+            <SettingsForm.Row item={item.name} index={index} key={item.id}
+              label='{{{i18n.name}}}'
+              addRow={that.addRow}
+              removeRow={that.removeRow}
+              disabled={that.state.disabled} />
+          );
+        });
+      }
+
+      return (
+        <form className="form-horizontal settings" method="post" action='' id="form">
+          <div className="form-group">
+            <h4 className="col-sm-10 col-sm-offset-2">{{{i18n.title}}}</h4>
+          </div>
+          <div className="form-controls" id="form-controls">
+            {settingsItems}
+          </div>
+          <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
+          <div className="form-group">
+            <div className="col-sm-offset-2 col-sm-10">
+              <button type="submit" className="btn btn-primary" name="submit" onClick={this.submit}>
+                {this.state.submitText}
+              </button>
             </div>
-            <script>
-                $(document).ready(Settings.init({
-                    {{#if hasColorpicker}}
-                    colorpicker: true,
-                    defaultColor: "{{config.defaultWorkerColor}}",
-                    {{/if}}
-                    {{#if flash}}
-                    enabled: true
-                    {{/if}}
-                }));
-            </script>
+          </div>
         </form>
-    </div>
+      );
+    }
+  });
+
+  var BaseRow = {
+      add: function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.props.addRow(event.target);
+      },
+      remove: function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.props.removeRow(this.props.index);
+      },
+      actionButton: function() {
+        if (this.props.index === 0) {
+          return (
+            <button className="btn btn-default btn-add" onClick={this.add} disabled={this.props.disabled}>
+              <i className="glyphicon glyphicon-plus"></i>
+            </button>
+          );
+        }
+
+        return (
+          <button className="btn btn-default btn-remove" onClick={this.remove} disabled={this.props.disabled}>
+            <i className="glyphicon glyphicon-minus"></i>
+          </button>
+        );
+      },
+      render: function() {
+        return (
+          <div className="form-group">
+            <label className="control-label col-sm-2" htmlFor="name">{this.props.label}</label>
+            <div className="col-sm-10">
+              <div className="settings-row">
+                <div className="col-xs-10">
+                  {this.input()}
+                </div>
+                <div className="col-xs-1">
+                  {this.actionButton()}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+  };
+
+  SettingsForm.Row = React.createClass({
+    mixins: [BaseRow],
+    input: function() {
+      return (
+        <input className="form-control" type="text" name="name"
+          defaultValue={this.props.item}
+          disabled={this.props.disabled}/>
+      );
+    }
+  });
+
+  SettingsForm.ColorRow = React.createClass({
+    mixins: [BaseRow],
+    setColorPicker: function(element) {
+      element.colorpicker({
+        input: '.colorpicker-field',
+        template: '<div class="colorpicker dropdown-menu">' +
+            '<div class="colorpicker-saturation"><i><b></b></i></div>' +
+            '<div class="colorpicker-hue"><i></i></div>' +
+            '<div class="colorpicker-alpha"><i></i></div>' +
+            '</div>'
+      });
+      element.colorpicker().on('changeColor.colorpicker', function(event) {
+        element.find('.form-control').css('color', event.color.toHex());
+        return true;
+      });
+    },
+    input: function() {
+      var that = this;
+
+      return (
+        <div className="input-group" ref={
+          function(div) {
+            if (div != null) {
+              var $div = $(div);
+              that.setColorPicker($div);
+              $div.find('.form-control').css(
+                'color', $div.colorpicker().data('colorpicker').color.toHex());
+              $div.colorpicker(that.props.disabled ? 'disable' : 'enable');
+            }
+          }
+        }>
+            <input className="form-control" type="text" name="name"
+              defaultValue={this.props.item.name}
+              disabled={this.props.disabled}/>
+            <input type="hidden" name="color" className="colorpicker-field"
+              defaultValue={this.props.item.color}/>
+            <span className="input-group-addon colorpicker-selector" ref={
+              function(span) {
+                var $span = $(span);
+                if (that.props.disabled) {
+                  $span.addClass('disabled');
+                }
+                else {
+                  $span.removeClass('disabled');
+                }
+              }
+            }>
+              <i></i>
+            </span>
+        </div>
+      );
+    }
+  });
+
+  var items = {{{json items}}};
+  ReactDOM.render(
+    <SettingsForm items={items} />,
+    document.getElementById('form-container')
+  );
+  </script>
 
 </div>

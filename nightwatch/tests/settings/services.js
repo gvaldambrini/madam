@@ -18,6 +18,7 @@ module.exports = {
 
   'Create services': function(browser) {
     browser
+      .pause(100)
       .page.Services().count(1)
       .page.Services().enableEdit()
       .page.Services().save()
