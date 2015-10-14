@@ -1,36 +1,126 @@
 <div class="content-body">
-    {{> form_errors}}
+  {{> form_errors}}
 
-    <div class="form-container">
-        <form id="form" class="form-horizontal product" method="post" {{#if actionUrl}}action='{{actionUrl}}'{{/if}}>
-            <div class="form-group">
-              <h4 class="col-sm-10 col-sm-offset-2">{{{i18n.title}}}</h4>
+  <div class="form-container" id="form-container"></div>
+  <script type="text/babel">
+  var FormInputDate = React.createClass({
+    render: function() {
+      var that = this;
+      return (
+        <div className="form-group">
+          <label htmlFor={this.props.name} className="control-label col-sm-2">{this.props.label}</label>
+          <div className="col-sm-10">
+            <div className="input-group date" ref={
+              function(div) {
+                var $div = $(div);
+                $div.datepicker();
+                $div.datepicker('setDate', that.props.value);
+              }
+            }>
+              <input type="text" name={this.props.name}
+                placeholder="{{config.date_format}}" className="form-control"/>
+              <span className="input-group-addon">
+                <i className="glyphicon glyphicon-th"></i>
+              </span>
             </div>
-            <div class="form-group">
-              <div class="col-sm-10 col-sm-offset-2 mandatory-fields">{{{i18n.mandatoryFields}}}</div>
+          </div>
+        </div>
+      );
+    },
+    componentWillMount: function() {
+      $.fn.datepicker.defaults.language = '{{config.language}}';
+      $.fn.datepicker.defaults.orientation = "top";
+      $.fn.datepicker.defaults.daysOfWeekDisabled = "0";
+      $.fn.datepicker.defaults.format = "{{config.date_format}}".toLowerCase();
+      $.fn.datepicker.defaults.autoclose = true;
+      $.fn.datepicker.defaults.weekStart = 1;
+      $.fn.datepicker.defaults.todayHighlight = true;
+      $.fn.datepicker.defaults.endDate = "0d";
+    }
+  });
+
+  var FormInput = React.createClass({
+    render: function() {
+      var mandatoryStar;
+      if (this.props.index === 0) {
+        mandatoryStar = <span className="mandatory">*</span>;
+      }
+
+      return (
+        <div className="form-group">
+          <label className="control-label col-sm-2" htmlFor={this.props.name}>
+            {this.props.label}
+            {mandatoryStar}
+          </label>
+          <div className="col-sm-10">
+            <input className="form-control" type={this.props.type}
+              name={this.props.name} placeholder={this.props.label}
+              autoFocus={this.props.index === 0}
+              defaultValue={this.props.value} />
+          </div>
+        </div>
+      );
+    }
+  });
+
+  var FormTextArea = React.createClass({
+    render: function() {
+      return (
+        <div className="form-group">
+          <label className="control-label col-sm-2">{this.props.label}</label>
+          <div className="col-sm-10">
+            <textarea name={this.props.name} className="form-control" rows="5"
+              defaultValue={this.props.value}>
+            </textarea>
+          </div>
+        </div>
+      );
+    }
+  });
+
+  var ProductForm = React.createClass({
+    render: function() {
+      var productData = {{{json obj}}};
+      return (
+        <form id="form" className="form-horizontal product" method="post"
+          {{#if actionUrl}}action='{{actionUrl}}'{{/if}}>
+          <div className="form-group">
+            <h4 className="col-sm-10 col-sm-offset-2">{{{i18n.title}}}</h4>
+          </div>
+          <div className="form-group">
+            <div className="col-sm-10 col-sm-offset-2 mandatory-fields">
+              {{{i18n.mandatoryFields}}}
             </div>
-            {{> input type='text' name='name' label=i18n.name mandatory=1 focus=1}}
-            {{> input type='text' name='brand' label=i18n.brand }}
-            {{> input_date name='sold_date' label=i18n.sold_date}}
-            <div class="form-group">
-                <label class="control-label col-sm-2">{{i18n.notes}}</label>
-                <div class="col-sm-10">
-                    <textarea name="notes" class="form-control" rows="5">{{notes}}</textarea>
-                </div>
+          </div>
+
+          <FormInput type='text' name='name' value={productData['name']}
+            label='{{i18n.name}}' index={0} />
+          <FormInput type='text' name='brand' value={productData['brand']}
+            label='{{i18n.brand}}' index={1} />
+          <FormInputDate name='sold_date' value={productData['sold_date']}
+            label='{{i18n.sold_date}}' index={2} />
+          <FormTextArea name='notes' value={productData['notes']}
+            label='{{i18n.notes}}' />
+
+          <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
+          <div className="form-group">
+            <div className="col-sm-offset-2 col-sm-10">
+              <button type="submit" className="btn btn-primary" name="submit">
+                {{i18n.submit}}
+              </button>
             </div>
-            <input type='hidden' name="_csrf" value="{{csrftoken}}">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary" name="submit">{{i18n.submit}}</button>
-                </div>
-            </div>
-            <script type="text/javascript">
-                var productData = {{{json obj}}};
-                var dateFormat = "{{config.date_format}}".toLowerCase();
-                var language = '{{config.language}}';
-                $(document).ready(Product.init(language, dateFormat, productData));
-            </script>
+          </div>
         </form>
-    </div>
+
+      );
+    },
+
+  });
+
+  ReactDOM.render(
+    <ProductForm/>,
+    document.getElementById('form-container')
+  );
+  </script>
 </div>
 

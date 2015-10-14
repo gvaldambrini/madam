@@ -270,7 +270,7 @@ ProductUtils.prototype.formNames = function(editForm) {
         sold_date: this.req.i18n.__('Sold date'),
         notes: this.req.i18n.__('Notes'),
         submit: editForm ? this.req.i18n.__('Edit product') : this.req.i18n.__('Add product'),
-        mandatoryFields: this.req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.')
+        mandatoryFields: this.req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
     };
 };
 
