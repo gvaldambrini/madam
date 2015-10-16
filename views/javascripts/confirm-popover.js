@@ -8,8 +8,9 @@
             return (Math.random() + '').slice(2, 11);
         }
 
-        // Create the container fro all the popovers if not exists.
+        // Create the container for all the popovers if not exists.
         var $mainContainer = $('#popovers-container');
+
         if ($mainContainer.length === 0) {
             if (typeof options.$rootContainer == 'undefined') {
                 options.$rootContainer = $('body');
@@ -63,7 +64,10 @@
                 if ($item.data('first-time')) {
                     // Attach the buttons event handlers to the new popover.
                     $item.data('first-time', false);
-                    $container.find('.btn-confirm').on('click', options.onConfirm);
+                    $container.find('.btn-confirm').on('click', function() {
+                        options.onConfirm();
+                        $item.click();
+                    });
                     $container.find('.btn-cancel').on('click', function() {
                         $item.click();
                     });

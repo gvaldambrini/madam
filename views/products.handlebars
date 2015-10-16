@@ -1,28 +1,246 @@
+<div id="products-view"></div>
 
-<div class="content-header">
-<a href='{{urlNew}}' class='btn btn-primary'>{{i18n.addNewProduct}}</a>
-<form class="search-form">
-    <input id="search-input" type="text" placeholder="{{i18n.search}}" class="form-control">
-    <span id="search-clear" class="glyphicon glyphicon-remove-circle"></span>
-</form>
-</div>
+<script type="text/babel">
+var InputSearch = React.createClass({
 
-<div id="products-table-container" class="content-body"></div>
-<script id="popover-template" type="text/x-handlebars-template">
-    {{>popover confirm=i18n.btnConfirm cancel=i18n.btnCancel}}
-</script>
+  searchClear: function() {
+    return $("#search-clear");
+  },
+  searchInput: function() {
+    return $("#search-input");
+  },
+  render: function() {
+    return (
+      <form className="search-form">
+        <input id="search-input" type="text"
+          placeholder="{{i18n.search}}" className="form-control"
+          onChange={this.search}/>
+        <span id="search-clear" className="glyphicon glyphicon-remove-circle"
+          onClick={this.resetSearch}></span>
+      </form>
+    )
+  },
+  search: function() {
+    var text = this.searchInput().val();
+    this.searchClear().toggle(Boolean(text));
+    this.props.search(text);
+  },
+  resetSearch: function() {
+    this.searchInput().val('').focus();
+    this.searchClear().hide();
+    this.search();
+  }
+});
 
-<script type='text/javascript'>
-    var templates = Handlebars.templates = Handlebars.templates || {};
-    {{#templates}}
-    templates['{{{name}}}'] = Handlebars.template({{{template}}});
-    {{/templates}}
+var ProductsTable = React.createClass({
+  goToEditForm: function(event) {
+    window.location.href = $(event.currentTarget).data('edit-url');
+  },
+  goToCloneForm: function(event) {
+    window.location.href = $(event.currentTarget).data('clone-url');
+    event.stopPropagation();
+  },
+  deleteProduct: function($target) {
+    var that = this;
+    $.ajax({
+      url: $target.data('delete-url'),
+      method: 'POST',
+      headers: {
+          'X-CSRF-Token': '{{csrftoken}}'
+      },
+      complete: that.refreshViewData
+    });
+  },
+  refreshViewData: function(obj, status) {
+    if (status === 'success') {
+      this.props.search();
+    }
+  },
+  renderhighlightedTd(element) {
+    var regExp = /<b>(.*)<\/b>(.*)/g;
+    var match = regExp.exec(element);
+    if (match !== null) {
+      return (
+        <td>
+          <b>{match[1]}</b>{match[2]}
+        </td>
+      );
+    }
 
-    var productsData = {{{json productsData}}};
-    $(document).ready(Products.init(templates, productsData, {
-        urlSearch: '{{urlSearch}}',
-        confirmTitle: '{{i18n.deleteTitle}}',
-        confirmMsg: '{{i18n.deleteMsg}}',
-        csrfToken: '{{csrftoken}}'
-    }));
+    return (
+      <td>
+        {element}
+      </td>
+    );
+  },
+  render: function() {
+    var that = this;
+    var productRows = this.props.data.products.map(function(product, index) {
+      var productDetails = product.objects.map(function(object) {
+        return (
+          <tr key={object.urlDelete} data-edit-url={object.urlEdit} onClick={that.goToEditForm}>
+            <td>{object.date}</td>
+            <td>{object.notes}</td>
+            <td className="no-padding">
+              <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
+                data-toggle="tooltip" data-placement="left"
+                title={object.deleteText} data-delete-url={object.urlDelete} ref={
+                  function(span) {
+                    if (span != null) {
+                      var $span = $(span);
+                      $span.tooltip();
+                      $span.confirmPopover({
+                        template: '#popover-template',
+                        title: '{{i18n.deleteTitle}}',
+                        content: '{{i18n.deleteMsg}}',
+                        $rootContainer: $('#products-table-container'),
+                        onConfirm: function() {
+                          that.deleteProduct($span);
+                        }
+                      });
+                    }
+                  }
+                }></span>
+            </td>
+          </tr>
+        );
+      });
+
+      return [
+        <tr key={product.name + product.brand} data-toggle="collapse" data-target={'#expanded-row' + index}>
+          {that.renderhighlightedTd(product.name)}
+          {that.renderhighlightedTd(product.brand)}
+          <td>{product.count}</td>
+          <td className="no-padding">
+            <span className="pull-right glyphicon glyphicon-plus"
+              data-toggle="tooltip" data-placement="left"
+              title={product.cloneText} data-clone-url={product.urlClone}
+              onClick={that.goToCloneForm} ref={
+                function(span) {
+                  if (span !== null) {
+                    $(span).tooltip();
+                  }
+                }
+              }></span>
+          </td>
+        </tr>,
+        <tr>
+          <td colSpan={4} className="hidden-row">
+            <div id={'expanded-row' + index} className="collapse">
+              <table className='table table-hover'>
+                  <thead data-toggle="collapse" data-target={'#expanded-row' + index}>
+                    <tr>
+                      <th>{product.headerDate}</th>
+                      <th>{product.headerNotes}</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {productDetails}
+                  </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
+      ];
+    });
+
+    return (
+      <table className='table table-hover'>
+        <thead>
+          <tr>
+            <th>{this.props.data.headerName}</th>
+            <th>{this.props.data.headerBrand}</th>
+            <th>{this.props.data.headerCount}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {productRows}
+        </tbody>
+      </table>
+    );
+  }
+});
+
+var PopoverTemplate = React.createClass({
+  render: function() {
+    return (
+      <div className="popover" role="tooltip">
+        <div className="arrow"></div>
+        <h3 className="popover-title"></h3>
+
+        <div className="popover-body">
+          <div className="popover-content"></div>
+          <button type="submit" className="btn btn-primary btn-confirm" name="submit">{this.props.confirm}</button>
+          <button type="submit" className="btn btn-default btn-cancel" name="submit">{this.props.cancel}</button>
+        </div>
+      </div>
+    );
+  }
+});
+
+
+var Products = React.createClass({
+
+  getInitialState: function() {
+    return {
+      data: {{{json productsData}}},
+      filterText: ''
+    };
+  },
+  search: function(text) {
+    if (typeof text === 'undefined') {
+      text = this.state.filterText;
+    }
+
+    this.setState({
+      data: this.state.data,
+      filterText: text
+    });
+
+    var that = this;
+    $.ajax({
+        url: '{{urlSearch}}',
+        data: {
+          text: text
+        },
+        success: function(msg) {
+          that.setState({
+            data: msg,
+            filterText: text
+          });
+        }
+    });
+  },
+  render: function() {
+    var products;
+    if (this.state.data.products.length > 0) {
+      products = <ProductsTable data={this.state.data} search={this.search}/>;
+    }
+    else {
+      products = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;
+    }
+
+    return (
+      <div>
+        <div className="content-header">
+          <a href='{{urlNew}}' className='btn btn-primary'>{{i18n.addNewProduct}}</a>
+          <InputSearch search={this.search} />
+        </div>
+        <div id="products-table-container" className="content-body">
+          {products}
+        </div>
+        <div id="popover-template">
+          <PopoverTemplate confirm='{{i18n.btnConfirm}}' cancel='{{i18n.btnCancel}}'/>
+        </div>
+      </div>
+    );
+  }
+});
+
+ReactDOM.render(
+  <Products />,
+  document.getElementById('products-view')
+);
 </script>
