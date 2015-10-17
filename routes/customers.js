@@ -214,7 +214,7 @@ router.get('/search', function(req, res, next) {
     });
 });
 
-router.get('/', common.exposeTemplates, function(req, res, next) {
+router.get('/', function(req, res, next) {
     client.search({
         index: req.config.mainIndex,
         type: 'customer',

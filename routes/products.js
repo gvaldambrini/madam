@@ -130,7 +130,7 @@ var aggregate_product = {
     }
 };
 
-router.get('/', common.exposeTemplates, function(req, res, next) {
+router.get('/', function(req, res, next) {
     client.search({
         index: req.config.mainIndex,
         type: 'product',

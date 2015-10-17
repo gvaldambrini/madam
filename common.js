@@ -63,41 +63,6 @@ Common.prototype.toLocalFormattedDate = function(req, ISODate) {
 };
 
 /**
- * Middleware to expose shared templates to the client side.
- * @method
- *
- * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
- * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
- * @param {object} next the next middleware to call.
- */
-Common.prototype.exposeTemplates = function(req, res, next) {
-
-    req.app.hbs.getTemplates('views/shared/', {
-        cache: req.app.enabled('view cache'),
-        precompiled: true
-    }).then(function (templates) {
-        var extRegex = new RegExp(req.app.hbs.extname + '$');
-
-        // Creates an array of templates which are exposed via
-        // `res.locals.templates`.
-        templates = Object.keys(templates).map(function (name) {
-            return {
-                name: name.replace(extRegex, ''),
-                template: templates[name]
-            };
-        });
-
-        // Exposes the templates during view rendering.
-        if (templates.length) {
-            res.locals.templates = templates;
-        }
-
-        setImmediate(next);
-    })
-    .catch(next);
-};
-
-/**
  * Converts the given container (array or string) into an array.
  * @method
  *
