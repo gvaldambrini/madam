@@ -1,28 +1,126 @@
+<div id="customers-view"></div>
+<script type="text/babel">
 
-<div class="content-header">
-<a href='{{urlNew}}' class='btn btn-primary'>{{i18n.createNewCustomer}}</a>
-<form class="search-form">
-    <input id="search-input" type="text" placeholder="{{i18n.search}}" class="form-control">
-    <span id="search-clear" class="glyphicon glyphicon-remove-circle"></span>
-</form>
-</div>
+{{>react_tables}}
 
-<div id="customers-table-container" class="content-body"></div>
-<script id="popover-template" type="text/x-handlebars-template">
-    {{>popover confirm=i18n.btnConfirm cancel=i18n.btnCancel}}
-</script>
 
-<script type='text/javascript'>
-    var templates = Handlebars.templates = Handlebars.templates || {};
-    {{#templates}}
-    templates['{{{name}}}'] = Handlebars.template({{{template}}});
-    {{/templates}}
+var CustomersTable = React.createClass({
+  mixins: [BaseTable],
+  render: function() {
+    var that = this;
+    var customerRows = this.props.data.customers.map(function(customer, index) {
+      return (
+        <tr key={customer.urlEdit} data-edit-url={customer.urlEdit} onClick={that.goToEditForm}>
+          <td dangerouslySetInnerHTML={that.renderHighlight(customer.name)} />
+          <td dangerouslySetInnerHTML={that.renderHighlight(customer.surname)} />
+          <td className="hidden-xs" dangerouslySetInnerHTML={that.renderHighlight(customer.phone)} />
+          <td className="hidden-xs">{customer.last_seen}</td>
+          <td className="no-padding">
+            <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
+              data-toggle="tooltip" data-placement="left"
+              title={customer.deleteText} data-delete-url={customer.urlDelete} ref={
+                function(span) {
+                  if (span != null) {
+                    var $span = $(span);
+                    $span.tooltip();
+                    $span.confirmPopover({
+                      template: '#popover-template',
+                      title: '{{i18n.deleteTitle}}',
+                      content: '{{i18n.deleteMsg}}',
+                      $rootContainer: $('#customers-table-container'),
+                      onConfirm: function() {
+                        that.deleteRow($span);
+                      }
+                    });
+                  }
+                }
+              }></span>
+          </td>
+        </tr>
+      );
+    });
 
-    var customersData = {{{json customersData}}};
-    $(document).ready(Customers.init(templates, customersData, {
-        urlSearch: '{{urlSearch}}',
-        confirmTitle: '{{i18n.deleteTitle}}',
-        confirmMsg: '{{i18n.deleteMsg}}',
-        csrfToken: '{{csrftoken}}'
-    }));
+    return (
+      <table className='table table-hover'>
+        <thead>
+          <tr>
+            <th>{this.props.data.headerName}</th>
+            <th>{this.props.data.headerSurname}</th>
+            <th className="hidden-xs">{this.props.data.headerPhone}</th>
+            <th className="hidden-xs">{this.props.data.headerLastSeen}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {customerRows}
+        </tbody>
+      </table>
+    );
+  }
+});
+
+
+var Customers = React.createClass({
+
+  getInitialState: function() {
+    return {
+      data: {{{json customersData}}},
+      filterText: ''
+    };
+  },
+  search: function(text) {
+    if (typeof text === 'undefined') {
+      text = this.state.filterText;
+    }
+
+    this.setState({
+      data: this.state.data,
+      filterText: text
+    });
+
+    var that = this;
+    $.ajax({
+        url: '{{urlSearch}}',
+        data: {
+          text: text
+        },
+        success: function(msg) {
+          that.setState({
+            data: msg,
+            filterText: text
+          });
+        }
+    });
+  },
+  render: function() {
+    var customers;
+    if (this.state.data.customers.length > 0) {
+      customers = <CustomersTable data={this.state.data} search={this.search}/>;
+    }
+    else {
+      customers = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;
+    }
+
+    return (
+      <div>
+        <div className="content-header">
+          <a href='{{urlNew}}' className='btn btn-primary'>{{i18n.createNewCustomer}}</a>
+          <InputSearch search={this.search} />
+        </div>
+        <div id="customers-table-container" className="content-body">
+          {customers}
+        </div>
+        <div id="popover-template">
+          <PopoverTemplate confirm='{{i18n.btnConfirm}}' cancel='{{i18n.btnCancel}}'/>
+        </div>
+      </div>
+    );
+  }
+});
+
+
+ReactDOM.render(
+  <Customers />,
+  document.getElementById('customers-view')
+);
 </script>

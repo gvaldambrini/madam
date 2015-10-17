@@ -1,77 +1,15 @@
 <div id="products-view"></div>
 
 <script type="text/babel">
-var InputSearch = React.createClass({
 
-  searchClear: function() {
-    return $("#search-clear");
-  },
-  searchInput: function() {
-    return $("#search-input");
-  },
-  render: function() {
-    return (
-      <form className="search-form">
-        <input id="search-input" type="text"
-          placeholder="{{i18n.search}}" className="form-control"
-          onChange={this.search}/>
-        <span id="search-clear" className="glyphicon glyphicon-remove-circle"
-          onClick={this.resetSearch}></span>
-      </form>
-    )
-  },
-  search: function() {
-    var text = this.searchInput().val();
-    this.searchClear().toggle(Boolean(text));
-    this.props.search(text);
-  },
-  resetSearch: function() {
-    this.searchInput().val('').focus();
-    this.searchClear().hide();
-    this.search();
-  }
-});
+{{>react_tables}}
+
 
 var ProductsTable = React.createClass({
-  goToEditForm: function(event) {
-    window.location.href = $(event.currentTarget).data('edit-url');
-  },
+  mixins: [BaseTable],
   goToCloneForm: function(event) {
     window.location.href = $(event.currentTarget).data('clone-url');
     event.stopPropagation();
-  },
-  deleteProduct: function($target) {
-    var that = this;
-    $.ajax({
-      url: $target.data('delete-url'),
-      method: 'POST',
-      headers: {
-          'X-CSRF-Token': '{{csrftoken}}'
-      },
-      complete: that.refreshViewData
-    });
-  },
-  refreshViewData: function(obj, status) {
-    if (status === 'success') {
-      this.props.search();
-    }
-  },
-  renderhighlightedTd(element) {
-    var regExp = /<b>(.*)<\/b>(.*)/g;
-    var match = regExp.exec(element);
-    if (match !== null) {
-      return (
-        <td>
-          <b>{match[1]}</b>{match[2]}
-        </td>
-      );
-    }
-
-    return (
-      <td>
-        {element}
-      </td>
-    );
   },
   render: function() {
     var that = this;
@@ -95,7 +33,7 @@ var ProductsTable = React.createClass({
                         content: '{{i18n.deleteMsg}}',
                         $rootContainer: $('#products-table-container'),
                         onConfirm: function() {
-                          that.deleteProduct($span);
+                          that.deleteRow($span);
                         }
                       });
                     }
@@ -108,8 +46,8 @@ var ProductsTable = React.createClass({
 
       return [
         <tr key={product.name + product.brand} data-toggle="collapse" data-target={'#expanded-row' + index}>
-          {that.renderhighlightedTd(product.name)}
-          {that.renderhighlightedTd(product.brand)}
+          <td dangerouslySetInnerHTML={that.renderHighlight(product.name)} />
+          <td dangerouslySetInnerHTML={that.renderHighlight(product.brand)} />
           <td>{product.count}</td>
           <td className="no-padding">
             <span className="pull-right glyphicon glyphicon-plus"
@@ -159,23 +97,6 @@ var ProductsTable = React.createClass({
           {productRows}
         </tbody>
       </table>
-    );
-  }
-});
-
-var PopoverTemplate = React.createClass({
-  render: function() {
-    return (
-      <div className="popover" role="tooltip">
-        <div className="arrow"></div>
-        <h3 className="popover-title"></h3>
-
-        <div className="popover-body">
-          <div className="popover-content"></div>
-          <button type="submit" className="btn btn-primary btn-confirm" name="submit">{this.props.confirm}</button>
-          <button type="submit" className="btn btn-default btn-cancel" name="submit">{this.props.cancel}</button>
-        </div>
-      </div>
     );
   }
 });
