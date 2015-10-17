@@ -1,0 +1,130 @@
+var FormInputDate = React.createClass({
+  render: function() {
+    var that = this;
+    return (
+      <div className="form-group">
+        <label htmlFor={this.props.name} className="control-label col-sm-2">{this.props.label}</label>
+        <div className="col-sm-10">
+          <div className="input-group date" ref={
+            function(div) {
+              var $div = $(div);
+              $div.datepicker();
+              $div.datepicker('setDate', that.props.value);
+            }
+          }>
+            <input type="text" name={this.props.name}
+              placeholder="{{config.date_format}}" className="form-control"/>
+            <span className="input-group-addon">
+              <i className="glyphicon glyphicon-th"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  },
+  componentWillMount: function() {
+    if (typeof this.props.orientation !== 'undefined') {
+      $.fn.datepicker.defaults.orientation = this.props.orientation;
+    }
+    $.fn.datepicker.defaults.language = '{{config.language}}';
+    $.fn.datepicker.defaults.daysOfWeekDisabled = "0";
+    $.fn.datepicker.defaults.format = "{{config.date_format}}".toLowerCase();
+    $.fn.datepicker.defaults.autoclose = true;
+    $.fn.datepicker.defaults.weekStart = 1;
+    $.fn.datepicker.defaults.todayHighlight = true;
+    $.fn.datepicker.defaults.endDate = "0d";
+  }
+});
+
+var FormInput = React.createClass({
+  render: function() {
+    var mandatoryStar;
+    if (this.props.index === 0) {
+      mandatoryStar = <span className="mandatory">*</span>;
+    }
+
+    return (
+      <div className="form-group">
+        <label className="control-label col-sm-2" htmlFor={this.props.name}>
+          {this.props.label}
+          {mandatoryStar}
+        </label>
+        <div className="col-sm-10">
+          <input className="form-control" type={this.props.type}
+            name={this.props.name} placeholder={this.props.label}
+            autoFocus={this.props.index === 0}
+            defaultValue={this.props.value} />
+        </div>
+      </div>
+    );
+  }
+});
+
+
+var FormInputRadio = React.createClass({
+  render: function() {
+    var that = this;
+    var radioValues = this.props.values.map(function(obj) {
+      return (
+        <label className="radio-inline" key={obj.value}>
+          <input type="radio" name={that.props.name} value={obj.value}
+          defaultChecked={that.props.value === obj.value}/>
+          {obj.name}
+        </label>
+      );
+    });
+
+    return (
+      <div className="form-group">
+        <label className="control-label col-sm-2" htmlFor={this.props.name}>
+          {this.props.label}
+        </label>
+        <div className="col-sm-8">
+          {radioValues}
+        </div>
+      </div>
+    );
+  }
+});
+
+
+var FormInputAndCheckbox = React.createClass({
+  render: function() {
+    return (
+      <div className="form-group">
+        <label className="control-label col-sm-2" htmlFor={this.props.name}>
+          {this.props.label}
+        </label>
+        <div className="col-sm-10">
+          <input className="form-control" type={this.props.type}
+            name={this.props.name} placeholder={this.props.label}
+            defaultValue={this.props.value} />
+        </div>
+        <div className="col-sm-offset-2 col-sm-10">
+          <div className="checkbox">
+            <label>
+              <input type="checkbox" name={this.props.cbname} defaultChecked={this.props.cbvalue} />
+              {this.props.cblabel}
+            </label>
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+
+
+var FormTextArea = React.createClass({
+  render: function() {
+    return (
+      <div className="form-group">
+        <label className="control-label col-sm-2">{this.props.label}</label>
+        <div className="col-sm-10">
+          <textarea name={this.props.name} className="form-control" rows="5"
+            defaultValue={this.props.value}>
+          </textarea>
+        </div>
+      </div>
+    );
+  }
+});

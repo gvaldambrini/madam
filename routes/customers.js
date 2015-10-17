@@ -269,7 +269,7 @@ var CustomerUtils = function(req, res) {
  * @var
  */
 CustomerUtils.formFields = [
-    'name', 'surname', 'mobile_phone', 'phone', 'email', 'first_seen',
+    'name', 'surname', 'mobile_phone', 'phone', 'email', 'first_seen', 'discount',
     'allow_sms', 'allow_email', 'notes'];
 
 /**
@@ -313,7 +313,7 @@ CustomerUtils.prototype.formNames = function(editForm) {
         notes: this.req.i18n.__('Notes'),
         submit: editForm ? this.req.i18n.__('Edit customer') : this.req.i18n.__('Create customer'),
         submit_and_add: this.req.i18n.__('Create customer and appointment'),
-        mandatoryFields: this.req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.')
+        mandatoryFields: this.req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
     };
 };
 
@@ -333,6 +333,8 @@ CustomerUtils.prototype.toElasticsearchFormat = function(sourceObj) {
                 obj[field] = this.toISODate(sourceObj[field]);
             else if (field == 'allow_sms' || field == 'allow_email')
                 obj[field] = sourceObj[field] == 'on';
+            else if (field == 'discount')
+                obj[field] = parseInt(sourceObj[field], 10);
             else
                 obj[field] = sourceObj[field];
         }
@@ -354,6 +356,8 @@ CustomerUtils.prototype.toViewFormat = function(sourceObj) {
         if (sourceObj[field]) {
             if (field == 'first_seen')
                 obj[field] = this.toLocalFormattedDate(sourceObj[field]);
+            else if (field == 'discount')
+                obj[field] = '' + sourceObj[field];
             else
                 obj[field] = sourceObj[field];
         }

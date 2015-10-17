@@ -1,63 +1,79 @@
 {{> customer_header }}
 
 <div class="content-body">
-    {{> form_errors}}
+  {{> form_errors}}
 
-    <div class="form-container">
-        <form id="form" class="form-horizontal customer" method="post" action=''>
-            <div class="form-group">
-              <h4 class="col-sm-10 col-sm-offset-2">{{{i18n.title}}}</h4>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-10 col-sm-offset-2 mandatory-fields">{{{i18n.mandatoryFields}}}</div>
-            </div>
-            {{> input type='text' name='name' label=i18n.name mandatory=1 focus=1}}
-            {{> input type='text' name='surname' label=i18n.surname}}
+  <div class="form-container" id="form-container"></div>
+  <script type="text/babel">
 
-            {{> input_and_checkbox type='tel' name='mobile_phone' label=i18n.mobile_phone cbname='allow_sms' cblabel=i18n.allow_sms}}
-            {{> input type='tel' name='phone' label=i18n.phone }}
-            {{> input_and_checkbox type='email' name='email' label=i18n.email cbname='allow_email' cblabel=i18n.allow_email}}
+  {{>react_forms}}
 
-            <div class="form-group">
-                <label class="control-label col-sm-2" for='discount'>{{i18n.discount}}</label>
-                <div class="col-sm-8">
-                    <label class="radio-inline">
-                        <input type="radio" name="discount" value="0">0%</input>
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="discount" value="10">10%</input>
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="discount" value="20">20%</input>
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="discount" value="30">30%</input>
-                    </label>
-                </div>
+  var CustomerForm = React.createClass({
+    render: function() {
+      var customerData = {{{json obj}}};
+      return (
+        <form id="form" className="form-horizontal customer" method="post"
+          action=''>
+          <div className="form-group">
+            <h4 className="col-sm-10 col-sm-offset-2">{{{i18n.title}}}</h4>
+          </div>
+          <div className="form-group">
+            <div className="col-sm-10 col-sm-offset-2 mandatory-fields">
+              {{{i18n.mandatoryFields}}}
             </div>
-            {{> input_date name='first_seen' label=i18n.first_seen}}
-            <div class="form-group">
-                <label class="control-label col-sm-2">{{i18n.notes}}</label>
-                <div class="col-sm-10">
-                    <textarea name="notes" class="form-control" rows="5">{{notes}}</textarea>
-                </div>
+          </div>
+          <FormInput type='text' name='name' value={customerData['name']}
+            label='{{i18n.name}}' index={0} />
+          <FormInput type='text' name='surname' value={customerData['surname']}
+            label='{{i18n.surname}}' index={1} />
+          <FormInputAndCheckbox type='tel' value={customerData['mobile_phone']}
+            name='mobile_phone' label='{{i18n.mobile_phone}}'
+            cbname='allow_sms' cblabel='{{i18n.allow_sms}}'
+            cbvalue={customerData['allow_sms']} />
+          <FormInput type='tel' name='phone' value={customerData['phone']}
+            label='{{i18n.phone}}' index={4} />
+
+          <FormInputAndCheckbox type='email' value={customerData['email']}
+            name='email' label='{{i18n.email}}'
+            cbname='allow_email' cblabel='{{i18n.allow_email}}'
+            cbvalue={customerData['allow_email']} />
+
+          <FormInputRadio name='discount' label='{{i18n.discount}}'
+            values={[
+              {name: '0%',  value: '0'},
+              {name: '10%', value: '10'},
+              {name: '20%', value: '20'},
+              {name: '30%', value: '30'}]}
+            value={customerData['discount']}/>
+
+          <FormInputDate name='first_seen' value={customerData['sold_date']}
+            label='{{i18n.first_seen}}' index={7} />
+          <FormTextArea name='notes' value={customerData['notes']}
+            label='{{i18n.notes}}' />
+          <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
+
+          <div className="form-group">
+            <div className="col-sm-offset-2 col-sm-10">
+              <button type="submit" className="btn btn-primary" name="submit" value="1">
+                {{i18n.submit}}
+              </button>
+              {{#unless editForm}}
+              <button type="submit" className="btn btn-primary" name="submit_and_add" value="1">
+                {{i18n.submit_and_add}}
+              </button>
+              {{/unless}}
             </div>
-            <input type='hidden' name="_csrf" value="{{csrftoken}}">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary" name="submit" value="1">{{i18n.submit}}</button>
-                    {{#unless editForm}}
-                    <button type="submit" class="btn btn-primary" name="submit_and_add" value="1">{{i18n.submit_and_add}}</button>
-                    {{/unless}}
-                </div>
-            </div>
-            <script type="text/javascript">
-                var customerData = {{{json obj}}};
-                var dateFormat = "{{config.date_format}}".toLowerCase();
-                var language = '{{config.language}}';
-                $(document).ready(Customer.init(language, dateFormat, customerData));
-            </script>
+          </div>
         </form>
-    </div>
+      );
+    }
+  });
+
+  ReactDOM.render(
+    <CustomerForm/>,
+    document.getElementById('form-container')
+  );
+  </script>
+
 </div>
 
