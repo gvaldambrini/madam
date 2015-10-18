@@ -69,10 +69,6 @@ var Customers = React.createClass({
     };
   },
   search: function(text) {
-    if (typeof text === 'undefined') {
-      text = this.state.filterText;
-    }
-
     this.setState({
       data: this.state.data,
       filterText: text
@@ -92,10 +88,13 @@ var Customers = React.createClass({
         }
     });
   },
+  updateTable: function() {
+    this.search(this.state.filterText);
+  },
   render: function() {
     var customers;
     if (this.state.data.customers.length > 0) {
-      customers = <CustomersTable data={this.state.data} search={this.search}/>;
+      customers = <CustomersTable data={this.state.data} updateTable={this.updateTable}/>;
     }
     else {
       customers = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;

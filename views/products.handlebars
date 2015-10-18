@@ -111,10 +111,6 @@ var Products = React.createClass({
     };
   },
   search: function(text) {
-    if (typeof text === 'undefined') {
-      text = this.state.filterText;
-    }
-
     this.setState({
       data: this.state.data,
       filterText: text
@@ -134,10 +130,13 @@ var Products = React.createClass({
         }
     });
   },
+  updateTable: function() {
+    this.search(this.state.filterText);
+  },
   render: function() {
     var products;
     if (this.state.data.products.length > 0) {
-      products = <ProductsTable data={this.state.data} search={this.search}/>;
+      products = <ProductsTable data={this.state.data} updateTable={this.updateTable}/>;
     }
     else {
       products = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;

@@ -60,12 +60,12 @@ var BaseTable = {
       headers: {
           'X-CSRF-Token': '{{csrftoken}}'
       },
-      complete: that.refreshViewData
+      complete: that.updateTable
     });
   },
-  refreshViewData: function(obj, status) {
+  updateTable: function(obj, status) {
     if (status === 'success') {
-      this.props.search();
+      this.props.updateTable();
     }
   },
   renderHighlight(element) {
