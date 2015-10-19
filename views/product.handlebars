@@ -22,11 +22,11 @@
           </div>
 
           <FormInput type='text' name='name' value={productData['name']}
-            label='{{i18n.name}}' index={0} />
+            label='{{i18n.name}}' focus={true} mandatory={true}/>
           <FormInput type='text' name='brand' value={productData['brand']}
-            label='{{i18n.brand}}' index={1} />
+            label='{{i18n.brand}}' />
           <FormInputDate name='sold_date' value={productData['sold_date']}
-            label='{{i18n.sold_date}}' orientation='top' index={2} />
+            label='{{i18n.sold_date}}' orientation='top'/>
           <FormTextArea name='notes' value={productData['notes']}
             label='{{i18n.notes}}' />
 

@@ -23,15 +23,15 @@
             </div>
           </div>
           <FormInput type='text' name='name' value={customerData['name']}
-            label='{{i18n.name}}' index={0} />
+            label='{{i18n.name}}' focus={true} mandatory={true}/>
           <FormInput type='text' name='surname' value={customerData['surname']}
-            label='{{i18n.surname}}' index={1} />
+            label='{{i18n.surname}}'/>
           <FormInputAndCheckbox type='tel' value={customerData['mobile_phone']}
             name='mobile_phone' label='{{i18n.mobile_phone}}'
             cbname='allow_sms' cblabel='{{i18n.allow_sms}}'
             cbvalue={customerData['allow_sms']} />
           <FormInput type='tel' name='phone' value={customerData['phone']}
-            label='{{i18n.phone}}' index={4} />
+            label='{{i18n.phone}}'/>
 
           <FormInputAndCheckbox type='email' value={customerData['email']}
             name='email' label='{{i18n.email}}'
@@ -47,7 +47,7 @@
             value={customerData['discount']}/>
 
           <FormInputDate name='first_seen' value={customerData['sold_date']}
-            label='{{i18n.first_seen}}' index={7} />
+            label='{{i18n.first_seen}}'/>
           <FormTextArea name='notes' value={customerData['notes']}
             label='{{i18n.notes}}' />
           <input type='hidden' name="_csrf" value="{{csrftoken}}"/>

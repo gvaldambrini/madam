@@ -39,7 +39,7 @@ var FormInputDate = React.createClass({
 var FormInput = React.createClass({
   render: function() {
     var mandatoryStar;
-    if (this.props.index === 0) {
+    if (this.props.mandatory) {
       mandatoryStar = <span className="mandatory">*</span>;
     }
 
@@ -52,7 +52,7 @@ var FormInput = React.createClass({
         <div className="col-sm-10">
           <input className="form-control" type={this.props.type}
             name={this.props.name} placeholder={this.props.label}
-            autoFocus={this.props.index === 0}
+            autoFocus={this.props.focus}
             defaultValue={this.props.value} />
         </div>
       </div>
