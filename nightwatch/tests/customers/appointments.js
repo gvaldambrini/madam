@@ -94,6 +94,7 @@ module.exports = {
       .page.Appointment().addService()
       .page.Appointment().setService(2, 'strong permanent')
       .page.Appointment().setService(3, 'color')
+      .page.Appointment().toggleService(3)
       .page.Appointment().setDate('21/09/2015')
       .page.Appointment().submit()
       .page.Appointments().tableContains(0, '21/09/2015', 'shampoo - strong permanent - color')
