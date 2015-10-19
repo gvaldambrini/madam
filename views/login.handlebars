@@ -5,31 +5,62 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
     {{#if isProduction}}
+    <script src="https://fb.me/react-0.14.0.min.js"></script>
+    <script src="https://fb.me/react-dom-0.14.0.min.js"></script>
     <link rel="stylesheet" href="/stylesheets/main.min.css">
     {{else}}
+    <script src="https://fb.me/react-0.14.0.js"></script>
+    <script src="https://fb.me/react-dom-0.14.0.js"></script>
     <link rel="stylesheet" href="/stylesheets/main.css">
     {{/if}}
 </head>
 <body>
-    {{> navbar show-toggle=false}}
-    <div class="container-fluid">
-        <div class="row col-sm-8 col-sm-offset-2">
-            <div id="login-box">
-            <h2 class="col-sm-offset-2">{{i18n.login}}</h2>
-            {{> form_errors}}
-            <form id="form" class="form-horizontal" method="post" action="/login">
-                {{> input type='text' name='username' label=i18n.username focus=1}}
-                {{> input type='password' name='password' label=i18n.password }}
-                <input type='hidden' name="_csrf" value="{{csrftoken}}">
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-primary" name="submit">{{i18n.login}}</button>
-                    </div>
+  {{> navbar show-toggle=false}}
+  <div class="container-fluid">
+    <div class="row col-sm-8 col-sm-offset-2">
+      <div id="login-box">
+        <h2 class="col-sm-offset-2">{{i18n.login}}</h2>
+        {{> form_errors}}
+
+        <div id="form-container"></div>
+        <script type="text/babel">
+
+        {{>react_forms}}
+
+        var LoginForm = React.createClass({
+          render: function() {
+            return (
+              <form id="form" className="form-horizontal login"
+                method="post" action="/login">
+
+                <FormInput type='text' name='username' value=''
+                  label='{{i18n.username}}' focus={true} mandatory={true}/>
+
+                <FormInput type='password' name='password' value=''
+                  label='{{i18n.password}}' mandatory={true}/>
+
+                <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
+                <div className="form-group">
+                  <div className="col-sm-offset-2 col-sm-10">
+                    <button type="submit" className="btn btn-primary" name="submit">
+                      {{i18n.login}}
+                    </button>
+                  </div>
                 </div>
-            </form>
-            </div>
-        </div>
+              </form>
+            );
+          }
+        });
+
+        ReactDOM.render(
+          <LoginForm />,
+          document.getElementById('form-container')
+        );
+        </script>
+      </div>
     </div>
+  </div>
 </body>
 </html>
