@@ -173,11 +173,11 @@ app.use(function(req, resp, next) {
   next();
 });
 
-app.use(csrf({ cookie: true }));
-app.use(function(request, response, next) {
-  response.locals.csrftoken = request.csrfToken();
-  next();
-});
+// app.use(csrf({ cookie: true }));
+// app.use(function(request, response, next) {
+//   response.locals.csrftoken = request.csrfToken();
+//   next();
+// });
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
