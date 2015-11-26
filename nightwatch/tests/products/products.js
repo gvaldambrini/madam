@@ -24,6 +24,7 @@ module.exports = {
         name: 'shampoo',
         brand: 'oreal'})
       .page.Product().submit()
+      .pause(300)
       .page.Products().alertNotPresent()
       .page.Products().tableCount(1)
       .page.Products().tableContains(0, 'shampoo', 'oreal', '1')

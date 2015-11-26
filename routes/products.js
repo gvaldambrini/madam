@@ -78,9 +78,8 @@ function processElasticsearchResults(req, resp) {
             obj = lookup[aggregations[i].hits.hits.hits[j]._id];
 
             objects[objects.length] = {
-                urlDelete: getProductUrl(req, 'delete', obj._id),
+                id: obj._id,
                 deleteText: req.i18n.__('Delete product'),
-                urlEdit: getProductUrl(req, 'edit', obj._id),
                 date: obj._source.sold_date ? common.toLocalFormattedDate(req, obj._source.sold_date) : '-',
                 notes: obj._source.notes ? obj._source.notes : '-'
             };
@@ -142,15 +141,24 @@ router.get('/', function(req, res, next) {
             aggs: aggregate_product
         }
     }, function(err, resp, respcode) {
+
         res.render('products', {
             i18n: {
                 title: req.i18n.__('Products'),
                 addNewProduct: req.i18n.__('Add product'),
+                editProduct: req.i18n.__('Edit product'),
                 search: req.i18n.__('Search...'),
                 btnConfirm: req.i18n.__('Confirm'),
                 btnCancel: req.i18n.__('Cancel'),
                 deleteTitle: req.i18n.__('Delete the product?'),
-                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?')
+                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
+                name: req.i18n.__('Name'),
+                brand: req.i18n.__('Brand'),
+                sold_date: req.i18n.__('Sold date'),
+                notes: req.i18n.__('Notes'),
+                submitAdd: req.i18n.__('Add product'),
+                submitEdit: req.i18n.__('Edit product'),
+                mandatoryFields: req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
             },
             productsData: {
                 headerName: req.i18n.__('Name'),
@@ -216,6 +224,7 @@ router.get('/search', function(req, res, next) {
     });
 });
 
+
 /**
  * Creates a new ProductUtils object, which encapsulates some common utility
  * functions and properties to handle the Product form and the related documents
@@ -235,6 +244,24 @@ var ProductUtils = function(req, res) {
  * @var
  */
 ProductUtils.formFields = ['name', 'brand', 'sold_date', 'notes'];
+
+/**
+ * Validates the Product form and returns the list of the errors if any.
+ */
+ProductUtils.prototype.validateForm = function() {
+    // Trim all the fields that allow the user to write text
+    for (var i = 0; i < ProductUtils.formFields.length; i++)
+        this.req.sanitize(ProductUtils.formFields[i]).trim();
+
+    this.req.checkBody('name', this.req.i18n.__('The name is mandatory')).notEmpty();
+
+    if (this.req.body.first_see) {
+        this.req.checkBody('sold_date', this.req.i18n.__(
+            'The sold date does not seem a valid date')).isValidDate();
+    }
+
+    return this.req.validationErrors();
+};
 
 /**
  * Transforms a local formatted date to the iso format.
@@ -322,152 +349,88 @@ ProductUtils.prototype.toViewFormat = function(sourceObj) {
     return obj;
 };
 
-/**
- * Handles the Product form, creating / updating a new document if the form
- * content validation passes, or displaying the proper error messages if not.
- * @method
- *
- * @param {string} title the title of the form.
- * @param {bool} editForm true if the form is for edit.
- */
-ProductUtils.prototype.handleForm = function(title, editForm) {
-    // Trim all the fields that allow the user to write text
-    for (var i = 0; i < ProductUtils.formFields.length; i++)
-        this.req.sanitize(ProductUtils.formFields[i]).trim();
 
-    this.req.checkBody('name', this.req.i18n.__('The name is mandatory')).notEmpty();
-
-    if (this.req.body.first_see) {
-        this.req.checkBody('sold_date', this.req.i18n.__(
-            'The sold date does not seem a valid date')).isValidDate();
-    }
-
-    var errors = this.req.validationErrors();
-    if (errors) {
-        var i18n = this.formNames(editForm);
-        i18n.title = title;
-
-        this.res.render('product', {
-            i18n: i18n,
-            flash: { type: 'alert-danger', messages: errors},
-            obj: this.req.body
-        });
-        return;
-    }
-
-    var args = {
-        index: this.req.config.mainIndex,
-        type: 'product',
-        refresh: true,
-    };
-
-    var obj = this.toElasticsearchFormat(this.req.body);
-
-    var that = this;  // workaround for the this visibility problem inside inner functions.
-    var cb = function(err, resp, respcode) {
-        if (!err) {
-            // redirect does not take into account being in inside a router
-            that.res.redirect(productsPath);
-        }
-        else {
-            var messages;
-            if (err instanceof esErrors.NoConnections)
-                messages = [{msg: that.req.i18n.__('Database connection error')}];
-            else
-                messages = [{msg: that.req.i18n.__('Database error')}];
-            console.error(err);
-
-            var i18n = that.formNames(editForm);
-            i18n.title = title;
-
-            that.res.render('product', {
-                i18n: i18n,
-                flash: { type: 'alert-danger', messages: messages},
-                obj: that.req.body
-            });
-        }
-    };
-
-    if (typeof this.req.params.id != 'undefined') {
-        args.id = this.req.params.id;
-        args.body = {doc: obj};
-        client.update(args, cb);
-    }
-    else {
-        args.body = obj;
-        args.body.created_at = new Date().toISOString();
-        client.index(args, cb);
-    }
-};
-
-
-router.use(['/new', '*clone', '*edit'], function (req, res, next) {
+router.use(['*'], function (req, res, next) {
     req.utils = new ProductUtils(req, res);
     next();
 });
 
-router.get('/new', function(req, res, next) {
-    var i18n = req.utils.formNames(false);
-    i18n.title = req.i18n.__('Add product');
-    res.render('product', {
-        i18n: i18n,
-        obj: {
-            sold_date: common.toLocalFormattedDate(req, moment()),
-        }
-    });
-});
 
-router.post('/new', function(req, res, next) {
-    req.utils.handleForm(req.i18n.__('Add product'), false);
-});
-
-router.get('/:id/clone', function(req, res, next) {
+router.get('/:id', function(req, res, next) {
     client.get({
         index: req.config.mainIndex,
         type: 'product',
         id: req.params.id
     }, function(err, resp, respcode) {
-        var i18n = req.utils.formNames(false);
-        i18n.title = req.i18n.__('Add product');
-        res.render('product', {
-            i18n: i18n,
-            obj: {
-                name: resp._source.name,
-                brand: resp._source.brand,
-                sold_date: common.toLocalFormattedDate(req, moment())
-            },
-            actionUrl: getProductsUrl(req, 'new')
-        });
+        res.json(req.utils.toViewFormat(resp._source)
+        );
     });
 });
 
-router.get('/:id/edit', function(req, res, next) {
-    client.get({
+/**
+ * Helper function which manages the result of an operation (index or update)
+ * on a product and sends to the client the appropriate response.
+ * @method
+ *
+ * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
+ * @param {object} error the error returned by the elasticsearch client
+ */
+function productCb(res, err) {
+    if (!err) {
+        res.sendStatus(200);
+        return;
+    }
+
+    var errors = [];
+    if (err instanceof esErrors.NoConnections)
+        errors[errors.length] = {msg: req.i18n.__('Database connection error')};
+    else
+        errors[errors.length] = {msg: req.i18n.__('Database error')};
+
+    res.status(500).json({errors: errors});
+}
+
+router.post('/', function(req, res, next) {
+    var errors = req.utils.validateForm();
+    if (errors) {
+        res.status(400).json({errors: errors});
+        return;
+    }
+
+    var args = {
         index: req.config.mainIndex,
         type: 'product',
-        id: req.params.id
-    }, function(err, resp, respcode) {
-        var i18n = req.utils.formNames(true);
-        i18n.title = req.i18n.__('Edit product');
+        refresh: true
+    };
 
-        res.render('product', {
-            i18n: i18n,
-            obj: req.utils.toViewFormat(resp._source)
-        });
+    args.body = req.utils.toElasticsearchFormat(req.body);
+    args.body.created_at = new Date().toISOString();
+    client.index(args, function(err, resp, respcode) {
+        productCb(res, err);
     });
 });
 
-router.post('/:id/edit', function(req, res, next) {
-    client.get({
+router.put('/:id', function(req, res, next) {
+    var errors = req.utils.validateForm();
+    if (errors) {
+        res.status(400).json({errors: errors});
+        return;
+    }
+
+    var args = {
         index: req.config.mainIndex,
         type: 'product',
-        id: req.params.id
-    }, function(err, resp, respcode) {
-        req.utils.handleForm(req.i18n.__('Edit product'), true);
+        id: req.params.id,
+        body: {doc: req.utils.toElasticsearchFormat(req.body)},
+        refresh: true
+    };
+
+    client.update(args, function(err, resp, respcode) {
+        productCb(res, err);
     });
 });
 
-router.post('/:id/delete', function(req, res, next) {
+router.delete('/:id', function(req, res, next) {
     client.delete({
         index: req.config.mainIndex,
         type: 'product',

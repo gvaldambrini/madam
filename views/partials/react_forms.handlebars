@@ -13,7 +13,14 @@ var FormInputDate = React.createClass({
             }
           }>
             <input type="text" name={this.props.name}
-              placeholder="{{config.date_format}}" className="form-control"/>
+              placeholder="{{config.date_format}}" className="form-control"
+              ref={
+                function(input) {
+                  // the react onChange event is not fired from the datepicker, so let's
+                  // use the standard event.
+                  $(input).change(that.props.handleChange);
+                }
+              }/>
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-th"></i>
             </span>
@@ -37,6 +44,15 @@ var FormInputDate = React.createClass({
 });
 
 var FormInput = React.createClass({
+  getInitialState: function() {
+    return {value: ''}
+  },
+  componentWillMount: function() {
+    this.setState({value: this.props.value});
+  },
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({value: nextProps.value});
+  },
   render: function() {
     var mandatoryStar;
     if (this.props.mandatory) {
@@ -53,7 +69,8 @@ var FormInput = React.createClass({
           <input className="form-control" type={this.props.type}
             name={this.props.name} placeholder={this.props.label}
             autoFocus={this.props.focus}
-            defaultValue={this.props.value} />
+            value={this.state.value}
+            onChange={this.props.handleChange}/>
         </div>
       </div>
     );
@@ -115,13 +132,23 @@ var FormInputAndCheckbox = React.createClass({
 
 
 var FormTextArea = React.createClass({
+  getInitialState: function() {
+    return {value: ''}
+  },
+  componentWillMount: function() {
+    this.setState({value: this.props.value});
+  },
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({value: nextProps.value});
+  },
   render: function() {
     return (
       <div className="form-group">
         <label className="control-label col-sm-2">{this.props.label}</label>
         <div className="col-sm-10">
           <textarea name={this.props.name} className="form-control" rows="5"
-            defaultValue={this.props.value}>
+            value={this.state.value}
+            onChange={this.props.handleChange}>
           </textarea>
         </div>
       </div>

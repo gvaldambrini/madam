@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
     {{#if isProduction}}
     <script src="https://fb.me/react-0.14.0.min.js"></script>
@@ -30,16 +31,32 @@
         {{>react_forms}}
 
         var LoginForm = React.createClass({
+          getInitialState: function() {
+            return {
+              username: '',
+              password: ''
+            }
+          },
+          handleChange: function(event) {
+            var $target = $(event.currentTarget);
+            var newState = this.state;
+            if (newState[$target.attr('name')] != $target.val()) {
+              newState[$target.attr('name')] = $target.val();
+              this.setState(newState);
+            }
+          },
           render: function() {
             return (
               <form id="form" className="form-horizontal login"
                 method="post" action="/login">
 
-                <FormInput type='text' name='username' value=''
-                  label='{{i18n.username}}' focus={true} mandatory={true}/>
+                <FormInput type='text' name='username'
+                  label='{{i18n.username}}' focus={true} mandatory={true}
+                  value={this.state.username} handleChange={this.handleChange}/>
 
-                <FormInput type='password' name='password' value=''
-                  label='{{i18n.password}}' mandatory={true}/>
+                <FormInput type='password' name='password'
+                  label='{{i18n.password}}' mandatory={true}
+                  value={this.state.password} handleChange={this.handleChange}/>
 
                 <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
                 <div className="form-group">

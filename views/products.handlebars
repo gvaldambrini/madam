@@ -2,27 +2,190 @@
 
 <script type="text/babel">
 
+{{>react_forms}}
 {{>react_tables}}
+
+var Link = ReactRouter.Link;
+var Router = ReactRouter.Router;
+var Route = ReactRouter.Route;
+var IndexRoute = ReactRouter.IndexRoute;
+var History = ReactRouter.History;
+
+
+var ProductForm = React.createClass({
+  mixins: [ History ],
+  getInitialState: function() {
+    return {
+      data: {},
+      editForm: false,
+      errors: []
+    }
+  },
+  componentWillMount: function() {
+    var that = this;
+    var editForm = this.props.route.path.startsWith('edit');
+    var cloneForm = this.props.route.path.startsWith('clone');
+    if (this.props.params.id) {
+      $.ajax({
+        url: '/products/' + this.props.params.id,
+        method: 'get',
+        success: function(data) {
+          if (cloneForm) {
+            data.sold_date = moment().format('{{config.language}}');
+            data.notes = '';
+          }
+          that.setState({
+            data: data,
+            editForm: editForm,
+            errors: []
+          });
+        }
+      });
+    }
+    else {
+      that.setState({
+        data: {
+          sold_date: moment().format('{{config.language}}')
+        },
+        editForm: editForm,
+        errors: []
+      });
+    }
+  },
+  submitForm: function(event) {
+    var that = this;
+    event.preventDefault();
+    event.stopPropagation();
+
+    $.ajax({
+      url: this.state.editForm ? '/products/' + this.props.params.id : '/products',
+      method: this.state.editForm ? 'put': 'post',
+      data: JSON.stringify(this.state.data),
+      contentType: 'application/json',
+      success: function() {
+        that.history.pushState(null, `/`);
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        var errors = [];
+        for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
+          errors[errors.length] = xhr.responseJSON.errors[i].msg;
+        }
+        that.setState({
+          editForm: that.props.route.path.startsWith('edit'),
+          errors: errors
+        });
+      }
+    });
+  },
+  handleChange: function(event) {
+    var $target = $(event.currentTarget);
+    var data = this.state.data;
+    if (data[$target.attr('name')] != $target.val() && $target.val()) {
+      data[$target.attr('name')] = $target.val();
+
+      this.setState({
+        data: data
+      });
+    }
+  },
+  render: function() {
+    var submitText, formTitle;
+    if (this.state.editForm) {
+      submitText = '{{i18n.submitEdit}}';
+      formTitle = '{{i18n.editProduct}}';
+    }
+    else {
+      submitText = '{{i18n.submitAdd}}';
+      formTitle = '{{i18n.addNewProduct}}';
+    }
+
+    var errors;
+    if (this.state.errors.length > 0) {
+      var errorMessages = this.state.errors.map(function(err) {
+        return (<li key={err}>{err}</li>);
+      });
+
+      errors = (
+        <div className="alert alert-danger">
+          <ul>
+            {errorMessages}
+          </ul>
+        </div>
+      );
+    }
+
+    return (
+      <div className="content-body">
+        {errors}
+        <div className="form-container" id="form-container">
+          <form id="form" className="form-horizontal product" method="post">
+            <div className="form-group">
+              <h4 className="col-sm-10 col-sm-offset-2">{formTitle}</h4>
+            </div>
+            <div className="form-group">
+              <div className="col-sm-10 col-sm-offset-2 mandatory-fields">
+                {{{i18n.mandatoryFields}}}
+              </div>
+            </div>
+
+            <FormInput type='text' name='name' value={this.state.data.name}
+              label='{{i18n.name}}' focus={true} mandatory={true}
+              handleChange={this.handleChange}/>
+            <FormInput type='text' name='brand' value={this.state.data.brand}
+              label='{{i18n.brand}}' handleChange={this.handleChange}/>
+            <FormInputDate name='sold_date' value={this.state.data.sold_date}
+              label='{{i18n.sold_date}}' orientation='top'
+              handleChange={this.handleChange}/>
+            <FormTextArea name='notes' value={this.state.data.notes}
+              label='{{i18n.notes}}'
+              handleChange={this.handleChange}/>
+
+            <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
+            <div className="form-group">
+              <div className="col-sm-offset-2 col-sm-10">
+                <button type="submit" className="btn btn-primary" name="submit" onClick={this.submitForm}>
+                  {submitText}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+});
 
 
 var ProductsTable = React.createClass({
-  mixins: [BaseTable],
-  goToCloneForm: function(event) {
-    window.location.href = $(event.currentTarget).data('clone-url');
-    event.stopPropagation();
+  mixins: [BaseTable, History],
+  deleteItem: function(objId) {
+    $.ajax({
+      url: '/products/' + objId,
+      method: 'delete',
+      headers: {
+          'X-CSRF-Token': '{{csrftoken}}'
+      },
+      complete: this.updateTable
+    });
   },
   render: function() {
     var that = this;
     var productRows = this.props.data.products.map(function(product, index) {
       var productDetails = product.objects.map(function(object) {
         return (
-          <tr key={object.urlDelete} data-edit-url={object.urlEdit} onClick={that.goToEditForm}>
+          <tr key={object.id} onClick={
+            function(event) {
+              that.history.pushState(null, '/edit/' + object.id);
+              event.preventDefault();
+              event.stopPropagation();
+            }
+          }>
             <td>{object.date}</td>
             <td>{object.notes}</td>
             <td className="no-padding">
               <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
                 data-toggle="tooltip" data-placement="left"
-                title={object.deleteText} data-delete-url={object.urlDelete} ref={
+                title={object.deleteText} data-obj-id={object.id} ref={
                   function(span) {
                     if (span != null) {
                       var $span = $(span);
@@ -33,7 +196,7 @@ var ProductsTable = React.createClass({
                         content: '{{i18n.deleteMsg}}',
                         $rootContainer: $('#products-table-container'),
                         onConfirm: function() {
-                          that.deleteRow($span);
+                          that.deleteItem($span.data('obj-id'));
                         }
                       });
                     }
@@ -53,7 +216,13 @@ var ProductsTable = React.createClass({
             <span className="pull-right glyphicon glyphicon-plus"
               data-toggle="tooltip" data-placement="left"
               title={product.cloneText} data-clone-url={product.urlClone}
-              onClick={that.goToCloneForm} ref={
+              onClick={
+                function(event) {
+                  that.history.pushState(null, '/clone/' + product.objects[0].id);
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+              } ref={
                 function(span) {
                   if (span !== null) {
                     $(span).tooltip();
@@ -107,13 +276,17 @@ var Products = React.createClass({
   getInitialState: function() {
     return {
       data: {{{json productsData}}},
-      filterText: ''
+      filterText: '',
+      loaded: false
     };
+  },
+  componentWillMount: function() {
+    this.updateTable();
   },
   search: function(text) {
     this.setState({
-      data: this.state.data,
-      filterText: text
+      filterText: text,
+      loaded: true
     });
 
     var that = this;
@@ -138,14 +311,18 @@ var Products = React.createClass({
     if (this.state.data.products.length > 0) {
       products = <ProductsTable data={this.state.data} updateTable={this.updateTable}/>;
     }
-    else {
+    else if (this.state.loaded) {
       products = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;
+    }
+    else {
+      products = <div></div>;
     }
 
     return (
       <div>
         <div className="content-header">
-          <a href='{{urlNew}}' className='btn btn-primary'>{{i18n.addNewProduct}}</a>
+          <Link className='btn btn-primary' to="/new">{{i18n.addNewProduct}}</Link>
+
           <InputSearch search={this.search} />
         </div>
         <div id="products-table-container" className="content-body">
@@ -159,8 +336,30 @@ var Products = React.createClass({
   }
 });
 
+var Root = React.createClass({
+  render: function() {
+    return (
+      <div>
+        {this.props.children}
+      </div>
+    );
+  }
+});
+
+var routes = function() {
+  return (
+    <Route path="/" component={Root}>
+      <IndexRoute component={Products}/>
+      <Route path="new" component={ProductForm}/>
+      <Route path="edit/:id" component={ProductForm}/>
+      <Route path="clone/:id" component={ProductForm}/>
+    </Route>
+  )
+};
+
 ReactDOM.render(
-  <Products />,
+  <Router routes={routes()}/>,
   document.getElementById('products-view')
 );
+
 </script>
