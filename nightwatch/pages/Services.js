@@ -6,7 +6,9 @@ module.exports = function (browser) {
 
     this.set = function(index, name) {
         return browser.execute(function(index, name) {
-            $('form input[type=text]:eq(' + index + ')').val(name);
+            $node = $('form input[type=text]:eq(' + index + ')');
+            $node.val(name);
+            $node.change();
         }, [index, name]);
     };
 

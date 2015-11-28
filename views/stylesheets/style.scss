@@ -181,7 +181,11 @@ $sidebar-padding: 20px;
       > a:hover {
         color: #909090;
       }
+      > a.active {
+        font-weight: bold;
+      }
     }
+
     li.active {
       font-weight: bold;
     }

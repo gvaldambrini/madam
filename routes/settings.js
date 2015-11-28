@@ -21,7 +21,24 @@ router.use(function (request, response, next) {
 });
 
 router.get('/', function(req, res, next) {
-    res.redirect('/settings/workers');
+    res.render('settings', {
+        i18n: {
+            workersName: req.i18n.__('Workers'),
+            servicesName: req.i18n.__('Services'),
+            workers: {
+                title: req.i18n.__('Set workers'),
+                name: req.i18n.__('Name'),
+                unlock: req.i18n.__('Unlock'),
+                save: req.i18n.__('Save workers')
+            },
+            services: {
+                title: req.i18n.__('Set services'),
+                name: req.i18n.__('Name'),
+                unlock: req.i18n.__('Unlock'),
+                save: req.i18n.__('Save services')
+            }
+        }
+    });
 });
 
 router.get('/workers', function(req, res, next) {
@@ -30,66 +47,30 @@ router.get('/workers', function(req, res, next) {
         type: 'workers',
         id: common.workersDocId
     }, function(err, resp, respcode) {
-        var items;
+        var items = [];
         if (resp.found && resp._source.workers.length > 0) {
             items = resp._source.workers;
         }
-        else {
-            items = [{name: '', color: req.config.defaultWorkerColor}];
-        }
-
-        res.render('settings', {
-            i18n: {
-                title: req.i18n.__('Set workers'),
-                name: req.i18n.__('Name'),
-                workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services'),
-                unlock: req.i18n.__('Unlock'),
-                save: req.i18n.__('Save workers')
-            },
-            hasColorpicker: true,
-            isWorkersActive: true,
-            items: items,
-            workersUrl: '#',
-            servicesUrl: '/settings/services'
+        res.json({
+            items: items
         });
     });
 });
 
-router.post('/workers', function(req, res, next) {
-    req.body.name = common.toArray(req.body.name);
-    req.body.color = common.toArray(req.body.color);
-
+router.put('/workers', function(req, res, next) {
     var workers = [];
-    for (var i = 0; i < req.body.name.length; i++) {
-        if (req.body.name[i]) {
+    for (var i = 0; i < req.body.workers.length; i++) {
+        if (req.body.workers[i].name.trim()) {
             workers.push({
-                name: req.body.name[i].trim(),
-                color: req.body.color[i]
+                name: req.body.workers[i].name.trim(),
+                color: req.body.workers[i].color
             });
         }
     }
 
     if (workers.length === 0) {
-        res.render('settings', {
-            i18n: {
-                title: req.i18n.__('Set workers'),
-                name: req.i18n.__('Name'),
-                workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services'),
-                unlock: req.i18n.__('Unlock'),
-                save: req.i18n.__('Save workers')
-            },
-            hasColorpicker: true,
-            isWorkersActive: true,
-            flash: {
-                type: 'alert-danger',
-                messages: [{msg: req.i18n.__('At least one worker is mandatory')}]
-            },
-            items: [{name: '', color: req.config.defaultWorkerColor}],
-            workersUrl: '#',
-            servicesUrl: '/settings/services'
-        });
+        var errors = [{msg: req.i18n.__('At least one worker is mandatory')}];
+        res.status(400).json({errors: errors});
         return;
     }
 
@@ -104,36 +85,17 @@ router.post('/workers', function(req, res, next) {
     };
 
     client.index(args, function(err, resp, respcode) {
-        var params = {
-            i18n: {
-                title: req.i18n.__('Set workers'),
-                name: req.i18n.__('Name'),
-                workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services'),
-                unlock: req.i18n.__('Unlock'),
-                save: req.i18n.__('Save workers')
-            },
-            hasColorpicker: true,
-            isWorkersActive: true,
-            items: workers.length > 0 ? workers : [{name: '', color: req.config.defaultWorkerColor}],
-            workersUrl: '#',
-            servicesUrl: '/settings/services'
-        };
-
-        if (err) {
-            var messages;
-            if (err instanceof esErrors.NoConnections)
-                messages = [{msg: req.i18n.__('Database connection error')}];
-            else
-                messages = [{msg: req.i18n.__('Database error')}];
-            console.error(err);
-            params.flash = {
-                type: 'alert-danger',
-                messages: messages
-            };
+        if (!err) {
+            res.status(200).json({items: workers});
+            return;
         }
+        var errors = [];
+        if (err instanceof esErrors.NoConnections)
+            errors[errors.length] = {msg: req.i18n.__('Database connection error')};
+        else
+            errors[errors.length] = {msg: req.i18n.__('Database error')};
 
-        res.render('settings', params);
+        res.status(500).json({errors: errors});
     });
 });
 
@@ -143,20 +105,43 @@ router.get('/services', function(req, res, next) {
         type: 'services',
         id: common.servicesDocId
     }, function(err, resp, respcode) {
-        res.render('settings', {
-            i18n: {
-                title: req.i18n.__('Set services'),
-                name: req.i18n.__('Name'),
-                workers: req.i18n.__('Workers'),
-                services: req.i18n.__('Services'),
-                unlock: req.i18n.__('Unlock'),
-                save: req.i18n.__('Save services')
-            },
-            isServicesActive: true,
-            items: resp.found && resp._source.names.length > 0 ? resp._source.names : [''],
-            workersUrl: '/settings/workers',
-            servicesUrl: '#'
+        res.json({
+            items: resp.found && resp._source.names.length > 0 ? resp._source.names : []
         });
+    });
+});
+
+router.put('/services', function(req, res, next) {
+    var services = common.toArray(req.body.services).filter(function(e) { return e; });
+    if (services.length === 0) {
+        var errors = [{msg: req.i18n.__('At least one service is mandatory')}];
+        res.status(400).json({errors: errors});
+        return;
+    }
+
+    var args = {
+        index: req.config.mainIndex,
+        type: 'services',
+        refresh: true,
+        id: common.servicesDocId,
+        body: {
+            names: services
+        }
+    };
+
+    client.index(args, function(err, resp, respcode) {
+        if (!err) {
+            res.status(200).json({items: services});
+            return;
+        }
+
+        var errors = [];
+        if (err instanceof esErrors.NoConnections)
+            errors[errors.length] = {msg: req.i18n.__('Database connection error')};
+        else
+            errors[errors.length] = {msg: req.i18n.__('Database error')};
+
+        res.status(500).json({errors: errors});
     });
 });
 
