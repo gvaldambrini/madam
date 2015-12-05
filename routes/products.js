@@ -362,33 +362,10 @@ router.get('/:id', function(req, res, next) {
         type: 'product',
         id: req.params.id
     }, function(err, resp, respcode) {
-        res.json(req.utils.toViewFormat(resp._source)
-        );
+        res.json(req.utils.toViewFormat(resp._source));
     });
 });
 
-/**
- * Helper function which manages the result of an operation (index or update)
- * on a product and sends to the client the appropriate response.
- * @method
- *
- * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
- * @param {object} error the error returned by the elasticsearch client
- */
-function productCb(res, err) {
-    if (!err) {
-        res.sendStatus(200);
-        return;
-    }
-
-    var errors = [];
-    if (err instanceof esErrors.NoConnections)
-        errors[errors.length] = {msg: req.i18n.__('Database connection error')};
-    else
-        errors[errors.length] = {msg: req.i18n.__('Database error')};
-
-    res.status(500).json({errors: errors});
-}
 
 router.post('/', function(req, res, next) {
     var errors = req.utils.validateForm();
@@ -406,7 +383,7 @@ router.post('/', function(req, res, next) {
     args.body = req.utils.toElasticsearchFormat(req.body);
     args.body.created_at = new Date().toISOString();
     client.index(args, function(err, resp, respcode) {
-        productCb(res, err);
+        common.indexCb(req, res, err, true);
     });
 });
 
@@ -426,7 +403,7 @@ router.put('/:id', function(req, res, next) {
     };
 
     client.update(args, function(err, resp, respcode) {
-        productCb(res, err);
+        common.indexCb(req, res, err, false);
     });
 });
 

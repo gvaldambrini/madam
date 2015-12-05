@@ -31,7 +31,7 @@ var ProductForm = React.createClass({
         method: 'get',
         success: function(data) {
           if (cloneForm) {
-            data.sold_date = moment().format('{{config.language}}');
+            data.sold_date = moment().format('{{config.date_format}}');
             data.notes = '';
           }
           that.setState({
@@ -45,7 +45,7 @@ var ProductForm = React.createClass({
     else {
       that.setState({
         data: {
-          sold_date: moment().format('{{config.language}}')
+          sold_date: moment().format('{{config.date_format}}')
         },
         editForm: editForm,
         errors: []
@@ -71,17 +71,15 @@ var ProductForm = React.createClass({
           errors[errors.length] = xhr.responseJSON.errors[i].msg;
         }
         that.setState({
-          editForm: that.props.route.path.startsWith('edit'),
           errors: errors
         });
       }
     });
   },
-  handleChange: function(event) {
-    var $target = $(event.currentTarget);
+  handleChange: function(name, value) {
     var data = this.state.data;
-    if (data[$target.attr('name')] != $target.val() && $target.val()) {
-      data[$target.attr('name')] = $target.val();
+    if (data[name] != value) {
+      data[name] = value;
 
       this.setState({
         data: data
@@ -140,7 +138,6 @@ var ProductForm = React.createClass({
               label='{{i18n.notes}}'
               handleChange={this.handleChange}/>
 
-            <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
             <div className="form-group">
               <div className="col-sm-offset-2 col-sm-10">
                 <button type="submit" className="btn btn-primary" name="submit" onClick={this.submitForm}>
@@ -189,6 +186,9 @@ var ProductsTable = React.createClass({
                   function(span) {
                     if (span != null) {
                       var $span = $(span);
+                      if ($span.data('tooltip-init'))
+                        return;
+                      $span.data('tooltip-init', true);
                       $span.tooltip();
                       $span.confirmPopover({
                         template: '#popover-template',

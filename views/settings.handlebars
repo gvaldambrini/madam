@@ -179,7 +179,9 @@ var SettingsRow = React.createClass({
           // working.
           function(input) {
             if (input != null) {
-              $(input).unbind('change', that.textChanged).change(that.textChanged);
+              $(input)
+                .unbind('change', that.textChanged)
+                .change(that.textChanged);
             }
           }
         }
@@ -365,7 +367,9 @@ var SettingsColorRow = React.createClass({
             var $div = $(div);
             that.setColorPicker($div);
             // forward the native change event to the react event handler
-            $div.find('input[name=color]').unbind('change', that.colorChanged).change(that.colorChanged);
+            $div.find('input[name=color]')
+              .unbind('change', that.colorChanged)
+              .change(that.colorChanged);
             $div.find('.form-control').css(
               'color', $div.colorpicker().data('colorpicker').color.toHex());
             $div.colorpicker(that.props.disabled ? 'disable' : 'enable');
@@ -380,7 +384,9 @@ var SettingsColorRow = React.createClass({
             // working.
               function(input) {
                 if (input != null) {
-                  $(input).unbind('change', that.textChanged).change(that.textChanged);
+                  $(input)
+                    .unbind('change', that.textChanged)
+                    .change(that.textChanged);
                 }
               }
             }

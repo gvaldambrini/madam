@@ -37,11 +37,10 @@
               password: ''
             }
           },
-          handleChange: function(event) {
-            var $target = $(event.currentTarget);
+          handleChange: function(name, value) {
             var newState = this.state;
-            if (newState[$target.attr('name')] != $target.val()) {
-              newState[$target.attr('name')] = $target.val();
+            if (newState[name] != value) {
+              newState[name] = value;
               this.setState(newState);
             }
           },

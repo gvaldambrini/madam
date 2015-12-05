@@ -4,6 +4,7 @@
  */
 
 var elasticsearch = require('elasticsearch');
+var esErrors = elasticsearch.errors;
 var moment = require('moment');
 
 /**
@@ -72,6 +73,31 @@ Common.prototype.toArray = function(container) {
     if (typeof container == 'string')
         container = [container];
     return container;
+};
+
+/**
+ * Helper function which manages the result of an operation (index or update)
+ * on a item and sends to the client the appropriate response.
+ * @method
+ *
+ * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+ * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
+ * @param {object} error the error returned by the elasticsearch client
+ * @param newItem bool true if the index is perfomed for creating a new item
+ */
+Common.prototype.indexCb = function(req, res, err, newItem) {
+    if (!err) {
+        res.sendStatus(newItem ? 201 : 200);
+        return;
+    }
+
+    var errors = [];
+    if (err instanceof esErrors.NoConnections)
+        errors[errors.length] = {msg: req.i18n.__('Database connection error')};
+    else
+        errors[errors.length] = {msg: req.i18n.__('Database error')};
+
+    res.status(500).json({errors: errors});
 };
 
 /**

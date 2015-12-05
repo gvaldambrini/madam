@@ -1,4 +1,15 @@
+
+var SimpleInput = {
+  handleChange: function(event) {
+    this.props.handleChange(this.props.name, event.currentTarget.value);
+  }
+};
+
+
 var FormInputDate = React.createClass({
+  handleChange: function(event) {
+    this.props.handleChange(this.props.name, $(event.currentTarget).val());
+  },
   render: function() {
     var that = this;
     return (
@@ -18,7 +29,9 @@ var FormInputDate = React.createClass({
                 function(input) {
                   // the react onChange event is not fired from the datepicker, so let's
                   // use the standard event.
-                  $(input).change(that.props.handleChange);
+                  $(input)
+                    .unbind('change', that.handleChange)
+                    .change(that.handleChange);
                 }
               }/>
             <span className="input-group-addon">
@@ -43,7 +56,9 @@ var FormInputDate = React.createClass({
   }
 });
 
+
 var FormInput = React.createClass({
+  mixins: [SimpleInput],
   getInitialState: function() {
     return {value: ''}
   },
@@ -70,7 +85,7 @@ var FormInput = React.createClass({
             name={this.props.name} placeholder={this.props.label}
             autoFocus={this.props.focus}
             value={this.state.value}
-            onChange={this.props.handleChange}/>
+            onChange={this.handleChange}/>
         </div>
       </div>
     );
@@ -132,6 +147,7 @@ var FormInputAndCheckbox = React.createClass({
 
 
 var FormTextArea = React.createClass({
+  mixins: [SimpleInput],
   getInitialState: function() {
     return {value: ''}
   },
@@ -148,7 +164,7 @@ var FormTextArea = React.createClass({
         <div className="col-sm-10">
           <textarea name={this.props.name} className="form-control" rows="5"
             value={this.state.value}
-            onChange={this.props.handleChange}>
+            onChange={this.handleChange}>
           </textarea>
         </div>
       </div>
