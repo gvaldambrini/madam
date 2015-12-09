@@ -67,10 +67,9 @@
 	"Fields marked with <span className=\"mandatory\">*</span> are mandatory.": "I campi marcati con <span className=\"mandatory\">*</span> sono obbligatori.",
 	"Create customer and appointment": "Crea cliente e appuntamento",
 	"Edit %s": "Modifica %s",
-	"New appointment for %s": "Nuovo appuntamento per %s",
-	"Edit appointment for %s": "Modifica appuntamento per %s",
 	"Edit appointment": "Modifica appuntamento",
 	"Set workers": "Definisci i lavoratori",
 	"Set services": "Definisci i servizi",
-	"Settings": "Impostazioni"
+	"Settings": "Impostazioni",
+	"New appointment": "Nuovo appuntamento"
 }

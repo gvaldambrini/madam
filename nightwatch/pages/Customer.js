@@ -31,7 +31,7 @@ module.exports = function (browser) {
     };
 
     this.submitAndAdd = function() {
-        return browser.click('button[name=submit_and_add]');
+        return browser.click('button[name=submit-and-add]');
     };
 
     this.goToAppointments = function() {

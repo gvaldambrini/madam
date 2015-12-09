@@ -184,16 +184,12 @@ $sidebar-padding: 20px;
       > a.active {
         font-weight: bold;
       }
-    }
 
-    li.active {
-      font-weight: bold;
-    }
-
-    li.disabled > a {
-      color: #C3B6B6;
-      pointer-events: none;
-      cursor: default;
+      > a.disabled {
+        color: #C3B6B6;
+        pointer-events: none;
+        cursor: default;
+      }
     }
   }
 }

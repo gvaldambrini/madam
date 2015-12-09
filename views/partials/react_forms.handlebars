@@ -94,13 +94,24 @@ var FormInput = React.createClass({
 
 
 var FormInputRadio = React.createClass({
+  mixins: [SimpleInput],
+  getInitialState: function() {
+    return {value: ''}
+  },
+  componentWillMount: function() {
+    this.setState({value: this.props.value});
+  },
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({value: nextProps.value});
+  },
   render: function() {
     var that = this;
     var radioValues = this.props.values.map(function(obj) {
       return (
         <label className="radio-inline" key={obj.value}>
           <input type="radio" name={that.props.name} value={obj.value}
-          defaultChecked={that.props.value === obj.value}/>
+          checked={that.state.value === obj.value}
+          onChange={that.handleChange}/>
           {obj.name}
         </label>
       );
@@ -121,6 +132,29 @@ var FormInputRadio = React.createClass({
 
 
 var FormInputAndCheckbox = React.createClass({
+  getInitialState: function() {
+    return {
+      value: '',
+      cbvalue: false
+    }
+  },
+  componentWillMount: function() {
+    this.setState({
+      value: this.props.value,
+      cbvalue: this.props.cbvalue
+    });
+  },
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({
+      value: nextProps.value,
+      cbvalue: nextProps.cbvalue
+    });
+  },
+  handleChange: function(event) {
+    var target = event.currentTarget;
+    var value = target.type == "checkbox" ? target.checked : target.value;
+    this.props.handleChange(target.name, value);
+  },
   render: function() {
     return (
       <div className="form-group">
@@ -130,12 +164,15 @@ var FormInputAndCheckbox = React.createClass({
         <div className="col-sm-10">
           <input className="form-control" type={this.props.type}
             name={this.props.name} placeholder={this.props.label}
-            defaultValue={this.props.value} />
+            value={this.state.value}
+            onChange={this.handleChange}/>
         </div>
         <div className="col-sm-offset-2 col-sm-10">
           <div className="checkbox">
             <label>
-              <input type="checkbox" name={this.props.cbname} defaultChecked={this.props.cbvalue} />
+              <input type="checkbox" name={this.props.cbname}
+              checked={this.state.cbvalue}
+              onChange={this.handleChange}/>
               {this.props.cblabel}
             </label>
           </div>

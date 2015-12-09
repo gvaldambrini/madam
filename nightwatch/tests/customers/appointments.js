@@ -25,7 +25,8 @@ module.exports = {
 
       .page.Appointments().alertContains(
         'To create an appointment, you have first to define the workers.')
-      .page.Appointments().followAlertLink()
+      //.page.Appointments().followAlertLink()
+      .page.Sidebar().goToSettings()
       .page.Workers().enableEdit()
       .page.Workers().set(0, {name: 'Cersei', color: '#fdd017'})
       .page.Workers().add()
@@ -36,10 +37,13 @@ module.exports = {
       .page.Sidebar().goToCustomers()
       .page.Customers().editCustomer(0)
       .page.Customer().goToAppointments()
+      .page.Appointments().createAppointment()
 
       .page.Appointments().alertContains(
         'To create an appointment, you have first to define the common services.')
-      .page.Appointments().followAlertLink()
+      .page.Sidebar().goToSettings()
+      .page.Workers().goToServices()
+      //.page.Appointments().followAlertLink()
       .page.Services().enableEdit()
       .page.Services().set(0, 'shampoo')
       .page.Services().add()
@@ -53,6 +57,7 @@ module.exports = {
       .page.Customers().tableContains(0, 'Tyrion', 'Lannister', '-', '-')
       .page.Customers().editCustomer(0)
       .page.Customer().goToAppointments()
+      .page.Appointments().createAppointment()
 
       .page.Appointments().alertNotPresent()
       .page.Appointment().submit()
@@ -72,7 +77,6 @@ module.exports = {
       .page.Appointment().toggleService(0)
       .page.Appointment().switchWorker(0)
       .page.Appointment().toggleService(1)
-      .page.Appointment().toggleService(2)
       .page.Appointment().selectWorker(2, 'Margaery')
       .page.Appointment().setDate('14/09/2015')
       .page.Appointment().submit()
@@ -94,7 +98,6 @@ module.exports = {
       .page.Appointment().addService()
       .page.Appointment().setService(2, 'strong permanent')
       .page.Appointment().setService(3, 'color')
-      .page.Appointment().toggleService(3)
       .page.Appointment().setDate('21/09/2015')
       .page.Appointment().submit()
       .page.Appointments().tableContains(0, '21/09/2015', 'shampoo - strong permanent - color')
@@ -126,6 +129,7 @@ module.exports = {
       .page.Customers().editCustomer(0)
       .page.Customer().goToAppointments()
       .page.Appointments().deleteAppointment(1)
+      .pause(100)
       .page.Appointments().tableCount(1)
       .page.Appointments().tableContains(0, '21/09/2015', 'shampoo - strong permanent - color')
       .page.Appointments().deleteAppointment(0)

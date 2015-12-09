@@ -30,7 +30,9 @@ module.exports = function (browser) {
 
     this.setService = function(index, name) {
         return browser.execute(function(index, name) {
-            $('#form .service:eq(' + index + ') input[type=text]').val(name);
+            $node = $('#form .service:eq(' + index + ') input[type=text]');
+            $node.val(name);
+            $node.change();
         }, [index, name]);
     };
 

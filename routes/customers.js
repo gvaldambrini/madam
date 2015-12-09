@@ -148,8 +148,7 @@ function processElasticsearchResults(req, hits) {
             surname = '-';
 
         results[results.length] = {
-            urlEdit: getCustomerUrl(req, 'edit', hits[i]._id),
-            urlDelete: getCustomerUrl(req, 'delete', hits[i]._id),
+            id: hits[i]._id,
             deleteText: req.i18n.__('Delete customer'),
             name: getField(hits[i], 'name', 'autocomplete'),
             surname: surname,
@@ -161,6 +160,11 @@ function processElasticsearchResults(req, hits) {
     results.sort(sortFn);
     return results;
 }
+
+router.use(['*'], function (req, res, next) {
+    req.utils = new CustomerUtils(req, res);
+    next();
+});
 
 router.get('/search', function(req, res, next) {
     var queryBody;
@@ -229,12 +233,55 @@ router.get('/', function(req, res, next) {
             i18n: {
                 title: req.i18n.__('Customers'),
                 createNewCustomer: req.i18n.__('Create new customer'),
+                editCustomer: req.i18n.__('Edit customer'),
                 search: req.i18n.__('Search...'),
                 btnConfirm: req.i18n.__('Confirm'),
                 btnCancel: req.i18n.__('Cancel'),
                 deleteTitle: req.i18n.__('Delete the customer?'),
-                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?')
-
+                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
+                headerInfo: req.i18n.__('Info'),
+                headerAppointments: req.i18n.__('Appointments'),
+                customer: {
+                    name: req.i18n.__('Name'),
+                    surname: req.i18n.__('Surname'),
+                    mobile_phone: req.i18n.__('Mobile Phone'),
+                    allow_sms: req.i18n.__('Allow sms'),
+                    phone: req.i18n.__('Phone'),
+                    email: req.i18n.__('Email'),
+                    allow_email: req.i18n.__('Allow email'),
+                    first_seen: req.i18n.__('First seen'),
+                    discount: req.i18n.__('Discount'),
+                    notes: req.i18n.__('Notes'),
+                    submitAdd: req.i18n.__('Create customer'),
+                    submitEdit: req.i18n.__('Edit customer'),
+                    submitAndAdd: req.i18n.__('Create customer and appointment'),
+                    mandatoryFields: req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
+                },
+                appointments: {
+                    title: req.i18n.__('Appointments'),
+                    date: req.i18n.__('Date'),
+                    services: req.i18n.__('Services'),
+                    createNew: req.i18n.__('Create new appointment'),
+                    btnConfirm: req.i18n.__('Confirm'),
+                    btnCancel: req.i18n.__('Cancel'),
+                    deleteTitle: req.i18n.__('Delete the appointment?'),
+                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?')
+                },
+                appointment: {
+                    titleNew: req.i18n.__('New appointment'),
+                    titleEdit: req.i18n.__('Edit appointment'),
+                    submitAdd: req.i18n.__('Create appointment'),
+                    submitEdit: req.i18n.__('Edit appointment'),
+                    date: req.i18n.__('Date'),
+                    notes: req.i18n.__('Notes'),
+                    addService: req.i18n.__('Add service'),
+                    setWorkersMsg: req.i18n.__(
+                        'To create an appointment, you have first to <a href="%s">define the workers.</a>',
+                        getUrl(req, '/settings/workers')),
+                    setServicesMsg: req.i18n.__(
+                        'To create an appointment, you have first to <a href="%s">define the common services.</a>',
+                        getUrl(req, '/settings/services'))
+                }
             },
             customersData: {
                 headerName: req.i18n.__('Name'),
@@ -247,6 +294,82 @@ router.get('/', function(req, res, next) {
             urlNew: getCustomersUrl(req, 'new'),
             urlSearch: getCustomersUrl(req, 'search')
         });
+    });
+});
+
+router.get('/:id', function(req, res, next) {
+    client.get({
+        index: req.config.mainIndex,
+        type: 'customer',
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        res.json(req.utils.toViewFormat(resp._source));
+    });
+});
+
+router.post('/', function(req, res, next) {
+    var errors = req.utils.validateForm();
+    if (errors) {
+        res.status(400).json({errors: errors});
+        return;
+    }
+
+    var args = {
+        index: req.config.mainIndex,
+        type: 'customer',
+        refresh: true,
+        body: req.utils.toElasticsearchFormat(req.body)
+    };
+
+    client.index(args, function(err, resp, respcode) {
+        common.indexCb(req, res, err, resp, true);
+    });
+});
+
+
+router.put('/:id', function(req, res, next) {
+    var errors = req.utils.validateForm();
+    if (errors) {
+        res.status(400).json({errors: errors});
+        return;
+    }
+
+    var args = {
+        index: req.config.mainIndex,
+        type: 'customer',
+        id: req.params.id,
+        refresh: true,
+        body: req.utils.toElasticsearchFormat(req.body)
+    };
+
+    client.get({
+        index: req.config.mainIndex,
+        type: 'customer',
+        id: args.id
+    }, function(err, resp, respcode) {
+        args.body.appointments = resp._source.appointments;
+        args.body.last_seen = resp._source.last_seen;
+        client.index(args, function(err, resp, respcode) {
+            common.indexCb(req, res, err, resp, true);
+        });
+    });
+});
+
+
+router.delete('/:id', function(req, res, next) {
+    client.delete({
+        index: req.config.mainIndex,
+        type: 'customer',
+        refresh: true,
+        id: req.params.id
+    }, function(err, resp, respcode) {
+        if (err) {
+            console.log(err);
+            res.status(400).end();
+        }
+        else {
+            res.status(200).end();
+        }
     });
 });
 
@@ -332,7 +455,7 @@ CustomerUtils.prototype.toElasticsearchFormat = function(sourceObj) {
             if (field == 'first_seen')
                 obj[field] = this.toISODate(sourceObj[field]);
             else if (field == 'allow_sms' || field == 'allow_email')
-                obj[field] = sourceObj[field] == 'on';
+                obj[field] = sourceObj[field] === "true";
             else if (field == 'discount')
                 obj[field] = parseInt(sourceObj[field], 10);
             else
@@ -365,16 +488,11 @@ CustomerUtils.prototype.toViewFormat = function(sourceObj) {
     return obj;
 };
 
-/**
- * Handles the Customer form, creating / updating a new document if the form
- * content validation passes, or displaying the proper error messages if not.
- * @method
- *
- * @param {string} title the title of the form.
- * @param {bool} editForm true if the form is for edit.
- */
-CustomerUtils.prototype.handleForm = function(title, editForm) {
 
+/**
+ * Validates the Customer form and returns the list of the errors if any.
+ */
+CustomerUtils.prototype.validateForm = function() {
     // Trim all the fields that allow the user to write text
     for (var i = 0; i < CustomerUtils.formFields.length; i++)
         this.req.sanitize(CustomerUtils.formFields[i]).trim();
@@ -400,153 +518,9 @@ CustomerUtils.prototype.handleForm = function(title, editForm) {
             'The first date seen does not seem a valid date')).isValidDate();
     }
 
-    var errors = this.req.validationErrors();
-    if (errors) {
-        var appDisabled = typeof this.req.params.id == 'undefined';
-        var i18n = this.formNames(editForm);
-        i18n.title = title;
-        i18n.info = this.req.i18n.__('Info');
-        i18n.appointments = this.req.i18n.__('Appointments');
-
-        this.res.render('customer', {
-            i18n: i18n,
-            isInfoActive: true,
-            isAppointmentsDisabled: appDisabled,
-            appointmentsUrl: appDisabled ? '#' :
-                getCustomerUrl(this.req, 'appointments'),
-            flash: { type: 'alert-danger', messages: errors},
-            editForm: editForm,
-            obj: this.req.body
-        });
-        return;
-    }
-
-    var that = this;  // workaround for the this visibility problem inside inner functions.
-    var cb = function(err, resp, respcode) {
-        if (!err) {
-            // redirect does not take into account being in inside a router
-            if (that.req.body.submit_and_add) {
-                that.res.redirect(getCustomerUrl(that.req, 'appointments', resp._id));
-            }
-            else {
-                that.res.redirect(customersPath);
-            }
-        }
-        else {
-            var messages;
-            if (err instanceof esErrors.NoConnections)
-                messages = [{msg: that.req.i18n.__('Database connection error')}];
-            else
-                messages = [{msg: that.req.i18n.__('Database error')}];
-            console.error(err);
-
-            var appDisabled = typeof that.req.params.id == 'undefined';
-            var i18n = that.formNames(editForm);
-            i18n.title = title;
-            i18n.info = that.req.i18n.__('Info');
-            i18n.appointments = that.req.i18n.__('Appointments');
-
-            that.res.render('customer', {
-                i18n: i18n,
-                isInfoActive: true,
-                isAppointmentsDisabled: appDisabled,
-                appointmentsUrl: appDisabled ? '#' :
-                    getCustomerUrl(that.req, 'appointments'),
-                flash: { type: 'alert-danger', messages: messages},
-                editForm: editForm,
-                obj: that.req.body
-            });
-        }
-    };
-
-    // We want to use the index API to update the document, in order to clear
-    // fields that were removed from the form. As consequnce, we need to add
-    // the parts of the object which are not in the Customer form (for example
-    // the appointments list).
-    var args = {
-        index: this.req.config.mainIndex,
-        type: 'customer',
-        refresh: true,
-        body: this.toElasticsearchFormat(this.req.body)
-    };
-    if (typeof this.req.params.id != 'undefined') {
-        args.id = this.req.params.id;
-
-        client.get({
-            index: this.req.config.mainIndex,
-            type: 'customer',
-            id: args.id
-        }, function(err, resp, respcode) {
-            args.body.appointments = resp._source.appointments;
-            args.body.last_seen = resp._source.last_seen;
-            client.index(args, cb);
-        });
-    }
-    else {
-        client.index(args, cb);
-    }
+    return this.req.validationErrors();
 };
 
-
-router.use(['/new', '*edit'], function (req, res, next) {
-    req.utils = new CustomerUtils(req, res);
-    next();
-});
-
-router.get('/new', function(req, res, next) {
-    var i18n = req.utils.formNames(false);
-    i18n.title = req.i18n.__('Create new customer');
-    i18n.info = req.i18n.__('Info');
-    i18n.appointments = req.i18n.__('Appointments');
-
-    res.render('customer', {
-        i18n: i18n,
-        isInfoActive: true,
-        isAppointmentsDisabled: true,
-        appointmentsUrl: '#',
-        editForm: false,
-        obj: {}
-    });
-});
-
-router.post('/new', function(req, res, next) {
-    req.utils.handleForm(req.i18n.__('Create new customer'), false);
-});
-
-router.get('/:id/edit', function(req, res, next) {
-    client.get({
-        index: req.config.mainIndex,
-        type: 'customer',
-        id: req.params.id
-    }, function(err, resp, respcode) {
-        var i18n = req.utils.formNames(true);
-        i18n.title = util.format(
-            req.i18n.__('Edit %s'), getCustomerName(resp._source));
-        i18n.info = req.i18n.__('Info');
-        i18n.appointments = req.i18n.__('Appointments');
-
-        res.render('customer', {
-            i18n: i18n,
-            isInfoActive: true,
-            isAppointmentsDisabled: false,
-            appointmentsUrl: getCustomerUrl(req, 'appointments'),
-            editForm: true,
-            obj: req.utils.toViewFormat(resp._source)
-        });
-    });
-});
-
-router.post('/:id/edit', function(req, res, next) {
-    client.get({
-        index: req.config.mainIndex,
-        type: 'customer',
-        id: req.params.id
-    }, function(err, resp, respcode) {
-        req.utils.handleForm(
-            util.format(req.i18n.__('Edit %s'), getCustomerName(resp._source)),
-            true);
-    });
-});
 
 router.get('/:id/appointments', function(req, res, next) {
     client.get({
@@ -568,61 +542,27 @@ router.get('/:id/appointments', function(req, res, next) {
         }
 
         var obj = resp._source;
-        if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0)
-            res.redirect(getCustomerUrl(req, 'appointments/new'));
-        else {
-            var appointments = [];
-            for (var i = 0; i < obj.appointments.length; i++) {
-                appointments.push({
-                    _date: obj.appointments[i].date,
-                    date: common.toLocalFormattedDate(req, obj.appointments[i].date),
-                    services: obj.appointments[i].services.map(descFn).join(' - '),
-                    urlEdit: getCustomerUrl(req, 'appointments/' + i + '/edit'),
-                    deleteText: req.i18n.__('Delete appointment'),
-                    urlDelete: getCustomerUrl(req, 'appointments/' + i + '/delete')
-                });
-            }
-            appointments.sort(sortFn);
+        var appointments = [];
 
-            res.render('appointments', {
-                i18n: {
-                    title: req.i18n.__('Appointments'),
-                    info: req.i18n.__('Info'),
-                    appointments: req.i18n.__('Appointments'),
-                    date: req.i18n.__('Date'),
-                    services: req.i18n.__('Services'),
-                    createNewAppintment: req.i18n.__('Create new appointment'),
-                    btnConfirm: req.i18n.__('Confirm'),
-                    btnCancel: req.i18n.__('Cancel'),
-                    deleteTitle: req.i18n.__('Delete the appointment?'),
-                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?')
-                },
-                infoUrl: getCustomerUrl(req, 'edit'),
-                isAppointmentsActive: true,
-                appointmentsUrl: getCustomerUrl(req, 'appointments'),
-                urlNew: getCustomerUrl(req, 'appointments/new'),
-                appointments: appointments
+        if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0) {
+            res.json(appointments);
+            return;
+        }
+
+        for (var i = 0; i < obj.appointments.length; i++) {
+            appointments.push({
+                id: i,
+                _date: obj.appointments[i].date,
+                date: common.toLocalFormattedDate(req, obj.appointments[i].date),
+                services: obj.appointments[i].services.map(descFn).join(' - '),
+                deleteText: req.i18n.__('Delete appointment')
             });
         }
+        appointments.sort(sortFn);
+        res.json(appointments);
     });
 });
 
-router.post('/:id/delete', function(req, res, next) {
-    client.delete({
-        index: req.config.mainIndex,
-        type: 'customer',
-        refresh: true,
-        id: req.params.id
-    }, function(err, resp, respcode) {
-        if (err) {
-            console.log(err);
-            res.status(400).end();
-        }
-        else {
-            res.status(200).end();
-        }
-    });
-});
 
 /**
  * Creates a new AppointmentUtils object, which encapsulates some common utility
@@ -642,100 +582,42 @@ var AppointmentUtils = function(req, res) {
  * Handles the Appointment form, creating / updating a new document if the form
  * content validation passes, or displaying the proper error messages if not.
  * @method
- *
- * @param {bool} editForm true if the form is for edit.
  */
-AppointmentUtils.prototype.handleForm = function(editForm) {
+AppointmentUtils.prototype.handleForm = function() {
     var that = this;
-    that.req.body.service = common.toArray(that.req.body.service);
-    that.req.body.worker = common.toArray(that.req.body.worker);
-
-    // starting from es 1.4.3 groovy dynamic scripting is no longer available
-    // by default, so we fallback to a get/update implementation.
-    client.mget({
-        body: {
-            docs: [
-                {_index: this.req.config.mainIndex, _type: 'customer', _id: this.req.params.id},
-                {_index: this.req.config.mainIndex, _type: 'workers', _id: common.workersDocId}
-            ]
-        }
+    client.get({
+        index: that.req.config.mainIndex,
+        type: 'customer',
+        id: that.req.params.id
     }, function(err, resp, respcode) {
+        var version = resp._version;
+        var obj = resp._source;
 
-        function filterServices(req) {
-            function filterFn(item, index) {
-                return that.req.body.enabled.indexOf(index.toString()) != -1 && item.trim().length > 0;
-            }
-
-            var descriptions = that.req.body.service.filter(filterFn);
-            var workers = that.req.body.worker.filter(filterFn);
-
-            var services = [];
-            for (var i = 0; i < descriptions.length; i++) {
+        var services = [];
+        for (var i = 0; i < that.req.body.services.length; i++) {
+            var item = that.req.body.services[i];
+            if (item.enabled && item.description.trim().length > 0) {
                 services.push({
-                    description: descriptions[i],
-                    worker: workers[i]
+                    description: item.description.trim(),
+                    worker: item.worker
                 });
             }
-            return services;
         }
 
-        var version = resp.docs[0]._version;
-        var obj = resp.docs[0]._source;
-        var workers = resp.docs[1]._source.workers;
-
-        var name = getCustomerName(obj);
-        var title = '';
-        if (editForm) {
-            title = util.format(that.req.i18n.__('Edit appointment for %s'), name);
-        }
-        else {
-            title = util.format(that.req.i18n.__('New appointment for %s'), name);
-        }
-        var params = {
-            i18n: {
-                title: title,
-                info: that.req.i18n.__('Info'),
-                appointments: that.req.i18n.__('Appointments'),
-                date: that.req.i18n.__('Date'),
-                notes: that.req.i18n.__('Notes'),
-                addService: that.req.i18n.__('Add service'),
-                submit: editForm ? that.req.i18n.__('Edit appointment') : that.req.i18n.__('Create appointment')
-            },
-            infoUrl: getCustomerUrl(that.req, 'edit'),
-            isAppointmentsActive: true,
-            appointmentsUrl: getCustomerUrl(that.req, 'appointments'),
-            workers: workers,
-            date: that.req.body.date
-        };
-
-        if (typeof that.req.body.enabled == 'undefined' || that.req.body.enabled.length === 0) {
-            var services = [];
-            for (var i = 0; i < that.req.body.service.length; i++) {
-                services.push({
-                    description: that.req.body.service[i],
-                    worker: {
-                        name: that.req.body.worker[i],
-                        color: that.getWorkerColor(that.req.body.worker[i], workers)
-                    },
-                    checked: false
-                });
-            }
-            params.services = services;
-            params.flash = {
-                type: 'alert-danger',
-                messages: [{msg: that.req.i18n.__('At least one service is mandatory')}]
-            };
-            that.res.render('appointment', params);
+        if (services.length === 0) {
+            var errors = [{msg: that.req.i18n.__('At least one service is mandatory')}];
+            that.res.status(400).json({errors: errors});
             return;
         }
 
         var appointment = {
             date: common.toISODate(that.req, that.req.body.date),
-            services: filterServices(that.req),
+            services: services,
             notes: that.req.body.notes
         };
 
-        if (typeof that.req.params.appnum == 'undefined') {
+        var newItem = typeof that.req.params.appnum === 'undefined';
+        if (newItem) {
             if (typeof obj.appointments == 'undefined')
                 obj.appointments = [];
 
@@ -751,44 +633,13 @@ AppointmentUtils.prototype.handleForm = function(editForm) {
             type: 'customer',
             id: that.req.params.id,
             version: version,
-            body: {
-                doc: obj
-            }
+            body: {doc: obj}
         }, function(err, resp, respcode) {
-
-            if (!err) {
-                that.res.redirect(getCustomerUrl(that.req, 'appointments'));
-            }
-            else {
-                console.log(err);
-
-                if (err instanceof esErrors.NoConnections)
-                    messages = [{msg: that.req.i18n.__('Database connection error')}];
-                else
-                    messages = [{msg: that.req.i18n.__('Database error')}];
-
-                var services = [];
-                for (var i = 0; i < that.req.body.service.length; i++) {
-                    services.push({
-                        description: that.req.body.service[i],
-                        worker: {
-                            name: that.req.body.worker[i],
-                            color: that.getWorkerColor(that.req.body.worker[i], workers)
-                        },
-                        checked: that.req.body.enabled.indexOf(i.toString()) != -1
-                    });
-                }
-                params.services = services;
-                params.flash = {
-                    type: 'alert-danger',
-                    messages: messages
-                };
-                that.res.render('appointment', params);
-            }
+            common.indexCb(that.req, that.res, err, resp, newItem);
         });
     });
-
 };
+
 
 /**
  * Returns the color associated to the given worker.
@@ -807,69 +658,13 @@ AppointmentUtils.prototype.getWorkerColor = function(worker, workers) {
 };
 
 
-router.use(['/:id/appointments/new', '/:id/appointments/*edit'], function (req, res, next) {
+router.use(['/:id/appointments*'], function (req, res, next) {
     req.utils = new AppointmentUtils(req, res);
     next();
 });
 
-router.get('/:id/appointments/new', function(req, res, next) {
-    client.mget({
-        body: {
-            docs: [
-                {_index: req.config.mainIndex, _type: 'customer', _id: req.params.id},
-                {_index: req.config.mainIndex, _type: 'workers', _id: common.workersDocId},
-                {_index: req.config.mainIndex, _type: 'services', _id: common.servicesDocId}
-            ]
-        }
-    }, function(err, resp, respcode) {
-        var workers = [];
-        if (typeof resp.docs[1]._source !== 'undefined') {
-            workers = resp.docs[1]._source.workers;
-        }
-        var services = [];
-        if (resp.docs[2]._source) {
-            for (var i = 0; i < resp.docs[2]._source.names.length; i++) {
-                services.push({
-                    description: resp.docs[2]._source.names[i],
-                    worker: workers[0],
-                    checked: false
-                });
-            }
-        }
-        res.render('appointment', {
-            i18n: {
-                title: util.format(
-                    req.i18n.__('New appointment for %s'),
-                    getCustomerName(resp.docs[0]._source)),
-                info: req.i18n.__('Info'),
-                appointments: req.i18n.__('Appointments'),
-                date: req.i18n.__('Date'),
-                notes: req.i18n.__('Notes'),
-                addService: req.i18n.__('Add service'),
-                submit: req.i18n.__('Create appointment'),
-                setWorkersMsg: req.i18n.__(
-                    'To create an appointment, you have first to <a href="%s">define the workers.</a>',
-                    getUrl(req, '/settings/workers')),
-                setServicesMsg: req.i18n.__(
-                    'To create an appointment, you have first to <a href="%s">define the common services.</a>',
-                    getUrl(req, '/settings/services'))
-            },
-            infoUrl: getCustomerUrl(req, 'edit'),
-            isAppointmentsActive: true,
-            appointmentsUrl: getCustomerUrl(req, 'appointments'),
-            workers: workers,
-            date: common.toLocalFormattedDate(req, moment()),
-            services: services,
-            notes: ''
-        });
-    });
-});
 
-router.post('/:id/appointments/new', function(req, res, next) {
-    req.utils.handleForm(false);
-});
-
-router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
+router.get('/:id/appointments/:appnum', function(req, res, next) {
     client.mget({
         body: {
             docs: [
@@ -892,21 +687,7 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
                 checked: true
             });
 
-        res.render('appointment', {
-            i18n: {
-                title: util.format(
-                    req.i18n.__('Edit appointment for %s'),
-                    getCustomerName(resp.docs[0]._source)),
-                info: req.i18n.__('Info'),
-                appointments: req.i18n.__('Appointments'),
-                date: req.i18n.__('Date'),
-                notes: req.i18n.__('Notes'),
-                addService: req.i18n.__('Add service'),
-                submit: req.i18n.__('Edit appointment')
-            },
-            infoUrl: getCustomerUrl(req, 'edit'),
-            isAppointmentsActive: true,
-            appointmentsUrl: getCustomerUrl(req, 'appointments'),
+        res.json({
             workers: workers,
             date: common.toLocalFormattedDate(req, appointment.date),
             services: services,
@@ -915,11 +696,15 @@ router.get('/:id/appointments/:appnum/edit', function(req, res, next) {
     });
 });
 
-router.post('/:id/appointments/:appnum/edit', function(req, res, next) {
-    req.utils.handleForm(true);
+router.post('/:id/appointments', function(req, res, next) {
+    req.utils.handleForm();
 });
 
-router.post('/:id/appointments/:appnum/delete', function(req, res, next) {
+router.put('/:id/appointments/:appnum', function(req, res, next) {
+    req.utils.handleForm();
+});
+
+router.delete('/:id/appointments/:appnum', function(req, res, next) {
     client.get({
         index: req.config.mainIndex,
         type: 'customer',

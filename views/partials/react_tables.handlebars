@@ -49,20 +49,6 @@ var PopoverTemplate = React.createClass({
 
 
 var BaseTable = {
-  goToEditForm: function(event) {
-    window.location.href = $(event.currentTarget).data('edit-url');
-  },
-  deleteRow: function($target) {
-    var that = this;
-    $.ajax({
-      url: $target.data('delete-url'),
-      method: 'POST',
-      headers: {
-          'X-CSRF-Token': '{{csrftoken}}'
-      },
-      complete: that.updateTable
-    });
-  },
   updateTable: function(obj, status) {
     if (status === 'success') {
       this.props.updateTable();

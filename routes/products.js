@@ -383,7 +383,7 @@ router.post('/', function(req, res, next) {
     args.body = req.utils.toElasticsearchFormat(req.body);
     args.body.created_at = new Date().toISOString();
     client.index(args, function(err, resp, respcode) {
-        common.indexCb(req, res, err, true);
+        common.indexCb(req, res, err, resp, true);
     });
 });
 
@@ -403,7 +403,7 @@ router.put('/:id', function(req, res, next) {
     };
 
     client.update(args, function(err, resp, respcode) {
-        common.indexCb(req, res, err, false);
+        common.indexCb(req, res, err, resp, false);
     });
 });
 
