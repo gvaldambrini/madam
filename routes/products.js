@@ -19,29 +19,6 @@ router.use(function (request, response, next) {
   next();
 });
 
-/**
- * Helper function to build the url for a single product based route.
- * @function
- *
- * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
- * @param {string} route the base route path.
- * @param {string} [productId] the product id, which will be extracted from the request if not provided.
- */
-function getProductUrl(req, route, productId) {
-    var pid = typeof productId == 'undefined' ? req.params.id : productId;
-    return getProductsUrl(req, pid + '/' + route);
-}
-
-/**
- * Helper function to build the url for a product based route.
- * @function
- *
- * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
- * @param {string} route the base route path.
- */
-function getProductsUrl(req, route) {
-    return req.protocol + "://" + req.get('host') + productsPath + '/' + route;
-}
 
 /**
  * Parses the elasticsearch response and returns an array of objects that represent the products.
@@ -87,7 +64,6 @@ function processElasticsearchResults(req, resp) {
 
         obj = lookup[aggregations[i].hits.hits.hits[0]._id];
         results[results.length] = {
-            urlClone: getProductUrl(req, 'clone', obj._id),
             cloneText: req.i18n.__('Add another'),
             name: getField(obj, 'name', 'autocomplete'),
             brand: getField(obj, 'brand', 'autocomplete'),
@@ -159,16 +135,7 @@ router.get('/', function(req, res, next) {
                 submitAdd: req.i18n.__('Add product'),
                 submitEdit: req.i18n.__('Edit product'),
                 mandatoryFields: req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
-            },
-            productsData: {
-                headerName: req.i18n.__('Name'),
-                headerBrand: req.i18n.__('Brand'),
-                headerCount: req.i18n.__('Sold'),
-                emptyMsg: req.i18n.__('No products to display.'),
-                products: processElasticsearchResults(req, resp)
-            },
-            urlNew: getProductsUrl(req, 'new'),
-            urlSearch: getProductsUrl(req, 'search')
+            }
         });
     });
 });

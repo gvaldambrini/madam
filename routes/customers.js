@@ -20,53 +20,6 @@ router.use(function (request, response, next) {
   next();
 });
 
-/**
- * Helper function to build the url for a single customer based route.
- * @function
- *
- * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
- * @param {string} route the base route path.
- * @param {string} [customerId] the customer id, which will be extracted from the request if not provided.
- */
-function getCustomerUrl(req, route, customerId) {
-    var cid = typeof customerId == 'undefined' ? req.params.id : customerId;
-    return getCustomersUrl(req, cid + '/' + route);
-}
-
-/**
- * Helper function to build the url for a customer based route.
- * @function
- *
- * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
- * @param {string} route the base route path.
- */
-function getCustomersUrl(req, route) {
-    return req.protocol + "://" + req.get('host') + customersPath + '/' + route;
-}
-
-/**
- * Helper function to build an arbitrary url.
- * @function
- *
- * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
- * @param {string} the path.
- */
-function getUrl(req, path) {
-    return req.protocol + "://" + req.get('host') + path;
-}
-
-/**
- * Returns the full name of the customer.
- * @function
- *
- * @param {object} obj the customer object fetched from elasticsearch
- */
-function getCustomerName(obj) {
-    if (typeof obj.surname !== 'undefined') {
-        return obj.name + ' ' + obj.surname;
-    }
-    return obj.name;
-}
 
 /**
  * Updates the last_seen property of the given obj looping over the obj appointments.
@@ -276,23 +229,11 @@ router.get('/', function(req, res, next) {
                     notes: req.i18n.__('Notes'),
                     addService: req.i18n.__('Add service'),
                     setWorkersMsg: req.i18n.__(
-                        'To create an appointment, you have first to <a href="%s">define the workers.</a>',
-                        getUrl(req, '/settings/workers')),
+                        'To create an appointment, you have first to define the workers.'),
                     setServicesMsg: req.i18n.__(
-                        'To create an appointment, you have first to <a href="%s">define the common services.</a>',
-                        getUrl(req, '/settings/services'))
+                        'To create an appointment, you have first to define the common services.')
                 }
-            },
-            customersData: {
-                headerName: req.i18n.__('Name'),
-                headerSurname: req.i18n.__('Surname'),
-                headerPhone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
-                headerLastSeen: req.i18n.__('Last seen'),
-                emptyMsg: req.i18n.__('No customers to display.'),
-                customers: processElasticsearchResults(req, resp.hits.hits)
-            },
-            urlNew: getCustomersUrl(req, 'new'),
-            urlSearch: getCustomersUrl(req, 'search')
+            }
         });
     });
 });

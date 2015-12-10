@@ -215,7 +215,7 @@ var ProductsTable = React.createClass({
           <td className="no-padding">
             <span className="pull-right glyphicon glyphicon-plus"
               data-toggle="tooltip" data-placement="left"
-              title={product.cloneText} data-clone-url={product.urlClone}
+              title={product.cloneText}
               onClick={
                 function(event) {
                   that.history.pushState(null, '/clone/' + product.objects[0].id);
@@ -275,9 +275,8 @@ var Products = React.createClass({
 
   getInitialState: function() {
     return {
-      data: {{{json productsData}}},
-      filterText: '',
-      loaded: false
+      data: undefined,
+      filterText: ''
     };
   },
   componentWillMount: function() {
@@ -285,13 +284,12 @@ var Products = React.createClass({
   },
   search: function(text) {
     this.setState({
-      filterText: text,
-      loaded: true
+      filterText: text
     });
 
     var that = this;
     $.ajax({
-        url: '{{urlSearch}}',
+        url: '/products/search',
         data: {
           text: text
         },
@@ -308,14 +306,15 @@ var Products = React.createClass({
   },
   render: function() {
     var products;
+    if (typeof this.state.data === 'undefined') {
+      return <div></div>;
+    }
+
     if (this.state.data.products.length > 0) {
       products = <ProductsTable data={this.state.data} updateTable={this.updateTable}/>;
     }
-    else if (this.state.loaded) {
-      products = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;
-    }
     else {
-      products = <div></div>;
+      products = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;
     }
 
     return (
@@ -336,7 +335,7 @@ var Products = React.createClass({
   }
 });
 
-var Root = React.createClass({
+var ProductsRoot = React.createClass({
   render: function() {
     return (
       <div>
@@ -348,7 +347,7 @@ var Root = React.createClass({
 
 var routes = function() {
   return (
-    <Route path="/" component={Root}>
+    <Route path="/" component={ProductsRoot}>
       <IndexRoute component={Products}/>
       <Route path="new" component={ProductForm}/>
       <Route path="edit/:id" component={ProductForm}/>

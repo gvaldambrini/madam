@@ -867,7 +867,7 @@ var Customers = React.createClass({
 
   getInitialState: function() {
     return {
-      data: {{{json customersData}}},
+      data: undefined,
       filterText: ''
     };
   },
@@ -882,7 +882,7 @@ var Customers = React.createClass({
 
     var that = this;
     $.ajax({
-        url: '{{urlSearch}}',
+        url: '/customers/search',
         data: {
           text: text
         },
@@ -898,6 +898,10 @@ var Customers = React.createClass({
     this.search(this.state.filterText);
   },
   render: function() {
+    if (typeof this.state.data === 'undefined') {
+      return <div></div>
+    }
+
     var customers;
     if (this.state.data.customers.length > 0) {
       customers = <CustomersTable data={this.state.data} updateTable={this.updateTable}/>;
@@ -924,7 +928,7 @@ var Customers = React.createClass({
 });
 
 
-var Root = React.createClass({
+var CustomersRoot = React.createClass({
   render: function() {
     return (
       <div>
@@ -937,7 +941,7 @@ var Root = React.createClass({
 
 var routes = function() {
   return (
-    <Route path="/" component={Root}>
+    <Route path="/" component={CustomersRoot}>
       <IndexRoute component={Customers}/>
       <Route path="new" component={Customer}>
         <IndexRoute component={CustomerForm}/>
