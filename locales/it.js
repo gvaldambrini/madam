@@ -64,7 +64,7 @@
 	"Unlock": "Sblocca",
 	"Save services": "Salva servizi",
 	"Save workers": "Salva lavoratori",
-	"Fields marked with <span className=\"mandatory\">*</span> are mandatory.": "I campi marcati con <span className=\"mandatory\">*</span> sono obbligatori.",
+	"Fields marked with <span class=\"mandatory\">*</span> are mandatory.": "I campi marcati con <span class=\"mandatory\">*</span> sono obbligatori.",
 	"Create customer and appointment": "Crea cliente e appuntamento",
 	"Edit %s": "Modifica %s",
 	"Edit appointment": "Modifica appuntamento",

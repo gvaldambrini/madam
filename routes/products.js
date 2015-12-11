@@ -120,21 +120,23 @@ router.get('/', function(req, res, next) {
 
         res.render('products', {
             i18n: {
-                title: req.i18n.__('Products'),
-                addNewProduct: req.i18n.__('Add product'),
-                editProduct: req.i18n.__('Edit product'),
-                search: req.i18n.__('Search...'),
-                btnConfirm: req.i18n.__('Confirm'),
-                btnCancel: req.i18n.__('Cancel'),
-                deleteTitle: req.i18n.__('Delete the product?'),
-                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
-                name: req.i18n.__('Name'),
-                brand: req.i18n.__('Brand'),
-                sold_date: req.i18n.__('Sold date'),
-                notes: req.i18n.__('Notes'),
-                submitAdd: req.i18n.__('Add product'),
-                submitEdit: req.i18n.__('Edit product'),
-                mandatoryFields: req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
+                products: {
+                    title: req.i18n.__('Products'),
+                    addNew: req.i18n.__('Add product'),
+                    edit: req.i18n.__('Edit product'),
+                    search: req.i18n.__('Search...'),
+                    btnConfirm: req.i18n.__('Confirm'),
+                    btnCancel: req.i18n.__('Cancel'),
+                    deleteTitle: req.i18n.__('Delete the product?'),
+                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
+                    name: req.i18n.__('Name'),
+                    brand: req.i18n.__('Brand'),
+                    sold_date: req.i18n.__('Sold date'),
+                    notes: req.i18n.__('Notes'),
+                    submitAdd: req.i18n.__('Add product'),
+                    submitEdit: req.i18n.__('Edit product'),
+                    mandatoryFields: req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.')
+                }
             }
         });
     });

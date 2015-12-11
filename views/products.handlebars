@@ -11,6 +11,7 @@ var Route = ReactRouter.Route;
 var IndexRoute = ReactRouter.IndexRoute;
 var History = ReactRouter.History;
 
+var i18n = {{{json i18n}}};
 
 var ProductForm = React.createClass({
   mixins: [ History ],
@@ -86,15 +87,20 @@ var ProductForm = React.createClass({
       });
     }
   },
+  renderHtml(element) {
+    return {
+      __html: element
+    }
+  },
   render: function() {
     var submitText, formTitle;
     if (this.state.editForm) {
-      submitText = '{{i18n.submitEdit}}';
-      formTitle = '{{i18n.editProduct}}';
+      submitText = i18n.products.submitEdit;
+      formTitle = i18n.products.edit;
     }
     else {
-      submitText = '{{i18n.submitAdd}}';
-      formTitle = '{{i18n.addNewProduct}}';
+      submitText = i18n.products.submitAdd;
+      formTitle = i18n.products.addNew;
     }
 
     var errors;
@@ -121,21 +127,21 @@ var ProductForm = React.createClass({
               <h4 className="col-sm-10 col-sm-offset-2">{formTitle}</h4>
             </div>
             <div className="form-group">
-              <div className="col-sm-10 col-sm-offset-2 mandatory-fields">
-                {{{i18n.mandatoryFields}}}
+              <div className="col-sm-10 col-sm-offset-2 mandatory-fields"
+              dangerouslySetInnerHTML={this.renderHtml(i18n.products.mandatoryFields)}>
               </div>
             </div>
 
             <FormInput type='text' name='name' value={this.state.data.name}
-              label='{{i18n.name}}' focus={true} mandatory={true}
+              label={i18n.products.name} focus={true} mandatory={true}
               handleChange={this.handleChange}/>
             <FormInput type='text' name='brand' value={this.state.data.brand}
-              label='{{i18n.brand}}' handleChange={this.handleChange}/>
+              label={i18n.products.brand} handleChange={this.handleChange}/>
             <FormInputDate name='sold_date' value={this.state.data.sold_date}
-              label='{{i18n.sold_date}}' orientation='top'
+              label={i18n.products.sold_date} orientation='top'
               handleChange={this.handleChange}/>
             <FormTextArea name='notes' value={this.state.data.notes}
-              label='{{i18n.notes}}'
+              label={i18n.products.notes}
               handleChange={this.handleChange}/>
 
             <div className="form-group">
@@ -192,8 +198,8 @@ var ProductsTable = React.createClass({
                       $span.tooltip();
                       $span.confirmPopover({
                         template: '#popover-template',
-                        title: '{{i18n.deleteTitle}}',
-                        content: '{{i18n.deleteMsg}}',
+                        title: i18n.products.deleteTitle,
+                        content: i18n.products.deleteMsg,
                         $rootContainer: $('#products-table-container'),
                         onConfirm: function() {
                           that.deleteItem($span.data('obj-id'));
@@ -320,15 +326,15 @@ var Products = React.createClass({
     return (
       <div>
         <div className="content-header">
-          <Link className='btn btn-primary' to="/new">{{i18n.addNewProduct}}</Link>
+          <Link className='btn btn-primary' to="/new">{i18n.products.addNew}</Link>
 
-          <InputSearch search={this.search} />
+          <InputSearch search={this.search} placeholder={i18n.products.search} />
         </div>
         <div id="products-table-container" className="content-body">
           {products}
         </div>
         <div id="popover-template">
-          <PopoverTemplate confirm='{{i18n.btnConfirm}}' cancel='{{i18n.btnCancel}}'/>
+          <PopoverTemplate confirm={i18n.products.btnConfirm} cancel={i18n.products.btnCancel}/>
         </div>
       </div>
     );

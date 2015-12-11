@@ -185,16 +185,12 @@ router.get('/', function(req, res, next) {
         res.render('customers', {
             i18n: {
                 title: req.i18n.__('Customers'),
-                createNewCustomer: req.i18n.__('Create new customer'),
-                editCustomer: req.i18n.__('Edit customer'),
-                search: req.i18n.__('Search...'),
-                btnConfirm: req.i18n.__('Confirm'),
-                btnCancel: req.i18n.__('Cancel'),
-                deleteTitle: req.i18n.__('Delete the customer?'),
-                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
-                headerInfo: req.i18n.__('Info'),
-                headerAppointments: req.i18n.__('Appointments'),
-                customer: {
+                customers: {
+                    search: req.i18n.__('Search...'),
+                    createNew: req.i18n.__('Create new customer'),
+                    edit: req.i18n.__('Edit customer'),
+                    submitAndAdd: req.i18n.__('Create customer and appointment'),
+                    mandatoryFields: req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.'),
                     name: req.i18n.__('Name'),
                     surname: req.i18n.__('Surname'),
                     mobile_phone: req.i18n.__('Mobile Phone'),
@@ -205,10 +201,14 @@ router.get('/', function(req, res, next) {
                     first_seen: req.i18n.__('First seen'),
                     discount: req.i18n.__('Discount'),
                     notes: req.i18n.__('Notes'),
+                    headerInfo: req.i18n.__('Info'),
+                    headerAppointments: req.i18n.__('Appointments'),
+                    deleteTitle: req.i18n.__('Delete the customer?'),
+                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
+                    btnConfirm: req.i18n.__('Confirm'),
+                    btnCancel: req.i18n.__('Cancel'),
                     submitAdd: req.i18n.__('Create customer'),
-                    submitEdit: req.i18n.__('Edit customer'),
-                    submitAndAdd: req.i18n.__('Create customer and appointment'),
-                    mandatoryFields: req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
+                    submitEdit: req.i18n.__('Edit customer')
                 },
                 appointments: {
                     title: req.i18n.__('Appointments'),
@@ -218,14 +218,11 @@ router.get('/', function(req, res, next) {
                     btnConfirm: req.i18n.__('Confirm'),
                     btnCancel: req.i18n.__('Cancel'),
                     deleteTitle: req.i18n.__('Delete the appointment?'),
-                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?')
-                },
-                appointment: {
+                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
                     titleNew: req.i18n.__('New appointment'),
                     titleEdit: req.i18n.__('Edit appointment'),
                     submitAdd: req.i18n.__('Create appointment'),
                     submitEdit: req.i18n.__('Edit appointment'),
-                    date: req.i18n.__('Date'),
                     notes: req.i18n.__('Notes'),
                     addService: req.i18n.__('Add service'),
                     setWorkersMsg: req.i18n.__(

@@ -23,19 +23,21 @@ router.use(function (request, response, next) {
 router.get('/', function(req, res, next) {
     res.render('settings', {
         i18n: {
-            workersName: req.i18n.__('Workers'),
-            servicesName: req.i18n.__('Services'),
-            workers: {
-                title: req.i18n.__('Set workers'),
-                name: req.i18n.__('Name'),
-                unlock: req.i18n.__('Unlock'),
-                save: req.i18n.__('Save workers')
-            },
-            services: {
-                title: req.i18n.__('Set services'),
-                name: req.i18n.__('Name'),
-                unlock: req.i18n.__('Unlock'),
-                save: req.i18n.__('Save services')
+            settings: {
+                workersName: req.i18n.__('Workers'),
+                servicesName: req.i18n.__('Services'),
+                workers: {
+                    title: req.i18n.__('Set workers'),
+                    name: req.i18n.__('Name'),
+                    unlock: req.i18n.__('Unlock'),
+                    save: req.i18n.__('Save workers')
+                },
+                services: {
+                    title: req.i18n.__('Set services'),
+                    name: req.i18n.__('Name'),
+                    unlock: req.i18n.__('Unlock'),
+                    save: req.i18n.__('Save services')
+                }
             }
         }
     });

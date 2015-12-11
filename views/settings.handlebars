@@ -9,6 +9,8 @@ var IndexRoute = ReactRouter.IndexRoute;
 var History = ReactRouter.History;
 var IndexRedirect = ReactRouter.IndexRedirect;
 
+var i18n = {{{json i18n}}};
+
 var BaseRow = {
   add: function(event) {
     event.preventDefault();
@@ -297,7 +299,7 @@ var ServicesForm = React.createClass({
       <SettingsRow value={item.name}
         key={item.id} rowId={item.id}
         index={index}
-        label='{{{i18n.name}}}'
+        label={i18n.settings.services.name}
         addRow={this.addRow}
         removeRow={this.removeRow}
         disabled={this.state.disabled}
@@ -516,7 +518,7 @@ var WorkersForm = React.createClass({
       <SettingsColorRow name={item.name} color={item.color}
         key={item.id} rowId={item.id}
         index={index}
-        label='{{{i18n.name}}}'
+        label={i18n.settings.workers.name}
         addRow={this.addRow}
         removeRow={this.removeRow}
         disabled={this.state.disabled}
@@ -533,10 +535,10 @@ var Root = React.createClass({
         <div className="content-header">
           <ul>
             <li role="presentation">
-              <Link to="/workers" activeClassName="active">{this.props.route.i18n.workersName}</Link>
+              <Link to="/workers" activeClassName="active">{i18n.settings.workersName}</Link>
             </li>
             <li role="presentation">
-              <Link to="/services" activeClassName="active">{this.props.route.i18n.servicesName}</Link>
+              <Link to="/services" activeClassName="active">{i18n.settings.servicesName}</Link>
             </li>
           </ul>
         </div>
@@ -547,12 +549,11 @@ var Root = React.createClass({
 });
 
 var routes = function() {
-  var i18n = {{{json i18n}}};
   return (
-    <Route path="/" i18n={i18n} component={Root}>
+    <Route path="/" component={Root}>
       <IndexRedirect from="/" to="workers" />
-      <Route path="workers" i18n={i18n.workers} component={WorkersForm}/>
-      <Route path="services" i18n={i18n.services} component={ServicesForm}/>
+      <Route path="workers" i18n={i18n.settings.workers} component={WorkersForm}/>
+      <Route path="services" i18n={i18n.settings.services} component={ServicesForm}/>
     </Route>
   )
 };

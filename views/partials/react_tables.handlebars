@@ -10,7 +10,7 @@ var InputSearch = React.createClass({
     return (
       <form className="search-form">
         <input id="search-input" type="text"
-          placeholder="{{i18n.search}}" className="form-control"
+          placeholder={this.props.placeholder} className="form-control"
           onChange={this.search}/>
         <span id="search-clear" className="glyphicon glyphicon-remove-circle"
           onClick={this.resetSearch}></span>
