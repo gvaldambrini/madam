@@ -29,29 +29,6 @@
     {{/if}}
 </head>
 <body>
-    {{> navbar show-toggle=true}}
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-2 sidebar collapse">
-                <ul class="nav nav-sidebar">
-                    <li {{#if isHomeActive}}class="active"{{/if}}>
-                        <a href="/">{{{__ 'Home'}}}</a>
-                    </li>
-                    <li {{#if isCustomersActive}}class="active"{{/if}}>
-                        <a href="/customers">{{{__ 'Customers'}}}</a>
-                    </li>
-                    <li {{#if isProductsActive}}class="active"{{/if}}>
-                        <a href="/products">{{{__ 'Products'}}}</a>
-                    </li>
-                    <li {{#if isSettingsActive}}class="active"{{/if}}>
-                        <a href="/settings">{{{__ 'Settings'}}}</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-sm-10 col-sm-offset-2 main">
-                {{{body}}}
-            </div>
-        </div>
-    </div>
+    {{{body}}}
 </body>
 </html>

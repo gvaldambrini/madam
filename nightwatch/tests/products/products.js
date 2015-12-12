@@ -24,7 +24,7 @@ module.exports = {
         name: 'shampoo',
         brand: 'oreal'})
       .page.Product().submit()
-      .pause(300)
+      .pause(200)
       .page.Products().alertNotPresent()
       .page.Products().tableCount(1)
       .page.Products().tableContains(0, 'shampoo', 'oreal', '1')
@@ -37,6 +37,7 @@ module.exports = {
         sold_date: '18/09/2015',
         notes: 'first'})
       .page.Product().submit()
+      .pause(500)
       .page.Products().tableCount(2)
       .page.Products().tableContains(1, 'shampoo', 'wella', '1')
       .page.Products().nestedTableCount(1, 1)

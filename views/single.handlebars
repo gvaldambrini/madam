@@ -1,0 +1,99 @@
+{{> navbar show-toggle=true}}
+<div class="container-fluid" id="main-container">
+</div>
+
+<script type="text/babel">
+
+var Link = ReactRouter.Link;
+var IndexLink = ReactRouter.IndexLink;
+var Router = ReactRouter.Router;
+var Route = ReactRouter.Route;
+var IndexRoute = ReactRouter.IndexRoute;
+var History = ReactRouter.History;
+var IndexRedirect = ReactRouter.IndexRedirect;
+
+{{>react_forms}}
+{{>react_tables}}
+
+var i18n = {{{json i18n}}};
+
+{{>appointments}}
+{{>customers}}
+{{>products}}
+{{>settings}}
+
+var Sidebar = React.createClass({
+  render: function() {
+    return (
+      <div className="col-sm-2 sidebar collapse">
+        <ul className="nav nav-sidebar">
+          <li>
+            <IndexLink activeClassName="active" to="/">{{{__ 'Home'}}}</IndexLink>
+          </li>
+          <li>
+            <Link activeClassName="active" to="/customers">{{{__ 'Customers'}}}</Link>
+          </li>
+          <li>
+            <Link activeClassName="active" to="/products">{{{__ 'Products'}}}</Link>
+          </li>
+          <li>
+            <Link activeClassName="active" to="/settings">{{{__ 'Settings'}}}</Link>
+          </li>
+        </ul>
+      </div>
+    );
+  }
+});
+
+var Root = React.createClass({
+  render: function() {
+    return (
+      <div className="row">
+        <Sidebar/>
+        <div className="col-sm-10 col-sm-offset-2 main">
+          {this.props.children}
+        </div>
+      </div>
+    );
+  }
+});
+
+
+var routes = function() {
+  return (
+    <Route path="/" component={Root}>
+      <Route path="customers" component={CustomersRoot}>
+        <IndexRoute component={Customers}/>
+        <Route path="new" component={Customer}>
+          <IndexRoute component={CustomerForm}/>
+        </Route>
+        <Route path="edit/:id" component={Customer}>
+          <IndexRoute component={CustomerForm}/>
+          <Route path="appointments" component={AppointmentsRoot}>
+            <IndexRoute component={Appointments}/>
+            <Route path="new" component={Appointment}/>
+            <Route path="edit/:appnum" component={Appointment}/>
+          </Route>
+        </Route>
+      </Route>
+      <Route path="products" component={ProductsRoot}>
+        <IndexRoute component={Products}/>
+        <Route path="new" component={ProductForm}/>
+        <Route path="edit/:id" component={ProductForm}/>
+        <Route path="clone/:id" component={ProductForm}/>
+      </Route>
+      <Route path="settings" component={SettingsRoot}>
+        <IndexRedirect from="/" to="workers" />
+        <Route path="workers" i18n={i18n.settings.workers} component={WorkersForm}/>
+        <Route path="services" i18n={i18n.settings.services} component={ServicesForm}/>
+      </Route>
+    </Route>
+  )
+};
+
+ReactDOM.render(
+  <Router routes={routes()}/>,
+  document.getElementById('main-container')
+);
+
+</script>

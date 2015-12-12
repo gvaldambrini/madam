@@ -26,6 +26,7 @@ module.exports = {
         mobile: '3335544333',
         phone: '055055055'})
       .page.Customer().submit()
+      .pause(200)
       .page.Customers().alertNotPresent()
       .page.Customers().tableCount(1)
       .page.Customers().tableContains(
@@ -36,6 +37,7 @@ module.exports = {
         name: 'Jon',
         surname: 'Snow'})
       .page.Customer().submit()
+      .pause(200)
       .page.Customers().tableCount(2)
       .page.Customers().tableContains(1, 'Jon', 'Snow', '-', '-')
       .end();
@@ -64,6 +66,7 @@ module.exports = {
         surname: 'Stark',
         email: 'notanymore@bastard.com'})
       .page.Customer().submit()
+      .pause(200)
       .page.Customers().tableContains(1, 'Jon', 'Stark', '-', '-')
       .end();
   },

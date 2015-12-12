@@ -25,8 +25,7 @@ module.exports = {
 
       .page.Appointments().alertContains(
         'To create an appointment, you have first to define the workers.')
-      //.page.Appointments().followAlertLink()
-      .page.Sidebar().goToSettings()
+      .page.Appointments().followAlertLink()
       .page.Workers().enableEdit()
       .page.Workers().set(0, {name: 'Cersei', color: '#fdd017'})
       .page.Workers().add()
@@ -41,9 +40,7 @@ module.exports = {
 
       .page.Appointments().alertContains(
         'To create an appointment, you have first to define the common services.')
-      .page.Sidebar().goToSettings()
-      .page.Workers().goToServices()
-      //.page.Appointments().followAlertLink()
+      .page.Appointments().followAlertLink()
       .page.Services().enableEdit()
       .page.Services().set(0, 'shampoo')
       .page.Services().add()

@@ -1,17 +1,3 @@
-<div id="products-view"></div>
-
-<script type="text/babel">
-
-{{>react_forms}}
-{{>react_tables}}
-
-var Link = ReactRouter.Link;
-var Router = ReactRouter.Router;
-var Route = ReactRouter.Route;
-var IndexRoute = ReactRouter.IndexRoute;
-var History = ReactRouter.History;
-
-var i18n = {{{json i18n}}};
 
 var ProductForm = React.createClass({
   mixins: [ History ],
@@ -64,7 +50,7 @@ var ProductForm = React.createClass({
       data: JSON.stringify(this.state.data),
       contentType: 'application/json',
       success: function() {
-        that.history.pushState(null, `/`);
+        that.history.pushState(null, `/products`);
       },
       error: function(xhr, textStatus, errorThrown) {
         var errors = [];
@@ -178,7 +164,7 @@ var ProductsTable = React.createClass({
         return (
           <tr key={object.id} onClick={
             function(event) {
-              that.history.pushState(null, '/edit/' + object.id);
+              that.history.pushState(null, '/products/edit/' + object.id);
               event.preventDefault();
               event.stopPropagation();
             }
@@ -224,7 +210,7 @@ var ProductsTable = React.createClass({
               title={product.cloneText}
               onClick={
                 function(event) {
-                  that.history.pushState(null, '/clone/' + product.objects[0].id);
+                  that.history.pushState(null, '/products/clone/' + product.objects[0].id);
                   event.preventDefault();
                   event.stopPropagation();
                 }
@@ -326,7 +312,7 @@ var Products = React.createClass({
     return (
       <div>
         <div className="content-header">
-          <Link className='btn btn-primary' to="/new">{i18n.products.addNew}</Link>
+          <Link className='btn btn-primary' to="/products/new">{i18n.products.addNew}</Link>
 
           <InputSearch search={this.search} placeholder={i18n.products.search} />
         </div>
@@ -350,21 +336,3 @@ var ProductsRoot = React.createClass({
     );
   }
 });
-
-var routes = function() {
-  return (
-    <Route path="/" component={ProductsRoot}>
-      <IndexRoute component={Products}/>
-      <Route path="new" component={ProductForm}/>
-      <Route path="edit/:id" component={ProductForm}/>
-      <Route path="clone/:id" component={ProductForm}/>
-    </Route>
-  )
-};
-
-ReactDOM.render(
-  <Router routes={routes()}/>,
-  document.getElementById('products-view')
-);
-
-</script>

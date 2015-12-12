@@ -356,7 +356,7 @@ var Appointment = React.createClass({
       data: JSON.stringify(data),
       contentType: 'application/json',
       success: function() {
-        that.history.pushState(null, '/edit/' + that.props.params.id + '/appointments');
+        that.history.pushState(null, '/customers/edit/' + that.props.params.id + '/appointments');
       },
       error: function(xhr, textStatus, errorThrown) {
         var errors = [];
@@ -379,7 +379,7 @@ var Appointment = React.createClass({
       return (
         <div id="appointment-view">
           <div className="alert alert-danger" role="alert">
-            {i18n.appointments.setWorkersMsg}
+            <Link to="/settings/workers">{i18n.appointments.setWorkersMsg}</Link>
           </div>
         </div>
       );
@@ -389,7 +389,7 @@ var Appointment = React.createClass({
       return (
         <div id="appointment-view">
           <div className="alert alert-danger" role="alert">
-            {i18n.appointments.setServicesMsg}
+            <Link to="/settings/services">{i18n.appointments.setServicesMsg}</Link>
           </div>
         </div>
       );
@@ -444,7 +444,7 @@ var AppointmentsTable = React.createClass({
         <tr key={appointment.id} onClick={
             function(event) {
               that.history.pushState(
-                null, '/edit/' + that.props.customer + '/appointments/edit/' + appointment.id);
+                null, '/customers/edit/' + that.props.customer + '/appointments/edit/' + appointment.id);
               event.preventDefault();
               event.stopPropagation();
             }
@@ -538,7 +538,7 @@ var Appointments = React.createClass({
 
     return (
       <div className="content-body">
-        <Link to={`/edit/${this.props.params.id}/appointments/new`} className='btn btn-primary'>
+        <Link to={`/customers/edit/${this.props.params.id}/appointments/new`} className='btn btn-primary'>
           {i18n.appointments.createNew}
         </Link>
         {table}

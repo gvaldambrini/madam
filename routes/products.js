@@ -13,12 +13,6 @@ var productsPath = '/products';
 var moment = require('moment');
 
 router.use(common.isAuthenticated);
-router.use(function (request, response, next) {
-  // everything inside this file is under the active view 'products'
-  response.locals.isProductsActive = true;
-  next();
-});
-
 
 /**
  * Parses the elasticsearch response and returns an array of objects that represent the products.
@@ -104,43 +98,6 @@ var aggregate_product = {
       }
     }
 };
-
-router.get('/', function(req, res, next) {
-    client.search({
-        index: req.config.mainIndex,
-        type: 'product',
-        size: 50,
-        body: {
-            query: {
-                match_all: {}
-            },
-            aggs: aggregate_product
-        }
-    }, function(err, resp, respcode) {
-
-        res.render('products', {
-            i18n: {
-                products: {
-                    title: req.i18n.__('Products'),
-                    addNew: req.i18n.__('Add product'),
-                    edit: req.i18n.__('Edit product'),
-                    search: req.i18n.__('Search...'),
-                    btnConfirm: req.i18n.__('Confirm'),
-                    btnCancel: req.i18n.__('Cancel'),
-                    deleteTitle: req.i18n.__('Delete the product?'),
-                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
-                    name: req.i18n.__('Name'),
-                    brand: req.i18n.__('Brand'),
-                    sold_date: req.i18n.__('Sold date'),
-                    notes: req.i18n.__('Notes'),
-                    submitAdd: req.i18n.__('Add product'),
-                    submitEdit: req.i18n.__('Edit product'),
-                    mandatoryFields: req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.')
-                }
-            }
-        });
-    });
-});
 
 router.get('/search', function(req, res, next) {
     var queryBody;

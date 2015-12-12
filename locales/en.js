@@ -71,5 +71,6 @@
 	"Set workers": "Set workers",
 	"Set services": "Set services",
 	"Settings": "Settings",
-	"New appointment": "New appointment"
+	"New appointment": "New appointment",
+	"MadamPettine": "MadamPettine"
 }

@@ -14,12 +14,6 @@ var moment = require('moment');
 var util = require('util');
 
 router.use(common.isAuthenticated);
-router.use(function (request, response, next) {
-  // everything inside this file is under the active view 'customers'
-  response.locals.isCustomersActive = true;
-  next();
-});
-
 
 /**
  * Updates the last_seen property of the given obj looping over the obj appointments.
@@ -167,70 +161,6 @@ router.get('/search', function(req, res, next) {
             headerLastSeen: req.i18n.__('Last seen'),
             emptyMsg: req.i18n.__('No customers to display.'),
             customers: processElasticsearchResults(req, resp.hits.hits)
-        });
-    });
-});
-
-router.get('/', function(req, res, next) {
-    client.search({
-        index: req.config.mainIndex,
-        type: 'customer',
-        size: 50,
-        body: {
-            query: {
-                match_all: {}
-            }
-        }
-    }, function(err, resp, respcode) {
-        res.render('customers', {
-            i18n: {
-                title: req.i18n.__('Customers'),
-                customers: {
-                    search: req.i18n.__('Search...'),
-                    createNew: req.i18n.__('Create new customer'),
-                    edit: req.i18n.__('Edit customer'),
-                    submitAndAdd: req.i18n.__('Create customer and appointment'),
-                    mandatoryFields: req.i18n.__('Fields marked with <span class="mandatory">*</span> are mandatory.'),
-                    name: req.i18n.__('Name'),
-                    surname: req.i18n.__('Surname'),
-                    mobile_phone: req.i18n.__('Mobile Phone'),
-                    allow_sms: req.i18n.__('Allow sms'),
-                    phone: req.i18n.__('Phone'),
-                    email: req.i18n.__('Email'),
-                    allow_email: req.i18n.__('Allow email'),
-                    first_seen: req.i18n.__('First seen'),
-                    discount: req.i18n.__('Discount'),
-                    notes: req.i18n.__('Notes'),
-                    headerInfo: req.i18n.__('Info'),
-                    headerAppointments: req.i18n.__('Appointments'),
-                    deleteTitle: req.i18n.__('Delete the customer?'),
-                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
-                    btnConfirm: req.i18n.__('Confirm'),
-                    btnCancel: req.i18n.__('Cancel'),
-                    submitAdd: req.i18n.__('Create customer'),
-                    submitEdit: req.i18n.__('Edit customer')
-                },
-                appointments: {
-                    title: req.i18n.__('Appointments'),
-                    date: req.i18n.__('Date'),
-                    services: req.i18n.__('Services'),
-                    createNew: req.i18n.__('Create new appointment'),
-                    btnConfirm: req.i18n.__('Confirm'),
-                    btnCancel: req.i18n.__('Cancel'),
-                    deleteTitle: req.i18n.__('Delete the appointment?'),
-                    deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
-                    titleNew: req.i18n.__('New appointment'),
-                    titleEdit: req.i18n.__('Edit appointment'),
-                    submitAdd: req.i18n.__('Create appointment'),
-                    submitEdit: req.i18n.__('Edit appointment'),
-                    notes: req.i18n.__('Notes'),
-                    addService: req.i18n.__('Add service'),
-                    setWorkersMsg: req.i18n.__(
-                        'To create an appointment, you have first to define the workers.'),
-                    setServicesMsg: req.i18n.__(
-                        'To create an appointment, you have first to define the common services.')
-                }
-            }
         });
     });
 });

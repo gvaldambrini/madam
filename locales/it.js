@@ -71,5 +71,6 @@
 	"Set workers": "Definisci i lavoratori",
 	"Set services": "Definisci i servizi",
 	"Settings": "Impostazioni",
-	"New appointment": "Nuovo appuntamento"
+	"New appointment": "Nuovo appuntamento",
+	"MadamPettine": "MadamPettine"
 }

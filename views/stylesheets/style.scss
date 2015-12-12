@@ -137,9 +137,9 @@ $sidebar-padding: 20px;
   padding-left: $sidebar-padding;
 }
 
-.nav-sidebar > .active > a,
-.nav-sidebar > .active > a:hover,
-.nav-sidebar > .active > a:focus {
+.nav-sidebar a.active,
+.nav-sidebar a.active:hover,
+.nav-sidebar a.active:focus {
   color: #fff;
   background-color: $primary-color;
 }
