@@ -1,5 +1,4 @@
-{{> navbar show-toggle=true}}
-<div class="container-fluid" id="main-container">
+<div id="main-container">
 </div>
 
 <script type="text/babel">
@@ -21,6 +20,8 @@ var i18n = {{{json i18n}}};
 {{>customers}}
 {{>products}}
 {{>settings}}
+{{>login}}
+
 
 var Sidebar = React.createClass({
   render: function() {
@@ -45,6 +46,62 @@ var Sidebar = React.createClass({
   }
 });
 
+
+var Navbar = React.createClass({
+  mixins: [History],
+  render: function() {
+    var that = this;
+    var logout;
+    if (this.props.getUser()) {
+      logout =  (
+        <div className="navbar-user">
+          {this.props.getUser()}
+          <div>
+            <a href="#" onClick={
+              function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                $.ajax({
+                  url: '/logout',
+                  method: 'post',
+                  success: function() {
+                    that.props.setUser(null);
+                    that.history.pushState(null, `/login`);
+                  }
+                });
+
+              }
+            }>logout</a>
+          </div>
+        </div>
+      );
+    }
+
+    var toggle;
+    if (this.props.showToggle) {
+      toggle = (
+        <button type="button" className="navbar-toggle" data-toggle="collapse" data-target=".sidebar">
+          <span className="sr-only">Toggle navigation</span>
+          <span className="icon-bar"></span>
+          <span className="icon-bar"></span>
+          <span className="icon-bar"></span>
+        </button>
+      );
+    }
+    return (
+      <nav className="navbar navbar-inverse navbar-fixed-top">
+          <div className="navbar-logo">
+              <Link className="logo" to="/"></Link>
+          </div>
+          {logout}
+          {toggle}
+      </nav>
+    );
+  }
+});
+
+
 var Root = React.createClass({
   render: function() {
     return (
@@ -59,40 +116,79 @@ var Root = React.createClass({
 });
 
 
-var routes = function() {
-  return (
-    <Route path="/" component={Root}>
-      <Route path="customers" component={CustomersRoot}>
-        <IndexRoute component={Customers}/>
-        <Route path="new" component={Customer}>
-          <IndexRoute component={CustomerForm}/>
-        </Route>
-        <Route path="edit/:id" component={Customer}>
-          <IndexRoute component={CustomerForm}/>
-          <Route path="appointments" component={AppointmentsRoot}>
-            <IndexRoute component={Appointments}/>
-            <Route path="new" component={Appointment}/>
-            <Route path="edit/:appnum" component={Appointment}/>
+var App = React.createClass({
+  render: function() {
+    var showToggle = this.props.route.getUser() !== null;
+    return (
+      <div className="container-fluid">
+        <Navbar
+          getUser={this.props.route.getUser}
+          setUser={this.props.route.setUser}
+          showToggle={showToggle} />
+        {this.props.children}
+      </div>
+    );
+  }
+});
+
+
+var AppRouter = React.createClass({
+  getInitialState: function() {
+    return {
+      user: null
+    };
+  },
+  setUser: function(newUser) {
+    this.setState({user: newUser});
+  },
+  getUser: function() {
+    return this.state.user;
+  },
+  requireAuth: function(nextState, replaceState) {
+    if (!this.state.user) {
+      replaceState({ nextPathname: nextState.location.pathname }, '/login')
+    }
+  },
+  render: function() {
+    return (
+      <Router>
+        <Route component={App} getUser={this.getUser} setUser={this.setUser}>
+          <Route path="/" component={Root} onEnter={this.requireAuth}>
+            <Route path="customers" component={CustomersRoot}>
+              <IndexRoute component={Customers}/>
+              <Route path="new" component={Customer}>
+                <IndexRoute component={CustomerForm}/>
+              </Route>
+              <Route path="edit/:id" component={Customer}>
+                <IndexRoute component={CustomerForm}/>
+                <Route path="appointments" component={AppointmentsRoot}>
+                  <IndexRoute component={Appointments}/>
+                  <Route path="new" component={Appointment}/>
+                  <Route path="edit/:appnum" component={Appointment}/>
+                </Route>
+              </Route>
+            </Route>
+            <Route path="products" component={ProductsRoot}>
+              <IndexRoute component={Products}/>
+              <Route path="new" component={ProductForm}/>
+              <Route path="edit/:id" component={ProductForm}/>
+              <Route path="clone/:id" component={ProductForm}/>
+            </Route>
+            <Route path="settings" component={SettingsRoot}>
+              <IndexRedirect from="/" to="workers" />
+              <Route path="workers" i18n={i18n.settings.workers} component={WorkersForm}/>
+              <Route path="services" i18n={i18n.settings.services} component={ServicesForm}/>
+            </Route>
           </Route>
+          <Route path="/login" component={LoginForm} setUser={this.setUser}/>
         </Route>
-      </Route>
-      <Route path="products" component={ProductsRoot}>
-        <IndexRoute component={Products}/>
-        <Route path="new" component={ProductForm}/>
-        <Route path="edit/:id" component={ProductForm}/>
-        <Route path="clone/:id" component={ProductForm}/>
-      </Route>
-      <Route path="settings" component={SettingsRoot}>
-        <IndexRedirect from="/" to="workers" />
-        <Route path="workers" i18n={i18n.settings.workers} component={WorkersForm}/>
-        <Route path="services" i18n={i18n.settings.services} component={ServicesForm}/>
-      </Route>
-    </Route>
-  )
-};
+      </Router>
+    );
+  }
+});
 
 ReactDOM.render(
-  <Router routes={routes()}/>,
+  <AppRouter/>,
   document.getElementById('main-container')
 );
 

@@ -7,7 +7,7 @@ var passport = require('passport');
 var router = express.Router();
 var common = require('../common');
 
-router.get('/', common.isAuthenticated, function(req, res, next) {
+router.get('/', function(req, res, next) {
     res.render('single', {
         i18n: {
             title: req.i18n.__('MadamPettine'),
@@ -86,42 +86,39 @@ router.get('/', common.isAuthenticated, function(req, res, next) {
                     unlock: req.i18n.__('Unlock'),
                     save: req.i18n.__('Save services')
                 }
+            },
+            login: {
+                username: req.i18n.__('Username'),
+                password: req.i18n.__('Password'),
+                submitText: req.i18n.__('Login'),
+                boxTitle: req.i18n.__('Login')
             }
         }
     });
 });
 
-
-router.get('/login', function(req, res, next) {
-    var params = {
-        layout: false,
-        i18n: {
-            username: req.i18n.__('Username'),
-            password: req.i18n.__('Password'),
-            login: req.i18n.__('Login')
+router.post('/login', function(req, res, next) {
+    passport.authenticate('login', function(err, user, info) {
+        if (err) {
+            return next(err);
         }
-    };
-
-    if (typeof req.session.error !== 'undefined') {
-        params.flash = {
-            type: 'alert-danger',
-            messages: [{msg: req.session.error}]
-        };
-        req.session.error = undefined;
-    }
-    res.render('login', params);
+        if (!user) {
+            var errors = [{msg: req.session.error}];
+            res.status(401).json({errors: errors});
+            return;
+        }
+        req.logIn(user, function(err) {
+        if (err) {
+            return next(err);
+        }
+        res.status(200).json({user: user});
+    });
+    })(req, res, next);
 });
 
-router.post('/login', passport.authenticate('login', {
-      successRedirect: '/',
-      failureRedirect: '/login'
-  })
-);
-
-
-router.get('/logout', function(req, res, next) {
+router.post('/logout', function(req, res, next) {
   req.logout();
-  res.redirect('/login');
+  res.status(200).end();
 });
 
 /** The index router. */

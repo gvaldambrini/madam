@@ -1,0 +1,94 @@
+
+var LoginForm = React.createClass({
+  mixins: [History],
+  getInitialState: function() {
+    return {
+      username: '',
+      password: '',
+      errors: []
+    }
+  },
+  handleChange: function(name, value) {
+    var newState = this.state;
+    if (newState[name] != value) {
+      newState[name] = value;
+      this.setState(newState);
+    }
+  },
+  submitForm: function(event) {
+
+    var that = this;
+    event.preventDefault();
+    event.stopPropagation();
+
+    $.ajax({
+      url: '/login',
+      method: 'post',
+      data: {
+        username: this.state.username,
+        password: this.state.password
+      },
+      success: function(data) {
+        that.props.route.setUser(data.user);
+        that.history.pushState(null, `/`);
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        var errors = [];
+        for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
+          errors[errors.length] = xhr.responseJSON.errors[i].msg;
+        }
+        that.setState({
+          errors: errors
+        });
+      }
+
+    });
+  },
+  render: function() {
+    var errors;
+    if (this.state.errors.length > 0) {
+      var errorMessages = this.state.errors.map(function(err) {
+        return (<li key={err}>{err}</li>);
+      });
+
+      errors = (
+        <div className="alert alert-danger">
+          <ul>
+            {errorMessages}
+          </ul>
+        </div>
+      );
+    }
+
+    return (
+      <div className="row col-sm-8 col-sm-offset-2">
+        <div id="login-box">
+          <h2 className="col-sm-offset-2">{i18n.login.boxTitle}</h2>
+          {errors}
+          <div id="form-container">
+            <form id="form" className="form-horizontal login"
+              method="post" action="/login">
+
+              <FormInput type='text' name='username'
+                label={i18n.login.username} focus={true} mandatory={true}
+                value={this.state.username} handleChange={this.handleChange}/>
+
+              <FormInput type='password' name='password'
+                label={i18n.login.password} mandatory={true}
+                value={this.state.password} handleChange={this.handleChange}/>
+
+              <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
+              <div className="form-group">
+                <div className="col-sm-offset-2 col-sm-10">
+                  <button type="submit" className="btn btn-primary" name="submit" onClick={this.submitForm}>
+                    {i18n.login.submitText}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
