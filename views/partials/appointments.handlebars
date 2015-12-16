@@ -176,24 +176,9 @@ var AppointmentForm = React.createClass({
           workers={that.props.workers} key={index} />
       );
     });
-    var errors;
-    if (this.props.errors.length > 0) {
-      var errorMessages = this.props.errors.map(function(err) {
-        return (<li key={err}>{err}</li>);
-      });
-
-      errors = (
-        <div className="alert alert-danger">
-          <ul>
-            {errorMessages}
-          </ul>
-        </div>
-      );
-    }
-
     return (
       <div className="content-body">
-        {errors}
+        {fnRenderErrors(this.props.errors)}
         <div className="form-container">
           <form id="form" className="form-horizontal customer" method="post">
             <div className="form-group">
@@ -217,7 +202,7 @@ var AppointmentForm = React.createClass({
 
             <div className="form-group">
                 <div className="col-sm-12">
-                    <button type="button" className="btn btn-primary" name="submit" onClick={this.props.submitForm}>
+                    <button type="button" className="btn btn-primary" name="submit" onClick={this.props.handleSubmit}>
                       {this.props.submitText}
                     </button>
                 </div>
@@ -331,7 +316,7 @@ var Appointment = React.createClass({
 
     this.setState({services: services});
   },
-  submitForm: function() {
+  handleSubmit: function() {
     var that = this;
     var editForm = typeof this.props.params.appnum != 'undefined';
     var baseUrl = '/customers/' + this.props.params.id;
@@ -350,24 +335,12 @@ var Appointment = React.createClass({
       notes: this.state.notes
     };
 
-    $.ajax({
-      url: baseUrl + (editForm ? '/appointments/' + this.props.params.appnum : '/appointments'),
-      method: editForm ? 'put': 'post',
-      data: JSON.stringify(data),
-      contentType: 'application/json',
-      success: function() {
-        that.history.pushState(null, '/customers/edit/' + that.props.params.id + '/appointments');
-      },
-      error: function(xhr, textStatus, errorThrown) {
-        var errors = [];
-        for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
-          errors[errors.length] = xhr.responseJSON.errors[i].msg;
-        }
-        that.setState({
-          errors: errors
-        });
-      }
-    });
+    var url = baseUrl + (editForm ? '/appointments/' + this.props.params.appnum : '/appointments');
+    var method = editForm ? 'put': 'post';
+    var successCb = function() {
+      that.history.pushState(null, '/customers/edit/' + that.props.params.id + '/appointments');
+    };
+    fnSubmitForm(this, url, method, data, successCb);
   },
   render: function() {
 
@@ -418,7 +391,7 @@ var Appointment = React.createClass({
           addService={this.addService}
           handleChange={this.handleChange}
           updateService={this.updateService}
-          submitForm={this.submitForm}/>
+          handleSubmit={this.handleSubmit}/>
       </div>
     );
   }

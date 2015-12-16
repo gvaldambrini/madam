@@ -208,3 +208,67 @@ var FormTextArea = React.createClass({
     );
   }
 });
+
+
+function fnRenderErrors(errors) {
+  var errors;
+  if (errors.length > 0) {
+    var errorMessages = errors.map(function(err) {
+      return (<li key={err}>{err}</li>);
+    });
+
+    errors = (
+      <div className="alert alert-danger">
+        <ul>
+          {errorMessages}
+        </ul>
+      </div>
+    );
+  }
+  return errors;
+}
+
+function fnSubmitForm(self, url, method, data, successCb) {
+  var that = self;
+
+  $.ajax({
+    url: url,
+    method: method,
+    contentType: 'application/json',
+    data: JSON.stringify(data),
+    success: successCb.bind(self),
+    error: function(xhr, textStatus, errorThrown) {
+      if (xhr.status === 401) {
+        that.history.pushState(null, '/login');
+      }
+
+      var errors = [];
+      for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
+        errors[errors.length] = xhr.responseJSON.errors[i].msg;
+      }
+      that.setState({
+        errors: errors
+      });
+    }
+
+  });
+}
+
+var BaseForm = {
+  handleChange: function(name, value) {
+    var data = this.state.data;
+    if (data[name] != value) {
+      data[name] = value;
+
+      this.setState({
+        data: data
+      });
+    }
+  },
+  renderErrors: function() {
+    return fnRenderErrors(this.state.errors);
+  },
+  submitForm: function(url, method, successCb) {
+    fnSubmitForm(this, url, method, this.state.data, successCb);
+  }
+};

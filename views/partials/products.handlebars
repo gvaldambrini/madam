@@ -1,6 +1,6 @@
 
 var ProductForm = React.createClass({
-  mixins: [ History ],
+  mixins: [BaseForm, History],
   getInitialState: function() {
     return {
       data: {},
@@ -39,39 +39,16 @@ var ProductForm = React.createClass({
       });
     }
   },
-  submitForm: function(event) {
-    var that = this;
+  handleSubmit: function(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    $.ajax({
-      url: this.state.editForm ? '/products/' + this.props.params.id : '/products',
-      method: this.state.editForm ? 'put': 'post',
-      data: JSON.stringify(this.state.data),
-      contentType: 'application/json',
-      success: function() {
-        that.history.pushState(null, `/products`);
-      },
-      error: function(xhr, textStatus, errorThrown) {
-        var errors = [];
-        for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
-          errors[errors.length] = xhr.responseJSON.errors[i].msg;
-        }
-        that.setState({
-          errors: errors
-        });
-      }
-    });
-  },
-  handleChange: function(name, value) {
-    var data = this.state.data;
-    if (data[name] != value) {
-      data[name] = value;
-
-      this.setState({
-        data: data
-      });
-    }
+    var successCb = function(data) {
+      this.history.pushState(null, '/products');
+    };
+    var url = this.state.editForm ? '/products/' + this.props.params.id : '/products';
+    var method = this.state.editForm ? 'put': 'post';
+    this.submitForm(url, method, successCb);
   },
   renderHtml(element) {
     return {
@@ -89,24 +66,9 @@ var ProductForm = React.createClass({
       formTitle = i18n.products.addNew;
     }
 
-    var errors;
-    if (this.state.errors.length > 0) {
-      var errorMessages = this.state.errors.map(function(err) {
-        return (<li key={err}>{err}</li>);
-      });
-
-      errors = (
-        <div className="alert alert-danger">
-          <ul>
-            {errorMessages}
-          </ul>
-        </div>
-      );
-    }
-
     return (
       <div className="content-body">
-        {errors}
+        {this.renderErrors()}
         <div className="form-container" id="form-container">
           <form id="form" className="form-horizontal product" method="post">
             <div className="form-group">
@@ -132,7 +94,7 @@ var ProductForm = React.createClass({
 
             <div className="form-group">
               <div className="col-sm-offset-2 col-sm-10">
-                <button type="submit" className="btn btn-primary" name="submit" onClick={this.submitForm}>
+                <button type="submit" className="btn btn-primary" name="submit" onClick={this.handleSubmit}>
                   {submitText}
                 </button>
               </div>

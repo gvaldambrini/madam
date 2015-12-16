@@ -1,6 +1,6 @@
 
 var CustomerForm = React.createClass({
-  mixins: [ History ],
+  mixins: [BaseForm, History],
   getInitialState: function() {
     return {
       data: {},
@@ -24,44 +24,23 @@ var CustomerForm = React.createClass({
       });
     }
   },
-  submitForm: function(event) {
-    var that = this;
-    var targetName = event.currentTarget.name;
+  handleSubmit: function(event) {
     event.preventDefault();
     event.stopPropagation();
-    $.ajax({
-      url: this.state.editForm ? '/customers/' + this.props.params.id : '/customers',
-      method: this.state.editForm ? 'put': 'post',
-      data: JSON.stringify(this.state.data),
-      contentType: 'application/json',
-      success: function(data) {
-        if (targetName === 'submit-and-add') {
-          that.history.pushState(null, '/customers/edit/' + data.id + '/appointments/new');
-        }
-        else {
-          that.history.pushState(null, '/customers/');
-        }
-      },
-      error: function(xhr, textStatus, errorThrown) {
-        var errors = [];
-        for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
-          errors[errors.length] = xhr.responseJSON.errors[i].msg;
-        }
-        that.setState({
-          errors: errors
-        });
-      }
-    });
-  },
-  handleChange: function(name, value) {
-    var data = this.state.data;
-    if (data[name] != value) {
-      data[name] = value;
 
-      this.setState({
-        data: data
-      });
-    }
+    var targetName = event.currentTarget.name;
+    var url = this.state.editForm ? '/customers/' + this.props.params.id : '/customers';
+    var method = this.state.editForm ? 'put': 'post';
+
+    var successCb = function(data) {
+      if (targetName === 'submit-and-add') {
+        this.history.pushState(null, '/customers/edit/' + data.id + '/appointments/new');
+      }
+      else {
+        this.history.pushState(null, '/customers/');
+      }
+    };
+    this.submitForm(url, method, successCb);
   },
   renderHtml(element) {
     return {
@@ -69,21 +48,6 @@ var CustomerForm = React.createClass({
     }
   },
   render: function() {
-    var errors;
-    if (this.state.errors.length > 0) {
-      var errorMessages = this.state.errors.map(function(err) {
-        return (<li key={err}>{err}</li>);
-      });
-
-      errors = (
-        <div className="alert alert-danger">
-          <ul>
-            {errorMessages}
-          </ul>
-        </div>
-      );
-    }
-
     var submitText, formTitle;
     if (this.state.editForm) {
       submitText = i18n.customers.submitEdit;
@@ -98,14 +62,14 @@ var CustomerForm = React.createClass({
     if (!this.state.editForm) {
       additionalButtons = (
         <button type="button" className="btn btn-primary" name="submit-and-add"
-          onClick={this.submitForm}>
+          onClick={this.handleSubmit}>
           {i18n.customers.submitAndAdd}
         </button>
       )
     }
     return (
       <div className="content-body">
-        {errors}
+        {this.renderErrors()}
         <div className="form-container" id="form-container">
           <form id="form" className="form-horizontal customer" method="post"
             action=''>
@@ -153,7 +117,7 @@ var CustomerForm = React.createClass({
 
             <div className="form-group">
               <div className="col-sm-offset-2 col-sm-10">
-                <button type="button" className="btn btn-primary" name="submit" onClick={this.submitForm}>
+                <button type="button" className="btn btn-primary" name="submit" onClick={this.handleSubmit}>
                   {submitText}
                 </button>
                 {additionalButtons}

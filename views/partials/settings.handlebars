@@ -97,24 +97,10 @@ var BaseSettingsForm = {
     }
     var settingsItems = this.state.items.map(this.settingsItem);
     var that = this;
-    var errors;
-    if (this.state.errors.length > 0) {
-      var errorMessages = this.state.errors.map(function(err) {
-        return (<li key={err}>{err}</li>);
-      });
-
-      errors = (
-        <div className="alert alert-danger">
-          <ul>
-            {errorMessages}
-          </ul>
-        </div>
-      );
-    }
 
     return (
       <div className="content-body">
-        {errors}
+        {fnRenderErrors(this.state.errors)}
         <div className="form-container" id="form-container">
           <form className="form-horizontal settings" method="post" action='' id="form">
             <div className="form-group">
@@ -126,7 +112,7 @@ var BaseSettingsForm = {
             <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
             <div className="form-group">
               <div className="col-sm-offset-2 col-sm-10">
-                <button type="button" className="btn btn-primary" name="submit" onClick={this.submit}>
+                <button type="button" className="btn btn-primary" name="submit" onClick={this.handleSubmit}>
                   {this.state.disabled ? this.props.route.i18n.unlock : this.props.route.i18n.save}
                 </button>
               </div>
@@ -232,7 +218,7 @@ var ServicesForm = React.createClass({
       loaded: false
     };
   },
-  submit: function(event) {
+  handleSubmit: function(event) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -248,23 +234,8 @@ var ServicesForm = React.createClass({
       items[items.length] = this.state.items[i].name;
     }
 
-    var that = this;
-    $.ajax({
-      url: '/settings/services',
-      method: 'put',
-      data: JSON.stringify({services: items}),
-      contentType: 'application/json',
-      success: that.loadItems,
-      error: function(xhr, textStatus, errorThrown) {
-        var errors = [];
-        for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
-          errors[errors.length] = xhr.responseJSON.errors[i].msg;
-        }
-        that.setState({
-          errors: errors
-        });
-      }
-    });
+    var data = {services: items};
+    fnSubmitForm(this, '/settings/services', 'put', data, this.loadItems);
   },
   handleChange: function(rowId, text) {
     var items = this.state.items;
@@ -471,7 +442,7 @@ var WorkersForm = React.createClass({
       items: items
     });
   },
-  submit: function(event) {
+  handleSubmit: function(event) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -482,24 +453,8 @@ var WorkersForm = React.createClass({
       return;
     }
 
-    var that = this;
-    $.ajax({
-      url: '/settings/workers',
-      method: 'put',
-      data: JSON.stringify({workers: this.state.items}),
-      contentType: 'application/json',
-      success: that.loadItems,
-      error: function(xhr, textStatus, errorThrown) {
-        var errors = [];
-        for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
-          errors[errors.length] = xhr.responseJSON.errors[i].msg;
-        }
-        that.setState({
-          errors: errors
-        });
-      }
-    });
-
+    var data = {workers: this.state.items};
+    fnSubmitForm(this, '/settings/workers', 'put', data, this.loadItems);
   },
   settingsItem: function(item, index) {
     return (
