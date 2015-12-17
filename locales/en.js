@@ -72,5 +72,7 @@
 	"Set services": "Set services",
 	"Settings": "Settings",
 	"New appointment": "New appointment",
-	"MadamPettine": "MadamPettine"
+	"MadamPettine": "MadamPettine",
+	"Missing username.": "Missing username.",
+	"Missing password.": "Missing password."
 }

@@ -72,5 +72,7 @@
 	"Set services": "Definisci i servizi",
 	"Settings": "Impostazioni",
 	"New appointment": "Nuovo appuntamento",
-	"MadamPettine": "MadamPettine"
+	"MadamPettine": "MadamPettine",
+	"Missing username.": "E' necessario inserire lo username.",
+	"Missing password.": "E' necessario inserire la password."
 }

@@ -128,8 +128,10 @@ passport.deserializeUser(function(username, done) {
 });
 
 passport.use('login', new LocalStrategy({
-    passReqToCallback : true
+    passReqToCallback : true,
+    session: false
   },
+  // The verify callback, called only if both username and password are present.
   function(req, username, password, done) {
       client.get({
           index: req.config.mainIndex,
@@ -147,19 +149,16 @@ passport.use('login', new LocalStrategy({
 
           if (typeof resp._source == 'undefined') {
             console.log('Users document not found');
-            req.session.error = req.i18n.__('Incorrect username.');
-            return done(null, false);
+            return done(req.i18n.__('Incorrect username.'), false);
           }
           users = resp._source.users.filter(filterFn);
           if (users.length === 0) {
-            req.session.error = req.i18n.__('Incorrect username.');
-            return done(null, false);
+            return done(req.i18n.__('Incorrect username.'), false);
           }
 
           user = users[0];
           if (!bcrypt.compareSync(password, user.password)) {
-            req.session.error = req.i18n.__('Incorrect password.');
-            return done(null, false);
+            return done(req.i18n.__('Incorrect password.'), false);
           }
 
           return done(null, username);
@@ -168,10 +167,6 @@ passport.use('login', new LocalStrategy({
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(function(req, resp, next) {
-  resp.locals.username = req.user;
-  next();
-});
 
 // app.use(csrf({ cookie: true }));
 // app.use(function(request, response, next) {

@@ -99,20 +99,28 @@ router.get('/', function(req, res, next) {
 
 router.post('/login', function(req, res, next) {
     passport.authenticate('login', function(err, user, info) {
-        if (err) {
-            return next(err);
-        }
         if (!user) {
-            var errors = [{msg: req.session.error}];
-            res.status(401).json({errors: errors});
+            if (typeof info !== 'undefined' && info.message === 'Missing credentials') {
+                // The verify callback (the function passed as second argument to the LocalStrategy
+                // class) is not called if the username or the password is missing. Instead,
+                // the returned error is null, the username false but the info is equal to the
+                // standard string 'Missing credentials', which is the one used here to provide
+                // a meaningful message to the frontend.
+                err = req.i18n.__(req.body.username  ? 'Missing password.' : 'Missing username.');
+                res.status(400).json({errors: [{msg: err}]});
+                return;
+            }
+
+            res.status(401).json({errors: [{msg: err}]});
             return;
         }
+
         req.logIn(user, function(err) {
-        if (err) {
-            return next(err);
-        }
-        res.status(200).json({user: user});
-    });
+            if (err) {
+                return next(err);
+            }
+            res.status(200).json({user: user});
+        });
     })(req, res, next);
 });
 
