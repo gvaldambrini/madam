@@ -110,14 +110,7 @@ var ProductForm = React.createClass({
 var ProductsTable = React.createClass({
   mixins: [BaseTable, History],
   deleteItem: function(objId) {
-    $.ajax({
-      url: '/products/' + objId,
-      method: 'delete',
-      headers: {
-          'X-CSRF-Token': '{{csrftoken}}'
-      },
-      complete: this.updateTable
-    });
+    this.deleteRow('/products/' + objId);
   },
   render: function() {
     var that = this;
@@ -226,10 +219,11 @@ var ProductsTable = React.createClass({
 
 
 var Products = React.createClass({
-
+  mixins: [BaseTableContainer, History],
   getInitialState: function() {
     return {
-      data: undefined,
+      data: [],
+      loaded: false,
       filterText: ''
     };
   },
@@ -241,26 +235,14 @@ var Products = React.createClass({
       filterText: text
     });
 
-    var that = this;
-    $.ajax({
-        url: '/products/search',
-        data: {
-          text: text
-        },
-        success: function(msg) {
-          that.setState({
-            data: msg,
-            filterText: text
-          });
-        }
-    });
+    this.fetchData('/products/search', text);
   },
   updateTable: function() {
     this.search(this.state.filterText);
   },
   render: function() {
     var products;
-    if (typeof this.state.data === 'undefined') {
+    if (!this.state.loaded) {
       return <div></div>;
     }
 

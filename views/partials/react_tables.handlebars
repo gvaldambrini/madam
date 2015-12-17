@@ -49,6 +49,16 @@ var PopoverTemplate = React.createClass({
 
 
 var BaseTable = {
+  deleteRow: function(url) {
+    $.ajax({
+      url: url,
+      method: 'delete',
+      headers: {
+          'X-CSRF-Token': '{{csrftoken}}'
+      },
+      complete: this.updateTable
+    });
+  },
   updateTable: function(obj, status) {
     if (status === 'success') {
       this.props.updateTable();
@@ -59,4 +69,30 @@ var BaseTable = {
       __html: element
     }
   }
+};
+
+
+var BaseTableContainer = {
+  fetchData: function(url, filterText) {
+    var that = this;
+    var ajaxArgs = {
+      url: url,
+      success: function(data) {
+        that.setState({
+          data: data,
+          loaded: true
+        });
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        if (xhr.status === 401) {
+          that.history.pushState(null, '/login');
+        }
+      }
+    };
+    if (typeof filterText !== 'undefined') {
+      ajaxArgs.data = {text: filterText};
+    }
+    $.ajax(ajaxArgs);
+  },
+
 };

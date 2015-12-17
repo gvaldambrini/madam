@@ -401,14 +401,7 @@ var Appointment = React.createClass({
 var AppointmentsTable = React.createClass({
   mixins: [BaseTable, History],
   deleteItem: function(objId) {
-    $.ajax({
-      url: '/customers/' + this.props.customer + '/appointments/' + objId,
-      method: 'delete',
-      headers: {
-          'X-CSRF-Token': '{{csrftoken}}'
-      },
-      complete: this.updateTable
-    });
+    this.deleteRow('/customers/' + this.props.customer + '/appointments/' + objId);
   },
   render: function() {
     var that = this;
@@ -473,6 +466,7 @@ var AppointmentsTable = React.createClass({
 
 
 var Appointments = React.createClass({
+  mixins: [BaseTableContainer, History],
   getInitialState: function() {
     return {
       data: [],
@@ -483,17 +477,7 @@ var Appointments = React.createClass({
     this.updateTable();
   },
   updateTable: function() {
-    var that = this;
-    $.ajax({
-      url: '/customers/' + this.props.params.id + '/appointments',
-      method: 'get',
-      success: function(data) {
-        that.setState({
-          data: data,
-          loaded: true
-        });
-      }
-    });
+    this.fetchData('/customers/' + this.props.params.id + '/appointments');
   },
   render: function() {
     if (!this.state.loaded) {

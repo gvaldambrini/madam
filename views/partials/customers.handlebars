@@ -183,14 +183,7 @@ var Customer = React.createClass({
 var CustomersTable = React.createClass({
   mixins: [BaseTable, History],
   deleteItem: function(objId) {
-    $.ajax({
-      url: '/customers/' + objId,
-      method: 'delete',
-      headers: {
-          'X-CSRF-Token': '{{csrftoken}}'
-      },
-      complete: this.props.updateTable
-    });
+    this.deleteRow('/customers/' + objId);
   },
   render: function() {
     var that = this;
@@ -256,10 +249,11 @@ var CustomersTable = React.createClass({
 
 
 var Customers = React.createClass({
-
+  mixins: [BaseTableContainer, History],
   getInitialState: function() {
     return {
-      data: undefined,
+      data: [],
+      loaded: false,
       filterText: ''
     };
   },
@@ -268,29 +262,16 @@ var Customers = React.createClass({
   },
   search: function(text) {
     this.setState({
-      data: this.state.data,
       filterText: text
     });
 
-    var that = this;
-    $.ajax({
-        url: '/customers/search',
-        data: {
-          text: text
-        },
-        success: function(msg) {
-          that.setState({
-            data: msg,
-            filterText: text
-          });
-        }
-    });
+    this.fetchData('/customers/search', text);
   },
   updateTable: function() {
     this.search(this.state.filterText);
   },
   render: function() {
-    if (typeof this.state.data === 'undefined') {
+    if (!this.state.loaded) {
       return <div></div>
     }
 
