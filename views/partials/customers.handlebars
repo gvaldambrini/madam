@@ -81,10 +81,10 @@ var CustomerForm = React.createClass({
                 dangerouslySetInnerHTML={this.renderHtml(i18n.customers.mandatoryFields)}>
               </div>
             </div>
-            <FormInput type='text' name='name' value={this.state.data.name}
+            <FormInput name='name' value={this.state.data.name}
               label={i18n.customers.name} focus={true} mandatory={true}
               handleChange={this.handleChange}/>
-            <FormInput type='text' name='surname' value={this.state.data.surname}
+            <FormInput name='surname' value={this.state.data.surname}
               label={i18n.customers.surname} handleChange={this.handleChange}/>
             <FormInputAndCheckbox type='tel' value={this.state.data.mobile_phone}
               name='mobile_phone' label={i18n.customers.mobile_phone}

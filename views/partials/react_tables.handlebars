@@ -1,5 +1,8 @@
 var InputSearch = React.createClass({
-
+  propTypes: {
+      search: React.PropTypes.func.isRequired,
+      placeholder: React.PropTypes.string.isRequired
+  },
   searchClear: function() {
     return $("#search-clear");
   },
@@ -31,6 +34,10 @@ var InputSearch = React.createClass({
 
 
 var PopoverTemplate = React.createClass({
+  propTypes: {
+      confirm: React.PropTypes.string.isRequired,
+      cancel: React.PropTypes.string.isRequired,
+  },
   render: function() {
     return (
       <div className="popover" role="tooltip">

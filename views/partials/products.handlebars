@@ -80,10 +80,10 @@ var ProductForm = React.createClass({
               </div>
             </div>
 
-            <FormInput type='text' name='name' value={this.state.data.name}
+            <FormInput name='name' value={this.state.data.name}
               label={i18n.products.name} focus={true} mandatory={true}
               handleChange={this.handleChange}/>
-            <FormInput type='text' name='brand' value={this.state.data.brand}
+            <FormInput name='brand' value={this.state.data.brand}
               label={i18n.products.brand} handleChange={this.handleChange}/>
             <FormInputDate name='sold_date' value={this.state.data.sold_date}
               label={i18n.products.sold_date} orientation='top'

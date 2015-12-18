@@ -7,6 +7,13 @@ var SimpleInput = {
 
 
 var FormInputDate = React.createClass({
+  propTypes: {
+      handleChange: React.PropTypes.func.isRequired,
+      name: React.PropTypes.string.isRequired,
+      label: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string,
+      orientation: React.PropTypes.oneOf(['top', 'bottom', 'left', 'right', 'auto'])
+  },
   handleChange: function(event) {
     this.props.handleChange(this.props.name, $(event.currentTarget).val());
   },
@@ -59,6 +66,20 @@ var FormInputDate = React.createClass({
 
 var FormInput = React.createClass({
   mixins: [SimpleInput],
+  propTypes: {
+      handleChange: React.PropTypes.func.isRequired,
+      name: React.PropTypes.string.isRequired,
+      label: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string,
+      type: React.PropTypes.string,
+      focus: React.PropTypes.bool,
+      mandatory: React.PropTypes.bool
+  },
+  getDefaultProps: function() {
+    return {
+      type: 'text'
+    };
+  },
   getInitialState: function() {
     return {value: ''}
   },
@@ -95,6 +116,15 @@ var FormInput = React.createClass({
 
 var FormInputRadio = React.createClass({
   mixins: [SimpleInput],
+  propTypes: {
+      handleChange: React.PropTypes.func.isRequired,
+      name: React.PropTypes.string.isRequired,
+      label: React.PropTypes.string.isRequired,
+      values: React.PropTypes.arrayOf(React.PropTypes.shape({
+        name: React.PropTypes.string.isRequired,
+        value: React.PropTypes.string.isRequired
+      })).isRequired
+  },
   getInitialState: function() {
     return {value: ''}
   },
@@ -132,6 +162,16 @@ var FormInputRadio = React.createClass({
 
 
 var FormInputAndCheckbox = React.createClass({
+  propTypes: {
+      handleChange: React.PropTypes.func.isRequired,
+      name: React.PropTypes.string.isRequired,
+      cblabel: React.PropTypes.string.isRequired,
+      cbname: React.PropTypes.string.isRequired,
+      label: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string,
+      cbvalue: React.PropTypes.bool,
+      type: React.PropTypes.string
+  },
   getInitialState: function() {
     return {
       value: '',
@@ -185,6 +225,12 @@ var FormInputAndCheckbox = React.createClass({
 
 var FormTextArea = React.createClass({
   mixins: [SimpleInput],
+  propTypes: {
+      handleChange: React.PropTypes.func.isRequired,
+      name: React.PropTypes.string.isRequired,
+      label: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string
+  },
   getInitialState: function() {
     return {value: ''}
   },
