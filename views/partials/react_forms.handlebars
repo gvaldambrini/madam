@@ -280,11 +280,15 @@ function fnSubmitForm(self, url, method, data, successCb) {
   $.ajax({
     url: url,
     method: method,
+    headers: {
+        'X-CSRF-Token': '{{csrftoken}}'
+    },
     contentType: 'application/json',
     data: JSON.stringify(data),
     success: successCb.bind(self),
     error: function(xhr, textStatus, errorThrown) {
       if (xhr.status === 401) {
+        Cookies.remove('user');
         that.history.pushState(null, '/login');
       }
 

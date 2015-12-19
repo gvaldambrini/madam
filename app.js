@@ -109,12 +109,16 @@ app.use(session({
   })
 );
 
-app.get('*', function(req, res, next) {
+app.use(csrf({ cookie: true }));
+app.use(function(req, res, next) {
     // To update the session expiration time we need to send the new
     // expiration in the response cookie.
     // To send again the response cookie to the client we need to
     // update the session object.
     req.session.fake = Date.now();
+
+    // Pass the csrf token to use to the frontend.
+    res.cookie('csrf', req.csrfToken());
     next();
 });
 
@@ -128,8 +132,7 @@ passport.deserializeUser(function(username, done) {
 });
 
 passport.use('login', new LocalStrategy({
-    passReqToCallback : true,
-    session: false
+    passReqToCallback : true
   },
   // The verify callback, called only if both username and password are present.
   function(req, username, password, done) {
@@ -168,11 +171,6 @@ passport.use('login', new LocalStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use(csrf({ cookie: true }));
-// app.use(function(request, response, next) {
-//   response.locals.csrftoken = request.csrfToken();
-//   next();
-// });
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
@@ -186,6 +184,5 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
-
 
 module.exports = app;

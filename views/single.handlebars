@@ -3,6 +3,19 @@
 
 <script type="text/babel">
 
+function csrfSafeMethod(method) {
+  // these HTTP methods do not require CSRF protection
+  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+  beforeSend: function(xhr, settings) {
+    if (!csrfSafeMethod(settings.type)) {
+      xhr.setRequestHeader("x-csrf-token", Cookies.get('csrf'));
+    }
+  }
+});
+
 var Link = ReactRouter.Link;
 var IndexLink = ReactRouter.IndexLink;
 var Router = ReactRouter.Router;
@@ -52,10 +65,11 @@ var Navbar = React.createClass({
   render: function() {
     var that = this;
     var logout;
-    if (this.props.getUser()) {
+    var currentUser = Cookies.get('user');
+    if (typeof currentUser !== 'undefined') {
       logout =  (
         <div className="navbar-user">
-          {this.props.getUser()}
+          {currentUser}
           <div>
             <a href="#" onClick={
               function(event) {
@@ -66,7 +80,7 @@ var Navbar = React.createClass({
                   url: '/logout',
                   method: 'post',
                   success: function() {
-                    that.props.setUser(null);
+                    Cookies.remove('user');
                     that.history.pushState(null, `/login`);
                   }
                 });
@@ -118,12 +132,10 @@ var Root = React.createClass({
 
 var App = React.createClass({
   render: function() {
-    var showToggle = this.props.route.getUser() !== null;
+    var showToggle = typeof Cookies.get('user') !== 'undefined';
     return (
       <div className="container-fluid">
         <Navbar
-          getUser={this.props.route.getUser}
-          setUser={this.props.route.setUser}
           showToggle={showToggle} />
         {this.props.children}
       </div>
@@ -131,64 +143,51 @@ var App = React.createClass({
   }
 });
 
-
-var AppRouter = React.createClass({
-  getInitialState: function() {
-    return {
-      user: null
-    };
-  },
-  setUser: function(newUser) {
-    this.setState({user: newUser});
-  },
-  getUser: function() {
-    return this.state.user;
-  },
-  requireAuth: function(nextState, replaceState) {
-    if (!this.state.user) {
+function requireAuth(nextState, replaceState) {
+    if (typeof Cookies.get('user') === 'undefined') {
       replaceState({ nextPathname: nextState.location.pathname }, '/login')
     }
-  },
-  render: function() {
-    return (
-      <Router>
-        <Route component={App} getUser={this.getUser} setUser={this.setUser}>
-          <Route path="/" component={Root} onEnter={this.requireAuth}>
-            <Route path="customers" component={CustomersRoot}>
-              <IndexRoute component={Customers}/>
-              <Route path="new" component={Customer}>
-                <IndexRoute component={CustomerForm}/>
-              </Route>
-              <Route path="edit/:id" component={Customer}>
-                <IndexRoute component={CustomerForm}/>
-                <Route path="appointments" component={AppointmentsRoot}>
-                  <IndexRoute component={Appointments}/>
-                  <Route path="new" component={Appointment}/>
-                  <Route path="edit/:appnum" component={Appointment}/>
-                </Route>
-              </Route>
-            </Route>
-            <Route path="products" component={ProductsRoot}>
-              <IndexRoute component={Products}/>
-              <Route path="new" component={ProductForm}/>
-              <Route path="edit/:id" component={ProductForm}/>
-              <Route path="clone/:id" component={ProductForm}/>
-            </Route>
-            <Route path="settings" component={SettingsRoot}>
-              <IndexRedirect from="/" to="workers" />
-              <Route path="workers" i18n={i18n.settings.workers} component={WorkersForm}/>
-              <Route path="services" i18n={i18n.settings.services} component={ServicesForm}/>
+}
+
+
+var routes = function() {
+  return (
+    <Route component={App}>
+      <Route path="/" component={Root} onEnter={requireAuth}>
+        <Route path="customers" component={CustomersRoot}>
+          <IndexRoute component={Customers}/>
+          <Route path="new" component={Customer}>
+            <IndexRoute component={CustomerForm}/>
+          </Route>
+          <Route path="edit/:id" component={Customer}>
+            <IndexRoute component={CustomerForm}/>
+            <Route path="appointments" component={AppointmentsRoot}>
+              <IndexRoute component={Appointments}/>
+              <Route path="new" component={Appointment}/>
+              <Route path="edit/:appnum" component={Appointment}/>
             </Route>
           </Route>
-          <Route path="/login" component={LoginForm} setUser={this.setUser}/>
         </Route>
-      </Router>
-    );
-  }
-});
+        <Route path="products" component={ProductsRoot}>
+          <IndexRoute component={Products}/>
+          <Route path="new" component={ProductForm}/>
+          <Route path="edit/:id" component={ProductForm}/>
+          <Route path="clone/:id" component={ProductForm}/>
+        </Route>
+        <Route path="settings" component={SettingsRoot}>
+          <IndexRedirect from="/" to="workers" />
+          <Route path="workers" i18n={i18n.settings.workers} component={WorkersForm}/>
+          <Route path="services" i18n={i18n.settings.services} component={ServicesForm}/>
+        </Route>
+      </Route>
+      <Route path="/login" component={LoginForm}/>
+    </Route>
+  );
+}
+
 
 ReactDOM.render(
-  <AppRouter/>,
+  <Router routes={routes()}/>,
   document.getElementById('main-container')
 );
 

@@ -92,6 +92,7 @@ var BaseTableContainer = {
       },
       error: function(xhr, textStatus, errorThrown) {
         if (xhr.status === 401) {
+          Cookies.remove('user');
           that.history.pushState(null, '/login');
         }
       }

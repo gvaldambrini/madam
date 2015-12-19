@@ -15,7 +15,7 @@ var LoginForm = React.createClass({
     event.stopPropagation();
 
     var successCb = function(data) {
-      this.props.route.setUser(data.user);
+      Cookies.set('user', data.user);
       this.history.pushState(null, '/');
     };
 
@@ -39,7 +39,6 @@ var LoginForm = React.createClass({
                 label={i18n.login.password} mandatory={true}
                 value={this.state.data.password} handleChange={this.handleChange}/>
 
-              <input type='hidden' name="_csrf" value="{{csrftoken}}"/>
               <div className="form-group">
                 <div className="col-sm-offset-2 col-sm-10">
                   <button type="submit" className="btn btn-primary" name="submit" onClick={this.handleSubmit}>
