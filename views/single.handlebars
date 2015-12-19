@@ -42,16 +42,16 @@ var Sidebar = React.createClass({
       <div className="col-sm-2 sidebar collapse">
         <ul className="nav nav-sidebar">
           <li>
-            <IndexLink activeClassName="active" to="/">{{{__ 'Home'}}}</IndexLink>
+            <IndexLink activeClassName="active" to="/">{i18n.sidebar.home}</IndexLink>
           </li>
           <li>
-            <Link activeClassName="active" to="/customers">{{{__ 'Customers'}}}</Link>
+            <Link activeClassName="active" to="/customers">{i18n.sidebar.customers}</Link>
           </li>
           <li>
-            <Link activeClassName="active" to="/products">{{{__ 'Products'}}}</Link>
+            <Link activeClassName="active" to="/products">{i18n.sidebar.products}</Link>
           </li>
           <li>
-            <Link activeClassName="active" to="/settings">{{{__ 'Settings'}}}</Link>
+            <Link activeClassName="active" to="/settings">{i18n.sidebar.settings}</Link>
           </li>
         </ul>
       </div>
