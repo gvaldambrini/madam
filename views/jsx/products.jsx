@@ -1,3 +1,18 @@
+var Link = require('react-router').Link;
+var History = require('react-router').History;
+
+var moment = require('moment');
+
+var BaseForm = require('./forms').BaseForm;
+var FormInputDate = require('./forms').FormInputDate;
+var FormInput = require('./forms').FormInput;
+var FormTextArea = require('./forms').FormTextArea;
+
+var PopoverTemplate = require('./tables').PopoverTemplate;
+var InputSearch = require('./tables').InputSearch;
+var BaseTable = require('./tables').BaseTable;
+var BaseTableContainer = require('./tables').BaseTableContainer;
+
 
 var ProductForm = React.createClass({
   mixins: [BaseForm, History],
@@ -18,7 +33,7 @@ var ProductForm = React.createClass({
         method: 'get',
         success: function(data) {
           if (cloneForm) {
-            data.sold_date = moment().format('{{config.date_format}}');
+            data.sold_date = moment().format(config.date_format);
             data.notes = '';
           }
           that.setState({
@@ -32,7 +47,7 @@ var ProductForm = React.createClass({
     else {
       that.setState({
         data: {
-          sold_date: moment().format('{{config.date_format}}')
+          sold_date: moment().format(config.date_format)
         },
         editForm: editForm,
         errors: []
@@ -280,3 +295,10 @@ var ProductsRoot = React.createClass({
     );
   }
 });
+
+
+module.exports = {
+  ProductForm: ProductForm,
+  Products: Products,
+  ProductsRoot: ProductsRoot
+};

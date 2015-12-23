@@ -1,3 +1,5 @@
+var Cookies = require('js-cookie');
+
 
 var SimpleInput = {
   handleChange: function(event) {
@@ -31,7 +33,7 @@ var FormInputDate = React.createClass({
             }
           }>
             <input type="text" name={this.props.name}
-              placeholder="{{config.date_format}}" className="form-control"
+              placeholder={config.date_format} className="form-control"
               ref={
                 function(input) {
                   // the react onChange event is not fired from the datepicker, so let's
@@ -53,9 +55,9 @@ var FormInputDate = React.createClass({
     if (typeof this.props.orientation !== 'undefined') {
       $.fn.datepicker.defaults.orientation = this.props.orientation;
     }
-    $.fn.datepicker.defaults.language = '{{config.language}}';
+    $.fn.datepicker.defaults.language = config.language;
     $.fn.datepicker.defaults.daysOfWeekDisabled = "0";
-    $.fn.datepicker.defaults.format = "{{config.date_format}}".toLowerCase();
+    $.fn.datepicker.defaults.format = config.date_format.toLowerCase();
     $.fn.datepicker.defaults.autoclose = true;
     $.fn.datepicker.defaults.weekStart = 1;
     $.fn.datepicker.defaults.todayHighlight = true;
@@ -322,3 +324,22 @@ var BaseForm = {
     fnSubmitForm(this, url, method, this.state.data, successCb);
   }
 };
+
+
+module.exports = {
+  SimpleInput: SimpleInput,
+  FormInputDate: FormInputDate,
+  FormInput: FormInput,
+  FormInputRadio: FormInputRadio,
+  FormInputAndCheckbox: FormInputAndCheckbox,
+  FormTextArea: FormTextArea,
+
+  fnRenderErrors: fnRenderErrors,
+  fnSubmitForm: fnSubmitForm,
+  BaseForm: BaseForm
+}
+
+
+
+
+

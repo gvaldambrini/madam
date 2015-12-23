@@ -1,3 +1,8 @@
+var Link = require('react-router').Link;
+
+var fnRenderErrors = require('./forms').fnRenderErrors;
+var fnSubmitForm = require('./forms').fnSubmitForm;
+
 
 var BaseRow = {
   add: function(event) {
@@ -96,7 +101,6 @@ var BaseSettingsForm = {
       );
     }
     var settingsItems = this.state.items.map(this.settingsItem);
-    var that = this;
 
     return (
       <div className="content-body">
@@ -378,7 +382,7 @@ var WorkersForm = React.createClass({
   newEmptyObj: function() {
     return {
       name: '',
-      color: '{{config.defaultWorkerColor}}'
+      color: config.defaultWorkerColor
     }
   },
   loadItems: function(data) {
@@ -490,3 +494,9 @@ var SettingsRoot = React.createClass({
   }
 });
 
+
+module.exports = {
+  ServicesForm: ServicesForm,
+  WorkersForm: WorkersForm,
+  SettingsRoot: SettingsRoot
+};

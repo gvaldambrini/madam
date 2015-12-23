@@ -1,3 +1,10 @@
+var History = require('react-router').History;
+
+var Cookies = require('js-cookie');
+
+var BaseForm = require('./forms').BaseForm;
+var FormInput = require('./forms').FormInput;
+
 
 var LoginForm = React.createClass({
   mixins: [BaseForm, History],
@@ -53,3 +60,7 @@ var LoginForm = React.createClass({
     );
   }
 });
+
+module.exports = {
+  LoginForm: LoginForm
+};

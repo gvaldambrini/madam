@@ -11,6 +11,13 @@ router.get('/', function(req, res, next) {
     res.render('single', {
         i18n: {
             title: req.i18n.__('MadamPettine'),
+            logout: req.i18n.__('logout'),
+            sidebar: {
+                home: req.i18n.__('Home'),
+                customers: req.i18n.__('Customers'),
+                products: req.i18n.__('Products'),
+                settings: req.i18n.__('Settings')
+            },
             customers: {
                 search: req.i18n.__('Search...'),
                 createNew: req.i18n.__('Create new customer'),

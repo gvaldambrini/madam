@@ -1,3 +1,17 @@
+var Link = require('react-router').Link;
+var History = require('react-router').History;
+
+var moment = require('moment');
+
+var SimpleInput = require('./forms').SimpleInput;
+var FormInputDate = require('./forms').FormInputDate;
+var fnRenderErrors = require('./forms').fnRenderErrors;
+var fnSubmitForm = require('./forms').fnSubmitForm;
+
+var BaseTable = require('./tables').BaseTable;
+var BaseTableContainer = require('./tables').BaseTableContainer;
+var PopoverTemplate = require('./tables').PopoverTemplate;
+
 
 var AppointmentService = React.createClass({
   getInitialState: function() {
@@ -138,7 +152,7 @@ var AppointmentService = React.createClass({
 });
 
 
-var AppointmentTextArea  = React.createClass({
+var AppointmentTextArea = React.createClass({
   mixins: [SimpleInput],
   getInitialState: function() {
     return {value: ''}
@@ -221,7 +235,7 @@ var Appointment = React.createClass({
     return {
       workers: undefined,
       services: undefined,
-      date: moment().format('{{config.date_format}}'),
+      date: moment().format(config.date_format),
       notes: '',
       errors: []
     }
@@ -517,3 +531,10 @@ var AppointmentsRoot = React.createClass({
     );
   }
 });
+
+
+module.exports = {
+  Appointment: Appointment,
+  Appointments: Appointments,
+  AppointmentsRoot: AppointmentsRoot
+}

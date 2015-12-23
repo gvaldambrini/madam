@@ -10,6 +10,10 @@ var shell = require('gulp-shell');
 var jshint = require('gulp-jshint');
 var reload = browserSync.reload;
 
+var webpack = require("webpack");
+var webpackConfig = require("./webpack.config.js");
+var WebpackDevServer = require("webpack-dev-server");
+
 gulp.task('vendorscripts', function() {
     return gulp.src([
         'node_modules/express-handlebars/node_modules/handlebars/dist/handlebars.runtime.min.js',
@@ -54,7 +58,26 @@ if (process.env.NODE_ENV === 'production') {
           .pipe(gulp.dest('public/javascripts'));
     });
 
-    gulp.task('build', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images']);
+    gulp.task('webpack-build', function(cb) {
+      var config = Object.create(webpackConfig);
+      config.plugins = config.plugins.concat(
+        new webpack.DefinePlugin({
+          "process.env": {
+            "NODE_ENV": JSON.stringify("production")
+          }
+        }),
+        new webpack.optimize.DedupePlugin(),
+        new webpack.optimize.UglifyJsPlugin()
+      );
+
+      webpack(config, function(err, stats) {
+        if (err)
+          console.log('[webpack-build] - Error:', err);
+        cb();
+      });
+    });
+
+    gulp.task('build', ['webpack-build', 'sass', 'scripts', 'vendorcss', 'vendorscripts', 'images']);
 }
 else {
     console.log('*** development ***');
@@ -85,10 +108,9 @@ else {
     gulp.task('build', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images', 'doc', 'lint']);
     gulp.task('scripts-watch', ['scripts'], reload);
 
-    gulp.task('browser-sync', ['nodemon'], function() {
+    gulp.task('browser-sync', function() {
       browserSync.init(null, {
         proxy: "http://localhost:3000",
-        browser: ['google chrome'],
         port: 4000
       });
     });
@@ -102,21 +124,38 @@ else {
       }).on('start', function () {
         if (!called) {
           called = true;
-          cb();
+          // Give server time to start
+          setTimeout(cb, 1000);
         }
       });
     });
 
-    gulp.task('default', ['build', 'browser-sync'], function () {
+    gulp.task('webpack-dev-server', function (cb) {
+      var config = Object.create(webpackConfig);
+      config.devtool = "eval";
+      config.debug = true;
+      config.entry.app.unshift("webpack-dev-server/client?http://localhost:8080");
+
+      var serverOptions = {
+        publicPath: 'http://localhost:8080/',
+        stats: {colors: true},
+        quiet: true
+      };
+
+      var devServer = new WebpackDevServer(webpack(config), serverOptions);
+      devServer.listen(8080, 'localhost', function(err) {
+        if (err)
+          console.log('unable to start webpack-dev-server:', err);
+        cb();
+      });
+    });
+
+    gulp.task('default', ['build', 'webpack-dev-server', 'nodemon', 'browser-sync'], function () {
       gulp.watch(["*.js", "routes/*.js", "views/javascripts/*.js"], ['lint']);
       gulp.watch(["*.js", "routes/*.js", "README.md", "jsdoc.json"], ['doc']);
       gulp.watch("views/stylesheets/*.scss", ['sass']);
       gulp.watch("views/javascripts/*.js", ['scripts-watch']);
-      gulp.watch([
-        "views/*.handlebars",
-        'views/partials/*.handlebars',
-        'views/layouts/*.handlebars',
-        'views/shared/*.handlebars'], reload);
+      gulp.watch(["views/*.handlebars"], reload);
     });
 }
 

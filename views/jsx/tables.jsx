@@ -1,3 +1,6 @@
+var Cookies = require('js-cookie');
+
+
 var InputSearch = React.createClass({
   propTypes: {
       search: React.PropTypes.func.isRequired,
@@ -60,9 +63,6 @@ var BaseTable = {
     $.ajax({
       url: url,
       method: 'delete',
-      headers: {
-          'X-CSRF-Token': '{{csrftoken}}'
-      },
       complete: this.updateTable
     });
   },
@@ -71,7 +71,7 @@ var BaseTable = {
       this.props.updateTable();
     }
   },
-  renderHighlight(element) {
+  renderHighlight: function(element) {
     return {
       __html: element
     }
@@ -104,3 +104,12 @@ var BaseTableContainer = {
   },
 
 };
+
+
+module.exports = {
+  InputSearch: InputSearch,
+  PopoverTemplate: PopoverTemplate,
+  BaseTable: BaseTable,
+  BaseTableContainer: BaseTableContainer
+};
+

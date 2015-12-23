@@ -74,5 +74,6 @@
 	"New appointment": "Nuovo appuntamento",
 	"MadamPettine": "MadamPettine",
 	"Missing username.": "E' necessario inserire lo username.",
-	"Missing password.": "E' necessario inserire la password."
+	"Missing password.": "E' necessario inserire la password.",
+	"logout": "logout"
 }

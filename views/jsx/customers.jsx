@@ -1,3 +1,19 @@
+var Link = require('react-router').Link;
+var IndexLink = require('react-router').IndexLink;
+var History = require('react-router').History;
+
+var BaseForm = require('./forms').BaseForm;
+var FormInputDate = require('./forms').FormInputDate;
+var FormInput = require('./forms').FormInput;
+var FormInputRadio = require('./forms').FormInputRadio;
+var FormInputAndCheckbox = require('./forms').FormInputAndCheckbox;
+var FormTextArea = require('./forms').FormTextArea;
+
+var PopoverTemplate = require('./tables').PopoverTemplate;
+var InputSearch = require('./tables').InputSearch;
+var BaseTable = require('./tables').BaseTable;
+var BaseTableContainer = require('./tables').BaseTableContainer;
+
 
 var CustomerForm = React.createClass({
   mixins: [BaseForm, History],
@@ -42,7 +58,7 @@ var CustomerForm = React.createClass({
     };
     this.submitForm(url, method, successCb);
   },
-  renderHtml(element) {
+  renderHtml: function(element) {
     return {
       __html: element
     }
@@ -311,3 +327,10 @@ var CustomersRoot = React.createClass({
   }
 });
 
+
+module.exports = {
+  CustomerForm: CustomerForm,
+  Customer: Customer,
+  Customers: Customers,
+  CustomersRoot: CustomersRoot
+};

@@ -74,5 +74,6 @@
 	"New appointment": "New appointment",
 	"MadamPettine": "MadamPettine",
 	"Missing username.": "Missing username.",
-	"Missing password.": "Missing password."
+	"Missing password.": "Missing password.",
+	"logout": "logout"
 }
