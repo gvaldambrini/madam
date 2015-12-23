@@ -191,8 +191,10 @@ var routes = function() {
   );
 }
 
+var createBrowserHistory = require('history/lib/createBrowserHistory');
+var history = createBrowserHistory();
 
 ReactDOM.render(
-  <Router routes={routes()}/>,
+  <Router routes={routes()} history={history}/>,
   document.getElementById('main-container')
 );

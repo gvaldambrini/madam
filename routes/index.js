@@ -7,7 +7,10 @@ var passport = require('passport');
 var router = express.Router();
 var common = require('../common');
 
-router.get('/', function(req, res, next) {
+router.get('*', function(req, res, next) {
+    if (req.xhr) {
+        return next();
+    }
     res.render('single', {
         i18n: {
             title: req.i18n.__('MadamPettine'),
