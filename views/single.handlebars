@@ -5,8 +5,8 @@
   var i18n = {{{json i18n}}};
   var config = {{{json config}}};
 </script>
-{{#if isProduction}}
-<script src="bundle.js"></script>
+{{#if webpackDevServer}}
+<script src="{{webpackDevServer}}/bundle.js"></script>
 {{else}}
-<script src="http://localhost:8080/bundle.js"></script>
+<script src="bundle.js"></script>
 {{/if}}

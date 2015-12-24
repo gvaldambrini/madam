@@ -43,6 +43,11 @@ app.use(function(request, response, next) {
   // Let the configuration available also in templates.
   response.locals.config = request.config;
   response.locals.isProduction = process.env.NODE_ENV == 'production';
+
+  if (typeof process.env.WEBPACK_DEV_SERVER != 'undefined') {
+    response.locals.webpackDevServer = process.env.WEBPACK_DEV_SERVER;
+  }
+
   next();
 });
 

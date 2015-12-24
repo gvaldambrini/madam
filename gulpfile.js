@@ -8,11 +8,10 @@ var nodemon = require('gulp-nodemon');
 var browserSync = require('browser-sync');
 var shell = require('gulp-shell');
 var jshint = require('gulp-jshint');
-var reload = browserSync.reload;
-
 var webpack = require("webpack");
 var webpackConfig = require("./webpack.config.js");
 var WebpackDevServer = require("webpack-dev-server");
+var reload = browserSync.reload;
 
 gulp.task('vendorscripts', function() {
     return gulp.src([
@@ -146,6 +145,7 @@ else {
       devServer.listen(8080, 'localhost', function(err) {
         if (err)
           console.log('unable to start webpack-dev-server:', err);
+        process.env.WEBPACK_DEV_SERVER = 'http://localhost:8080/';
         cb();
       });
     });

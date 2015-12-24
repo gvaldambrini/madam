@@ -1,12 +1,4 @@
 module.exports = {
-  before: function (browser, done) {
-    browser.globals.startServer(done);
-  },
-
-  after: function(browser, done) {
-    browser.globals.stopServer(done);
-  },
-
   beforeEach: function(browser) {
     browser
       .url('http://localhost:7890')
