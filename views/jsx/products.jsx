@@ -1,17 +1,9 @@
-var Link = require('react-router').Link;
-var History = require('react-router').History;
+import { Link, History } from 'react-router';
 
-var moment = require('moment');
+import moment from 'moment';
 
-var BaseForm = require('./forms').BaseForm;
-var FormInputDate = require('./forms').FormInputDate;
-var FormInput = require('./forms').FormInput;
-var FormTextArea = require('./forms').FormTextArea;
-
-var PopoverTemplate = require('./tables').PopoverTemplate;
-var InputSearch = require('./tables').InputSearch;
-var BaseTable = require('./tables').BaseTable;
-var BaseTableContainer = require('./tables').BaseTableContainer;
+import { BaseForm, FormInputDate, FormInput, FormTextArea } from './forms';
+import { PopoverTemplate, InputSearch, BaseTableContainer, BaseTable } from './tables';
 
 
 var ProductForm = React.createClass({

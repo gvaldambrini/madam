@@ -1,9 +1,8 @@
-var History = require('react-router').History;
+import { History } from 'react-router';
 
-var Cookies = require('js-cookie');
+import Cookies from 'js-cookie';
 
-var BaseForm = require('./forms').BaseForm;
-var FormInput = require('./forms').FormInput;
+import { BaseForm, FormInput } from './forms';
 
 
 var LoginForm = React.createClass({

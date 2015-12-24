@@ -1,16 +1,9 @@
-var Link = require('react-router').Link;
-var History = require('react-router').History;
+import { Link, History } from 'react-router';
 
-var moment = require('moment');
+import moment from 'moment';
 
-var SimpleInput = require('./forms').SimpleInput;
-var FormInputDate = require('./forms').FormInputDate;
-var fnRenderErrors = require('./forms').fnRenderErrors;
-var fnSubmitForm = require('./forms').fnSubmitForm;
-
-var BaseTable = require('./tables').BaseTable;
-var BaseTableContainer = require('./tables').BaseTableContainer;
-var PopoverTemplate = require('./tables').PopoverTemplate;
+import { SimpleInput, FormInputDate, fnRenderErrors, fnSubmitForm } from './forms';
+import { BaseTable, BaseTableContainer, PopoverTemplate } from './tables';
 
 
 var AppointmentService = React.createClass({

@@ -1,12 +1,12 @@
-var Cookies = require('js-cookie');
+import Cookies from 'js-cookie';
 
-var Link = require('react-router').Link;
-var IndexLink = require('react-router').IndexLink;
-var Router = require('react-router').Router;
-var Route = require('react-router').Route;
-var IndexRoute = require('react-router').IndexRoute;
-var History = require('react-router').History;
-var IndexRedirect = require('react-router').IndexRedirect;
+import { Router, Route, Link, IndexRedirect, IndexLink, IndexRoute, History } from 'react-router';
+
+import { Appointment, Appointments, AppointmentsRoot } from './appointments';
+import { CustomerForm, Customer, Customers, CustomersRoot } from './customers';
+import { ProductForm, Products, ProductsRoot } from './products';
+import { ServicesForm, WorkersForm, SettingsRoot } from './settings';
+import { LoginForm } from './login';
 
 
 function csrfSafeMethod(method) {
@@ -130,24 +130,6 @@ var App = React.createClass({
   }
 });
 
-var Appointment = require('./appointments').Appointment;
-var Appointments = require('./appointments').Appointments;
-var AppointmentsRoot = require('./appointments').AppointmentsRoot;
-
-var CustomerForm = require('./customers').CustomerForm;
-var Customer = require('./customers').Customer;
-var Customers = require('./customers').Customers;
-var CustomersRoot = require('./customers').CustomersRoot;
-
-var ProductForm = require('./products').ProductForm;
-var Products = require('./products').Products;
-var ProductsRoot = require('./products').ProductsRoot;
-
-var ServicesForm = require('./settings').ServicesForm;
-var WorkersForm = require('./settings').WorkersForm;
-var SettingsRoot = require('./settings').SettingsRoot;
-
-var LoginForm = require('./login').LoginForm;
 
 function requireAuth(nextState, replaceState) {
     if (typeof Cookies.get('user') === 'undefined') {

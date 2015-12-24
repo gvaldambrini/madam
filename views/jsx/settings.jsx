@@ -1,7 +1,6 @@
-var Link = require('react-router').Link;
+import { Link } from 'react-router';
 
-var fnRenderErrors = require('./forms').fnRenderErrors;
-var fnSubmitForm = require('./forms').fnSubmitForm;
+import { fnRenderErrors, fnSubmitForm } from './forms';
 
 
 var BaseRow = {
