@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, IndexLink, History } from 'react-router';
 
 import { BaseForm, FormInputDate, FormInput, FormInputRadio, FormInputAndCheckbox, FormTextArea } from './forms';

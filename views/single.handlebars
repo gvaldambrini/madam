@@ -6,7 +6,9 @@
   var config = {{{json config}}};
 </script>
 {{#if webpackDevServer}}
+<script src="{{webpackDevServer}}/vendor.js"></script>
 <script src="{{webpackDevServer}}/bundle.js"></script>
 {{else}}
+<script src="vendor.js"></script>
 <script src="bundle.js"></script>
 {{/if}}

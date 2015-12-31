@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, History } from 'react-router';
 
 import moment from 'moment';

@@ -1,6 +1,8 @@
-import Cookies from 'js-cookie';
-
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { Router, Route, Link, IndexRedirect, IndexLink, IndexRoute, History } from 'react-router';
+
+import Cookies from 'js-cookie';
 
 import { Appointment, Appointments, AppointmentsRoot } from './appointments';
 import { CustomerForm, Customer, Customers, CustomersRoot } from './customers';

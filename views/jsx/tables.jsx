@@ -1,4 +1,6 @@
-var Cookies = require('js-cookie');
+import React from 'react';
+
+import Cookies from 'js-cookie';
 
 
 var InputSearch = React.createClass({

@@ -3,7 +3,8 @@ var webpack = require('webpack');
 module.exports = {
     context: __dirname + "/views",
     entry: {
-        app: ["./jsx/main.jsx"],
+        app: ["./javascripts/confirm-popover.js", "./jsx/main.jsx"],
+        vendor: ['react', 'react-dom', 'react-router', 'moment', 'js-cookie']
     },
     output: {
         path: __dirname + "/public",
@@ -26,8 +27,8 @@ module.exports = {
         extensions: ['', '.js', '.jsx']
     },
     plugins: [
+        new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.js')
     ],
     externals: {
-        'react': 'React'
-    },
+    }
 };

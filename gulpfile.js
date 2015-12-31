@@ -1,7 +1,6 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
 var minifycss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var nodemon = require('gulp-nodemon');
@@ -37,6 +36,25 @@ gulp.task('images', function() {
       .pipe(gulp.dest('public/images'));
 });
 
+gulp.task('webpack-build', function(cb) {
+  var config = Object.create(webpackConfig);
+  config.plugins = config.plugins.concat(
+    new webpack.DefinePlugin({
+      "process.env": {
+        "NODE_ENV": JSON.stringify("production")
+      }
+    }),
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.UglifyJsPlugin()
+  );
+
+  webpack(config, function(err, stats) {
+    if (err)
+      console.log('[webpack-build] - Error:', err);
+    cb();
+  });
+});
+
 if (process.env.NODE_ENV === 'production') {
     console.log('*** production ***');
 
@@ -49,34 +67,7 @@ if (process.env.NODE_ENV === 'production') {
             .pipe(gulp.dest('public/stylesheets'));
     });
 
-    gulp.task('scripts', function() {
-        return gulp.src('views/javascripts/*.js')
-          .pipe(concat('main.js'))
-          .pipe(uglify())
-          .pipe(rename('main.min.js'))
-          .pipe(gulp.dest('public/javascripts'));
-    });
-
-    gulp.task('webpack-build', function(cb) {
-      var config = Object.create(webpackConfig);
-      config.plugins = config.plugins.concat(
-        new webpack.DefinePlugin({
-          "process.env": {
-            "NODE_ENV": JSON.stringify("production")
-          }
-        }),
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.UglifyJsPlugin()
-      );
-
-      webpack(config, function(err, stats) {
-        if (err)
-          console.log('[webpack-build] - Error:', err);
-        cb();
-      });
-    });
-
-    gulp.task('build', ['webpack-build', 'sass', 'scripts', 'vendorcss', 'vendorscripts', 'images']);
+    gulp.task('build', ['webpack-build', 'sass', 'vendorcss', 'vendorscripts', 'images']);
 }
 else {
     console.log('*** development ***');
@@ -89,23 +80,16 @@ else {
             .pipe(reload({stream:true}));
     });
 
-    gulp.task('scripts', function() {
-        return gulp.src('views/javascripts/*.js')
-          .pipe(concat('main.js'))
-          .pipe(gulp.dest('public/javascripts'));
-    });
-
     gulp.task('doc', shell.task([
       './node_modules/.bin/jsdoc -c jsdoc.json -r README.md']));
 
     gulp.task('lint', function() {
-      return gulp.src(["*.js", "routes/*.js", "views/javascripts/*.js"])
+      return gulp.src(["*.js", "routes/*.js"])
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
     });
 
-    gulp.task('build', ['sass', 'scripts', 'vendorcss', 'vendorscripts', 'images', 'doc', 'lint']);
-    gulp.task('scripts-watch', ['scripts'], reload);
+    gulp.task('build', ['sass', 'vendorcss', 'vendorscripts', 'images', 'doc', 'lint']);
 
     gulp.task('browser-sync', function() {
       browserSync.init(null, {
@@ -151,10 +135,9 @@ else {
     });
 
     gulp.task('default', ['build', 'webpack-dev-server', 'nodemon', 'browser-sync'], function () {
-      gulp.watch(["*.js", "routes/*.js", "views/javascripts/*.js"], ['lint']);
+      gulp.watch(["*.js", "routes/*.js"], ['lint']);
       gulp.watch(["*.js", "routes/*.js", "README.md", "jsdoc.json"], ['doc']);
       gulp.watch("views/stylesheets/*.scss", ['sass']);
-      gulp.watch("views/javascripts/*.js", ['scripts-watch']);
       gulp.watch(["views/*.handlebars"], reload);
     });
 }
