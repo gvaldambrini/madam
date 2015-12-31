@@ -10,14 +10,15 @@ reusing snippets of the code in other projects (even completely unrelated!).
 
 ## System architecture
 
-The backend code is written in [Node.js](https://nodejs.org) 0.12.x, and it is based
+The backend code is written in [Node.js](https://nodejs.org) 4.x, and it is based
 on the version 4 of the web framework [Express.js](http://expressjs.com/).
 [Passport](http://passportjs.org/) with local strategy is used as the authentication
 middleware while [elasticsearch](https://www.elastic.co/products/elasticsearch) is
 the (main and unique) database.
-The template system is [handlebars](http://handlebarsjs.com/) and the frontend code
-is written using plain [jQuery](https://jquery.com/) and styled with
-[Bootstrap](http://getbootstrap.com/) version 3.
+The user interface is written in [React](https://github.com/facebook/react) and styled
+with [Bootstrap](http://getbootstrap.com/) version 3.
+[React Router](https://github.com/rackt/react-router) is used to perform the routing and
+[Webpack](https://webpack.github.io/) to bundle together js and jsx files.
 [Sass](http://sass-lang.com/) is the selected css pre-processor while [Gulp](http://gulpjs.com/)
 is the task runner & build system.
 Finally, [Nightwatch.js](http://nightwatchjs.org/) is used to perform end-to-end
@@ -40,7 +41,7 @@ node ./scripts/generate_indices.js
 ```
 node ./scripts/generate_data.js
 ```
-4. Launch the application with [browsersync](http://www.browsersync.io/) enabled:
+4. Launch the application with [browsersync](http://www.browsersync.io/) & the [webpack dev server](http://webpack.github.io/docs/webpack-dev-server.html) enabled:
 ```
 gulp
 ```
