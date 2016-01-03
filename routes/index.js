@@ -102,6 +102,13 @@ router.get('*', function(req, res, next) {
                 password: req.i18n.__('Password'),
                 submitText: req.i18n.__('Login'),
                 boxTitle: req.i18n.__('Login')
+            },
+            homepage: {
+                planAppointment: req.i18n.__('Plan appointment for:'),
+                plan: req.i18n.__('Add'),
+                customerPlaceholder: req.i18n.__('Insert a new customer or select an existing one'),
+                planned: req.i18n.__('Planned'),
+                appointments: req.i18n.__('Appointments')
             }
         }
     });

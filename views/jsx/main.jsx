@@ -9,6 +9,7 @@ import { CustomerForm, Customer, Customers, CustomersRoot } from './customers';
 import { ProductForm, Products, ProductsRoot } from './products';
 import { ServicesForm, WorkersForm, SettingsRoot } from './settings';
 import { LoginForm } from './login';
+import { HomePage } from './homepage';
 
 
 function csrfSafeMethod(method) {
@@ -23,6 +24,14 @@ $.ajaxSetup({
     }
   }
 });
+
+// Datepicker default settings
+$.fn.datepicker.defaults.language = config.language;
+$.fn.datepicker.defaults.daysOfWeekDisabled = "0";
+$.fn.datepicker.defaults.format = config.date_format.toLowerCase();
+$.fn.datepicker.defaults.autoclose = true;
+$.fn.datepicker.defaults.weekStart = 1;
+$.fn.datepicker.defaults.todayHighlight = true;
 
 
 var Sidebar = React.createClass({
@@ -144,6 +153,7 @@ var routes = function() {
   return (
     <Route component={App}>
       <Route path="/" component={Root} onEnter={requireAuth}>
+        <IndexRoute component={HomePage}/>
         <Route path="customers" component={CustomersRoot}>
           <IndexRoute component={Customers}/>
           <Route path="new" component={Customer}>

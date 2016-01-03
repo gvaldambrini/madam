@@ -113,6 +113,53 @@ router.use(['*'], function (req, res, next) {
     next();
 });
 
+router.get('/simple-search', function(req, res, next) {
+    var queryBody;
+    if (req.query.text.trim()) {
+        queryBody = {
+            query: {
+                multi_match: {
+                    query: req.query.text,
+                    operator: 'and',
+                    type: 'cross_fields',
+                    fields: [
+                        "name.autocomplete",
+                        "surname.autocomplete"
+                    ]
+                }
+            }
+        };
+    }
+    else {
+        queryBody = {
+            query: {
+                match_all: {}
+            }
+        };
+    }
+
+    client.search({
+        index: req.config.mainIndex,
+        type: 'customer',
+        size: req.query.size ?  req.query.size : 50,
+        body: queryBody
+    }, function(err, resp, respcode) {
+
+        var customers = [];
+        for (var i = 0; i < resp.hits.hits.length; i++) {
+            customers[customers.length] = {
+                id: resp.hits.hits[i]._id,
+                name: resp.hits.hits[i]._source.name,
+                surname: resp.hits.hits[i]._source.surname
+            };
+        }
+
+        res.json({
+            customers: customers
+        });
+    });
+});
+
 router.get('/search', function(req, res, next) {
     var queryBody;
     if (req.query.text.trim()) {
@@ -389,6 +436,41 @@ CustomerUtils.prototype.validateForm = function() {
     return this.req.validationErrors();
 };
 
+
+router.get('/appointments/:date', function(req, res, next) {
+    var queryBody = {
+        query: {
+            bool: {
+                must: [
+                    {
+                        term: { 'customer.appointments.date': req.params.date }
+                    }
+                ]
+            }
+        }
+    };
+
+    client.search({
+        index: req.config.mainIndex,
+        type: 'customer',
+        size: req.query.size ?  req.query.size : 50,
+        body: queryBody
+    }, function(err, resp, respcode) {
+
+        var appointments = [];
+        for (var i = 0; i < resp.hits.hits.length; i++) {
+            appointments[appointments.length] = {
+                id: resp.hits.hits[i]._id,
+                name: resp.hits.hits[i]._source.name,
+                surname: resp.hits.hits[i]._source.surname
+            };
+        }
+
+        res.json({
+            appointments: appointments
+        });
+    });
+});
 
 router.get('/:id/appointments', function(req, res, next) {
     client.get({

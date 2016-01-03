@@ -75,5 +75,9 @@
 	"MadamPettine": "MadamPettine",
 	"Missing username.": "Missing username.",
 	"Missing password.": "Missing password.",
-	"logout": "logout"
+	"logout": "logout",
+	"Plan appointment for:": "Plan appointment for:",
+	"Add": "Add",
+	"Insert a new customer or select an existing one": "Insert a new customer or select an existing one",
+	"Planned": "Planned"
 }

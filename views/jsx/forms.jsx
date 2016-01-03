@@ -30,7 +30,7 @@ var FormInputDate = React.createClass({
           <div className="input-group date" ref={
             function(div) {
               var $div = $(div);
-              $div.datepicker();
+              $div.datepicker({endDate: "0d"});
               $div.datepicker('setDate', that.props.value);
             }
           }>
@@ -57,13 +57,6 @@ var FormInputDate = React.createClass({
     if (typeof this.props.orientation !== 'undefined') {
       $.fn.datepicker.defaults.orientation = this.props.orientation;
     }
-    $.fn.datepicker.defaults.language = config.language;
-    $.fn.datepicker.defaults.daysOfWeekDisabled = "0";
-    $.fn.datepicker.defaults.format = config.date_format.toLowerCase();
-    $.fn.datepicker.defaults.autoclose = true;
-    $.fn.datepicker.defaults.weekStart = 1;
-    $.fn.datepicker.defaults.todayHighlight = true;
-    $.fn.datepicker.defaults.endDate = "0d";
   }
 });
 

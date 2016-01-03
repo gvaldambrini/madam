@@ -75,5 +75,9 @@
 	"MadamPettine": "MadamPettine",
 	"Missing username.": "E' necessario inserire lo username.",
 	"Missing password.": "E' necessario inserire la password.",
-	"logout": "logout"
+	"logout": "logout",
+	"Plan appointment for:": "Pianifica appuntamento per:",
+	"Add": "Aggiungi",
+	"Insert a new customer or select an existing one": "Inserisci nuovo cliente o seleziona uno esistente",
+	"Planned": "Pianificato"
 }
