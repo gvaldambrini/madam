@@ -12,6 +12,7 @@ var esErrors = elasticsearch.errors;
 var customersPath = '/customers';
 var moment = require('moment');
 var util = require('util');
+var async = require('async');
 
 router.use(common.isAuthenticated);
 
@@ -438,38 +439,187 @@ CustomerUtils.prototype.validateForm = function() {
 
 
 router.get('/appointments/:date', function(req, res, next) {
-    var queryBody = {
-        query: {
-            bool: {
-                must: [
-                    {
-                        term: { 'customer.appointments.date': req.params.date }
-                    }
-                ]
+    function getApps(callback) {
+        var queryBody = {
+            query: {
+                bool: {
+                    must: { term: { 'customer.appointments.date': req.params.date }}
+                }
             }
-        }
-    };
+        };
 
-    client.search({
-        index: req.config.mainIndex,
-        type: 'customer',
-        size: req.query.size ?  req.query.size : 50,
-        body: queryBody
-    }, function(err, resp, respcode) {
-
-        var appointments = [];
-        for (var i = 0; i < resp.hits.hits.length; i++) {
-            appointments[appointments.length] = {
-                id: resp.hits.hits[i]._id,
-                name: resp.hits.hits[i]._source.name,
-                surname: resp.hits.hits[i]._source.surname
-            };
-        }
-
-        res.json({
-            appointments: appointments
+        client.search({
+            index: req.config.mainIndex,
+            type: 'customer',
+            size: req.query.size ?  req.query.size : 50,
+            body: queryBody
+        }, function(err, resp, respcode) {
+            var appointments = [];
+            var hits = resp.hits.hits;
+            for (var i = 0; i < hits.length; i++) {
+                appointments[appointments.length] = {
+                    id: hits[i]._id,
+                    fullname: util.format('%s %s', hits[i]._source.name, hits[i]._source.surname),
+                    planned: false
+                };
+            }
+            callback(null, appointments);
         });
-    });
+    }
+
+    function getPlannedApps(callback) {
+        var queryBody = {
+            query: {
+                bool: {
+                    must: { term: { 'customer.planned_appointments.date': req.params.date }}
+                }
+            }
+        };
+
+        client.search({
+            index: req.config.mainIndex,
+            type: 'customer',
+            size: req.query.size ?  req.query.size : 50,
+            body: queryBody
+        }, function(err, resp, respcode) {
+            var appointments = [];
+            var hits = resp.hits.hits;
+            for (var i = 0; i < hits.length; i++) {
+                appointments[appointments.length] = {
+                    id: hits[i]._id,
+                    fullname: util.format('%s %s', hits[i]._source.name, hits[i]._source.surname),
+                    planned: true
+                };
+            }
+            callback(null, appointments);
+        });
+    }
+
+    function getPlannedCalendarApps(callback) {
+        client.get({
+            index: req.config.mainIndex,
+            type: 'calendar',
+            id: common.calendarDocId
+        }, function(err, resp, respcode) {
+            var appointments = [];
+
+            if (resp.found && resp._source.days.length > 0) {
+                var calDays = resp._source.days;
+                for (var i = 0; i < calDays.length; i++) {
+                    if (calDays[i].date === req.params.date) {
+                        for (var j = 0; j < calDays[i].planned_appointments.length; j++) {
+                            appointments.push({
+                                id: undefined,
+                                fullname: calDays[i].planned_appointments[j],
+                                planned: true
+                            });
+                        }
+                        break;
+                    }
+                }
+                callback(null, appointments);
+            }
+        });
+    }
+
+    async.parallel(
+        [getApps, getPlannedApps, getPlannedCalendarApps],
+        function(err, results) {
+            var appointments = [];
+            var i, j;
+            for (i = 0; i < results.length; i++) {
+                for (j = 0; j < results[i].length; j++) {
+                    appointments[appointments.length] = results[i][j];
+                }
+            }
+            res.json({
+                appointments: appointments
+            });
+        }
+    )
+});
+
+router.post('/planned-appointments/:date', function(req, res, next) {
+
+    function planOnCustomer(isodate, id) {
+        client.get({
+            index: req.config.mainIndex,
+            type: 'customer',
+            id: id
+        }, function(err, resp, respcode) {
+            var version = resp._version;
+            var obj = resp._source;
+
+            if (typeof obj.planned_appointments == 'undefined')
+                obj.planned_appointments = [];
+
+            obj.planned_appointments.push({
+                date: isodate
+            });
+
+            client.update({
+                index: req.config.mainIndex,
+                type: 'customer',
+                id: id,
+                version: version,
+                body: {doc: obj}
+            }, function(err, resp, respcode) {
+                common.indexCb(req, res, err, resp, true);
+            });
+        });
+    }
+
+    function planOnCalendar(isodate, fullname) {
+        client.get({
+            index: req.config.mainIndex,
+            type: 'calendar',
+            id: common.calendarDocId
+        }, function(err, resp, respcode) {
+            var calDays = [];
+            if (resp.found && resp._source.days.length > 0) {
+                calDays = resp._source.days;
+            }
+            var dateFound = false;
+            for (var i = 0; i < calDays.length; i++) {
+                if (calDays[i].date === isodate) {
+                    dateFound = true;
+                    calDays[i].planned_appointments.push(fullname);
+                }
+            }
+            if (!dateFound) {
+                calDays.push({
+                    date: isodate,
+                    planned_appointments: [fullname]
+                });
+            }
+
+            client.index({
+                index: req.config.mainIndex,
+                type: 'calendar',
+                id: common.calendarDocId,
+                body: {days: calDays}
+            }, function(err, resp, respcode) {
+                common.indexCb(req, res, err, resp, true);
+            });
+        });
+    }
+
+    var plannedDate = moment(req.params.date);
+    if (!plannedDate.isValid()) {
+        var errors = [{msg: req.i18n.__('The planned date is not valid')}];
+        res.status(400).json({errors: errors});
+        return;
+    }
+
+    var that = this;
+
+    if (typeof req.body.id !== 'undefined') {
+        planOnCustomer(plannedDate.format('YYYY-MM-DD'), req.body.id);
+    }
+    else {
+        planOnCalendar(plannedDate.format('YYYY-MM-DD'), req.body.fullname)
+    }
+
 });
 
 router.get('/:id/appointments', function(req, res, next) {

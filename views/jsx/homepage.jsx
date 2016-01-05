@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 import moment from 'moment';
 
 import { BaseTableContainer } from './tables';
+import { fnSubmitForm } from './forms';
 
 
 var InputCustomer = React.createClass({
@@ -131,17 +132,18 @@ var PlanAppointment = React.createClass({
 
 var AppointmentsTable = React.createClass({
   render: function() {
+    var that = this;
     var appointmentRows = this.props.appointments.map(function(app, index) {
       var content;
       if (app.planned) {
-        content = <i style={{color: '#999'}}>({i18n.homepage.planned}) {app.name}</i>
+        content = <i style={{color: '#999'}}>({i18n.homepage.planned}) {app.fullname}</i>
       }
       else {
-        content = app.name;
+        content = app.fullname;
       }
 
       return (
-        <tr key={app.name + app.planned}>
+        <tr key={that.props.date + app.fullname + app.planned}>
           <td>{content}</td>
           <td className="no-padding">
             <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
@@ -169,7 +171,7 @@ var HomePage = React.createClass({
       date: moment().format('YYYY-MM-DD'),
       data: [],
       loaded: false,
-      planned: []
+      errors: []
     }
   },
   componentWillMount: function() {
@@ -184,29 +186,24 @@ var HomePage = React.createClass({
     this.fetchData('/customers/appointments/' + (typeof date === 'undefined' ? this.state.date : date));
   },
   addAppointment: function(customer) {
-    var planned = this.state.planned;
-    planned.push(customer.fullname);
-    this.setState({planned: planned});
+    var that = this;
+    var data = {
+      fullname: customer.fullname,
+      id: customer.id
+    };
+    var url = '/customers/planned-appointments/' + this.state.date;
+    fnSubmitForm(this, url, 'post', data, function() {
+      var appointments = that.state.data.appointments;
+      appointments.push({
+        fullname: data.fullname,
+        id: data.id,
+        planned: true
+      });
+      that.setState({data: {appointments: appointments}});
+    });
   },
   setDate: function(date) {
     this.setState({date: moment(date).format('YYYY-MM-DD')});
-  },
-  mergeAppointments: function() {
-    var appointments = [];
-    for (var i = 0; i < this.state.data.appointments.length; ++i) {
-      appointments.push({
-        name: this.state.data.appointments[i].name + ' ' + this.state.data.appointments[i].surname,
-        planned: false
-      });
-    }
-
-    for (i = 0; i < this.state.planned.length; i++) {
-      appointments.push({
-        name: this.state.planned[i],
-        planned: true
-      });
-    }
-    return appointments;
   },
   render: function() {
     var that = this;
@@ -216,7 +213,7 @@ var HomePage = React.createClass({
 
     var appointments;
     if (this.state.data.appointments.length > 0) {
-      appointments = <AppointmentsTable appointments={this.mergeAppointments()}/>;
+      appointments = <AppointmentsTable appointments={this.state.data.appointments} date={this.state.date}/>;
     }
 
     return (

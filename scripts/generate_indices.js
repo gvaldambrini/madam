@@ -161,6 +161,11 @@
                                 notes: {type: 'string'}
                             }
                         },
+                        planned_appointments: {
+                            properties: {
+                                date: {type: 'date'}
+                            }
+                        }
                     }
                 }
             }
@@ -301,6 +306,34 @@
         });
     }
 
+    function createCalendarType(callback) {
+        client.indices.putMapping({
+            index: mainIndex,
+            type: 'calendar',
+            body: {
+                calendar: {
+                    properties: {
+                        days: {
+                            type: "object",
+                            properties: {
+                                date: {type: 'date'},
+                                planned_appointments: {
+                                    type: "string",
+                                    index: "not_analyzed"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }, function(err, resp, respcode) {
+            if (!err) {
+                console.log('Type calendar created');
+            }
+            callback(err, resp);
+        });
+    }
+
     function generate(_mainIndex, cb) {
         mainIndex = _mainIndex;
 
@@ -311,6 +344,7 @@
             createWorkersType,
             createServicesType,
             createProductType,
+            createCalendarType,
             createUsersType
         ], cb);
     }

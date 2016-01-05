@@ -28,6 +28,10 @@
     var minApp = 0;
     var maxApp = 5;
 
+    // The minimum number of planned appointments generated for each customer
+    var minPlannedApp = 0;
+    var maxPlannedApp = 2;
+
     // The number of customers generated
     var numCustomers = 20;
 
@@ -93,25 +97,39 @@
             body[body.length] = {index: {_index: mainIndex, _type: 'customer'}};
 
             var appointments = [];
+            var offset = getRandomInt(0, 3);
             for (var j = 0; j < getRandomInt(minApp, maxApp); j++) {
                 var appServices = [];
                 var serviceNames = services.slice();
+
                 for (var k = 0; k < getRandomInt(Math.floor(services.length / 2), services.length); k++) {
                     appServices[appServices.length] = {
                         description: popRandomElement(serviceNames),
                         worker: getRandomElement(workers).name
                     };
                 }
+
                 appointments[appointments.length] = {
-                    date: moment().subtract(j, 'days').format('YYYY-MM-DD'),
+                    date: moment().subtract(offset, 'days').format('YYYY-MM-DD'),
                     services: appServices
                 };
+                offset += getRandomInt(2, 8);
+            }
+
+            offset = getRandomInt(0, 3);
+            var planned_appointments = [];
+            for (var k = 0; k < getRandomInt(minPlannedApp, maxPlannedApp); k++) {
+                planned_appointments[planned_appointments.length] = {
+                    date: moment().add(offset, 'days').format('YYYY-MM-DD')
+                };
+                offset += getRandomInt(4, 7);
             }
 
             var customer = {
                 name: getRandomElement(firstnames),
                 surname: getRandomElement(lastnames),
-                appointments: appointments
+                appointments: appointments,
+                planned_appointments: planned_appointments
             };
 
             if (appointments.length > 0)
@@ -169,6 +187,33 @@
         client.bulk({body: body});
     }
 
+    function populateCalendar() {
+        console.log('Populate calendar...');
+        var body = [];
+        var lastnames = readFileAsArray(path.join(__dirname, 'data', 'lastnames.txt'));
+        var firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
+
+        body[body.length] = {index: {_index: mainIndex, _type: 'calendar', _id: common.calendarDocId}};
+
+        var calendarDays = [];
+        var numDays = 3;
+        var offset = getRandomInt(-3, 3);
+
+        for (var i = 0; i < numDays; i++) {
+            var plannedApp = [];
+            for (var j = 0; j < getRandomInt(1, 3); j++) {
+                plannedApp[plannedApp.length] = getRandomElement(firstnames) + ' ' + getRandomElement(lastnames);
+            }
+            calendarDays[calendarDays.length] = {
+                date: moment().add(offset, 'days').format('YYYY-MM-DD'),
+                planned_appointments: plannedApp
+            };
+            offset += getRandomInt(1, 4);
+        }
+        body[body.length] = {days: calendarDays};
+        client.bulk({body: body});
+    }
+
     function createUser() {
         console.log('Create user...');
         var body = [];
@@ -193,6 +238,7 @@
         populateSettings();
         populateCustomers();
         populateProducts();
+        populateCalendar();
         createUser();
     }
 }

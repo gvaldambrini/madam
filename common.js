@@ -119,4 +119,10 @@ Common.prototype.servicesDocId = '5678a632-9d9a-43c9-b440-4f6e1f6dfea7';
  */
 Common.prototype.usersDocId = 'b5198cbb-3a7b-4393-a129-2593f18510d5';
 
+/**
+ * The id of the calendar document.
+ * @var {string}
+ */
+Common.prototype.calendarDocId = 'b6d047ab-ddb6-4a5d-b66b-8a321c45c2b5';
+
 module.exports = new Common();
