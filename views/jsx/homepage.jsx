@@ -164,11 +164,17 @@ var AppointmentsTable = React.createClass({
   }
 });
 
-var HomePage = React.createClass({
+
+var Calendar = React.createClass({
   mixins: [ BaseTableContainer, History ],
   getInitialState: function() {
+
+    var date = typeof this.props.params.date !== 'undefined'
+      ? this.props.params.date
+      : moment().format('YYYY-MM-DD');
+
     return {
-      date: moment().format('YYYY-MM-DD'),
+      date: date,
       data: [],
       loaded: false,
       errors: []
@@ -177,9 +183,10 @@ var HomePage = React.createClass({
   componentWillMount: function() {
     this.updateTable();
   },
-  componentWillUpdate: function(nextProps, nextState) {
-    if (nextState.date !== this.state.date) {
-      this.updateTable(nextState.date);
+  componentWillReceiveProps: function(nextProps) {
+    if (nextProps.params.date !== this.state.date) {
+      this.updateTable(nextProps.params.date);
+      this.setState({date: moment(nextProps.params.date).format('YYYY-MM-DD')});
     }
   },
   updateTable: function(date) {
@@ -203,7 +210,7 @@ var HomePage = React.createClass({
     });
   },
   setDate: function(date) {
-    this.setState({date: moment(date).format('YYYY-MM-DD')});
+    this.history.pushState(null, '/calendar/' + moment(date).format('YYYY-MM-DD'));
   },
   render: function() {
     var that = this;
@@ -217,7 +224,7 @@ var HomePage = React.createClass({
     }
 
     return (
-      <div className="content-body">
+      <div>
         <div className='date-selector-header'>
           <span className="glyphicon glyphicon-menu-left" onClick={function(event) {
             var date = moment(that.state.date).subtract(1, 'days');
@@ -227,7 +234,7 @@ var HomePage = React.createClass({
           }}/>
           <span className="date-selector" data-provide="datepicker" ref={
             function(span) {
-              $(span).datepicker().on("changeDate", function(event) {
+              $(span).datepicker().off('changeDate').on('changeDate', function(event) {
                 that.setDate(moment(event.date.toISOString()));
               });
             }
@@ -250,6 +257,17 @@ var HomePage = React.createClass({
 });
 
 
+var HomePage = React.createClass({
+  render: function() {
+    return (
+      <div className="content-body">
+        {this.props.children}
+      </div>
+    );
+  }
+});
+
 module.exports = {
-  HomePage: HomePage
+  HomePage: HomePage,
+  Calendar: Calendar
 };

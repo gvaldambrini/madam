@@ -9,7 +9,7 @@ import { CustomerForm, Customer, Customers, CustomersRoot } from './customers';
 import { ProductForm, Products, ProductsRoot } from './products';
 import { ServicesForm, WorkersForm, SettingsRoot } from './settings';
 import { LoginForm } from './login';
-import { HomePage } from './homepage';
+import { HomePage, Calendar } from './homepage';
 
 
 function csrfSafeMethod(method) {
@@ -40,7 +40,7 @@ var Sidebar = React.createClass({
       <div className="col-sm-2 sidebar collapse">
         <ul className="nav nav-sidebar">
           <li>
-            <IndexLink activeClassName="active" to="/">{i18n.sidebar.home}</IndexLink>
+            <Link activeClassName="active" to="/calendar">{i18n.sidebar.home}</Link>
           </li>
           <li>
             <Link activeClassName="active" to="/customers">{i18n.sidebar.customers}</Link>
@@ -153,7 +153,15 @@ var routes = function() {
   return (
     <Route component={App}>
       <Route path="/" component={Root} onEnter={requireAuth}>
-        <IndexRoute component={HomePage}/>
+        <IndexRedirect to="calendar" />
+        // this would be ideally just a main route with path equal to "/calendar(/:date)",
+        // however with that configuration the related link in the sidebar is not active
+        // when accessing the calendar page with a specific date.
+        // This trick (having the main root simply as "calendar") solve the problem.
+        <Route path="calendar" component={HomePage}>
+          <IndexRoute component={Calendar}/>
+          <Route path="/calendar(/:date)" component={Calendar}/>
+        </Route>
         <Route path="customers" component={CustomersRoot}>
           <IndexRoute component={Customers}/>
           <Route path="new" component={Customer}>
