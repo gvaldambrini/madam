@@ -104,10 +104,11 @@ var PlanAppointment = React.createClass({
       return;
 
     this.props.plan(this.state.customer);
-    this.setState({customer: {
-      fullname: '',
-      id: undefined
-    }});
+    this.setState({
+      customer: {
+        fullname: '',
+        id: undefined
+      }});
   },
   render: function() {
     return (
@@ -199,9 +200,10 @@ var Calendar = React.createClass({
       id: customer.id
     };
     var url = '/customers/planned-appointments/' + this.state.date;
-    fnSubmitForm(this, url, 'post', data, function() {
+    fnSubmitForm(this, url, 'post', data, function(response) {
       var appointments = that.state.data.appointments;
       appointments.push({
+        appid: response.id,
         fullname: data.fullname,
         id: data.id,
         planned: true

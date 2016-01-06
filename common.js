@@ -82,13 +82,16 @@ Common.prototype.toArray = function(container) {
  *
  * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
  * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
- * @param {object} error the error returned by the elasticsearch client
- * @oaram {object} resp the elasticsearch response
- * @param newItem bool true if the index is perfomed for creating a new item
+ * @param {object} error the error returned by the elasticsearch client.
+ * @oaram {object} resp the elasticsearch response.
+ * @param newItem bool true if the index is perfomed for creating a new item.
+ * @oaram string objId the optional object id if it is not the es document id.
  */
-Common.prototype.indexCb = function(req, res, err, resp, newItem) {
+Common.prototype.indexCb = function(req, res, err, resp, newItem, objId) {
     if (!err) {
-        res.status(newItem ? 201 : 200).json({id: resp._id});
+        res.status(newItem ? 201 : 200).json({
+            id: typeof objId === 'undefined' ? resp._id : objId
+        });
         return;
     }
 

@@ -250,9 +250,9 @@ var Appointment = React.createClass({
   componentWillMount: function() {
     var that = this;
 
-    if (typeof this.props.params.appnum != 'undefined') {
+    if (typeof this.props.params.appid !== 'undefined') {
       $.ajax({
-        url: '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appnum,
+        url: '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid,
         method: 'get',
         success: that.loadAppointment
       });
@@ -326,7 +326,7 @@ var Appointment = React.createClass({
   },
   handleSubmit: function() {
     var that = this;
-    var editForm = typeof this.props.params.appnum != 'undefined';
+    var editForm = typeof this.props.params.appid != 'undefined';
     var baseUrl = '/customers/' + this.props.params.id;
 
     var services = [];
@@ -343,7 +343,7 @@ var Appointment = React.createClass({
       notes: this.state.notes
     };
 
-    var url = baseUrl + (editForm ? '/appointments/' + this.props.params.appnum : '/appointments');
+    var url = baseUrl + (editForm ? '/appointments/' + this.props.params.appid : '/appointments');
     var method = editForm ? 'put': 'post';
     var successCb = function() {
       that.history.pushState(null, '/customers/edit/' + that.props.params.id + '/appointments');
@@ -377,7 +377,7 @@ var Appointment = React.createClass({
     }
 
     var submitText, formTitle;
-    if (typeof this.props.params.appnum != 'undefined') {
+    if (typeof this.props.params.appid != 'undefined') {
       submitText = i18n.appointments.submitEdit;
       formTitle = i18n.appointments.titleEdit;
     }
@@ -415,10 +415,10 @@ var AppointmentsTable = React.createClass({
     var that = this;
     var appointmentRows = this.props.data.map(function(appointment) {
       return (
-        <tr key={appointment.id} onClick={
+        <tr key={appointment.appid} onClick={
             function(event) {
               that.history.pushState(
-                null, '/customers/edit/' + that.props.customer + '/appointments/edit/' + appointment.id);
+                null, '/customers/edit/' + that.props.customer + '/appointments/edit/' + appointment.appid);
               event.preventDefault();
               event.stopPropagation();
             }
@@ -428,7 +428,7 @@ var AppointmentsTable = React.createClass({
           <td className="no-padding">
             <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
               data-toggle="tooltip" data-placement="left"
-              title={appointment.deleteText} data-obj-id={appointment.id} ref={
+              title={appointment.deleteText} data-obj-id={appointment.appid} ref={
                 function(span) {
                   if (span != null) {
                     var $span = $(span);

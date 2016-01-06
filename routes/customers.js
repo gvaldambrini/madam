@@ -13,6 +13,7 @@ var customersPath = '/customers';
 var moment = require('moment');
 var util = require('util');
 var async = require('async');
+var uuid = require('node-uuid');
 
 router.use(common.isAuthenticated);
 
@@ -451,17 +452,24 @@ router.get('/appointments/:date', function(req, res, next) {
         client.search({
             index: req.config.mainIndex,
             type: 'customer',
-            size: req.query.size ?  req.query.size : 50,
+            size: req.query.size ? req.query.size : 50,
             body: queryBody
         }, function(err, resp, respcode) {
             var appointments = [];
-            var hits = resp.hits.hits;
-            for (var i = 0; i < hits.length; i++) {
-                appointments[appointments.length] = {
-                    id: hits[i]._id,
-                    fullname: util.format('%s %s', hits[i]._source.name, hits[i]._source.surname),
-                    planned: false
-                };
+            for (var i = 0; i < resp.hits.hits.length; i++) {
+                var hit = resp.hits.hits[i];
+
+                for (var j = 0; j < hit._source.appointments.length; j++) {
+                    if (hit._source.appointments[j].date === req.params.date) {
+                        appointments[appointments.length] = {
+                            id: hit._id,
+                            appid: hit._source.appointments[j].appid,
+                            fullname: util.format('%s %s', hit._source.name, hit._source.surname),
+                            planned: false
+                        };
+                        break;
+                    }
+                }
             }
             callback(null, appointments);
         });
@@ -483,13 +491,19 @@ router.get('/appointments/:date', function(req, res, next) {
             body: queryBody
         }, function(err, resp, respcode) {
             var appointments = [];
-            var hits = resp.hits.hits;
-            for (var i = 0; i < hits.length; i++) {
-                appointments[appointments.length] = {
-                    id: hits[i]._id,
-                    fullname: util.format('%s %s', hits[i]._source.name, hits[i]._source.surname),
-                    planned: true
-                };
+            for (var i = 0; i < resp.hits.hits.length; i++) {
+                var hit = resp.hits.hits[i];
+                for (var j = 0; j < hit._source.planned_appointments.length; j++) {
+                    if (hit._source.planned_appointments[j].date === req.params.date) {
+                        appointments[appointments.length] = {
+                            id: hit._id,
+                            appid: hit._source.planned_appointments[j].appid,
+                            fullname: util.format('%s %s', hit._source.name, hit._source.surname),
+                            planned: true
+                        };
+                        break;
+                    }
+                }
             }
             callback(null, appointments);
         });
@@ -510,7 +524,8 @@ router.get('/appointments/:date', function(req, res, next) {
                         for (var j = 0; j < calDays[i].planned_appointments.length; j++) {
                             appointments.push({
                                 id: undefined,
-                                fullname: calDays[i].planned_appointments[j],
+                                appid: calDays[i].planned_appointments[j].appid,
+                                fullname: calDays[i].planned_appointments[j].fullname,
                                 planned: true
                             });
                         }
@@ -536,7 +551,7 @@ router.get('/appointments/:date', function(req, res, next) {
                 appointments: appointments
             });
         }
-    )
+    );
 });
 
 router.post('/planned-appointments/:date', function(req, res, next) {
@@ -549,11 +564,13 @@ router.post('/planned-appointments/:date', function(req, res, next) {
         }, function(err, resp, respcode) {
             var version = resp._version;
             var obj = resp._source;
+            var appointmentId = uuid.v4();
 
             if (typeof obj.planned_appointments == 'undefined')
                 obj.planned_appointments = [];
 
             obj.planned_appointments.push({
+                appid: appointmentId,
                 date: isodate
             });
 
@@ -564,7 +581,7 @@ router.post('/planned-appointments/:date', function(req, res, next) {
                 version: version,
                 body: {doc: obj}
             }, function(err, resp, respcode) {
-                common.indexCb(req, res, err, resp, true);
+                common.indexCb(req, res, err, resp, true, appointmentId);
             });
         });
     }
@@ -580,16 +597,23 @@ router.post('/planned-appointments/:date', function(req, res, next) {
                 calDays = resp._source.days;
             }
             var dateFound = false;
+            var appointmentId = uuid.v4();
             for (var i = 0; i < calDays.length; i++) {
                 if (calDays[i].date === isodate) {
                     dateFound = true;
-                    calDays[i].planned_appointments.push(fullname);
+                    calDays[i].planned_appointments.push({
+                        appid: appointmentId,
+                        fullname: fullname
+                    });
                 }
             }
             if (!dateFound) {
                 calDays.push({
                     date: isodate,
-                    planned_appointments: [fullname]
+                    planned_appointments: [{
+                        appid: appointmentId,
+                        fullname: fullname
+                    }]
                 });
             }
 
@@ -599,7 +623,7 @@ router.post('/planned-appointments/:date', function(req, res, next) {
                 id: common.calendarDocId,
                 body: {days: calDays}
             }, function(err, resp, respcode) {
-                common.indexCb(req, res, err, resp, true);
+                common.indexCb(req, res, err, resp, true, appointmentId);
             });
         });
     }
@@ -617,7 +641,7 @@ router.post('/planned-appointments/:date', function(req, res, next) {
         planOnCustomer(plannedDate.format('YYYY-MM-DD'), req.body.id);
     }
     else {
-        planOnCalendar(plannedDate.format('YYYY-MM-DD'), req.body.fullname)
+        planOnCalendar(plannedDate.format('YYYY-MM-DD'), req.body.fullname);
     }
 
 });
@@ -651,7 +675,7 @@ router.get('/:id/appointments', function(req, res, next) {
 
         for (var i = 0; i < obj.appointments.length; i++) {
             appointments.push({
-                id: i,
+                appid: obj.appointments[i].appid,
                 _date: obj.appointments[i].date,
                 date: common.toLocalFormattedDate(req, obj.appointments[i].date),
                 services: obj.appointments[i].services.map(descFn).join(' - '),
@@ -710,13 +734,20 @@ AppointmentUtils.prototype.handleForm = function() {
             return;
         }
 
+
+        var newItem = false;
         var appointment = {
+            appid: that.req.params.appid,
             date: common.toISODate(that.req, that.req.body.date),
             services: services,
             notes: that.req.body.notes
         };
 
-        var newItem = typeof that.req.params.appnum === 'undefined';
+        if (typeof that.req.params.appid === 'undefined') {
+            newItem = true;
+            appointment.appid = uuid.v4();
+        }
+
         if (newItem) {
             if (typeof obj.appointments == 'undefined')
                 obj.appointments = [];
@@ -724,7 +755,12 @@ AppointmentUtils.prototype.handleForm = function() {
             obj.appointments.push(appointment);
         }
         else {
-            obj.appointments[that.req.params.appnum] = appointment;
+            for (var j = 0; j < obj.appointments.length; j++) {
+                if (obj.appointments[i].appid === that.req.params.appid) {
+                    obj.appointments[j] = appointment;
+                    break;
+                }
+            }
         }
         updateLastSeen(obj);
 
@@ -735,7 +771,7 @@ AppointmentUtils.prototype.handleForm = function() {
             version: version,
             body: {doc: obj}
         }, function(err, resp, respcode) {
-            common.indexCb(that.req, that.res, err, resp, newItem);
+            common.indexCb(that.req, that.res, err, resp, newItem, appointment.appid);
         });
     });
 };
@@ -764,7 +800,7 @@ router.use(['/:id/appointments*'], function (req, res, next) {
 });
 
 
-router.get('/:id/appointments/:appnum', function(req, res, next) {
+router.get('/:id/appointments/:appid', function(req, res, next) {
     client.mget({
         body: {
             docs: [
@@ -773,7 +809,20 @@ router.get('/:id/appointments/:appnum', function(req, res, next) {
             ]
         }
     }, function(err, resp, respcode) {
-        var appointment = resp.docs[0]._source.appointments[req.params.appnum];
+
+        var appointment;
+        for (var j = 0; j < resp.docs[0]._source.appointments.length; j++) {
+            if (resp.docs[0]._source.appointments[j].appid === req.params.appid) {
+                appointment = resp.docs[0]._source.appointments[j];
+                break;
+            }
+        }
+
+        if (typeof appointment === 'undefined') {
+            res.sendStatus(404);
+            return;
+        }
+
         var workers = resp.docs[1]._source.workers;
         var services = [];
 
@@ -800,11 +849,11 @@ router.post('/:id/appointments', function(req, res, next) {
     req.utils.handleForm();
 });
 
-router.put('/:id/appointments/:appnum', function(req, res, next) {
+router.put('/:id/appointments/:appid', function(req, res, next) {
     req.utils.handleForm();
 });
 
-router.delete('/:id/appointments/:appnum', function(req, res, next) {
+router.delete('/:id/appointments/:appid', function(req, res, next) {
     client.get({
         index: req.config.mainIndex,
         type: 'customer',
@@ -812,18 +861,26 @@ router.delete('/:id/appointments/:appnum', function(req, res, next) {
     }, function(err, resp, respcode) {
         var version = resp._version;
         var obj = resp._source;
-        var index = req.params.appnum;
 
         if (err) {
             console.log(err);
             res.status(400).end();
             return;
         }
-        if (index < 0 || index >= obj.appointments.length) {
-            console.log('Wrong index:', index, 'in removing appointment for customer:', req.params.id);
-            res.status(400).end();
+
+        var index = -1;
+        for (var i = 0; i < obj.appointments.length; i++) {
+            if (obj.appointments[i].appid === req.params.appid) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index === -1) {
+            res.sendStatus(404);
             return;
         }
+
         obj.appointments.splice(index, 1);
         updateLastSeen(obj);
 

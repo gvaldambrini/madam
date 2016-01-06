@@ -12,6 +12,7 @@
     var elasticsearch = require('elasticsearch');
     var moment = require('moment');
     var bcrypt = require('bcrypt-nodejs');
+    var uuid = require('node-uuid');
     var common = require('../common');
     var client = common.createClient();
 
@@ -110,6 +111,7 @@
                 }
 
                 appointments[appointments.length] = {
+                    appid: uuid.v4(),
                     date: moment().subtract(offset, 'days').format('YYYY-MM-DD'),
                     services: appServices
                 };
@@ -120,6 +122,7 @@
             var planned_appointments = [];
             for (var k = 0; k < getRandomInt(minPlannedApp, maxPlannedApp); k++) {
                 planned_appointments[planned_appointments.length] = {
+                    appid: uuid.v4(),
                     date: moment().add(offset, 'days').format('YYYY-MM-DD')
                 };
                 offset += getRandomInt(4, 7);
@@ -202,7 +205,10 @@
         for (var i = 0; i < numDays; i++) {
             var plannedApp = [];
             for (var j = 0; j < getRandomInt(1, 3); j++) {
-                plannedApp[plannedApp.length] = getRandomElement(firstnames) + ' ' + getRandomElement(lastnames);
+                plannedApp[plannedApp.length] = {
+                    appid: uuid.v4(),
+                    fullname: getRandomElement(firstnames) + ' ' + getRandomElement(lastnames)
+                };
             }
             calendarDays[calendarDays.length] = {
                 date: moment().add(offset, 'days').format('YYYY-MM-DD'),

@@ -149,6 +149,10 @@
                         notes: {type: 'string'},
                         appointments: {
                             properties: {
+                                appid: {
+                                    type: 'string',
+                                    index: 'not_analyzed'
+                                },
                                 date: {type: 'date'},
                                 services: {
                                     properties: {
@@ -163,6 +167,10 @@
                         },
                         planned_appointments: {
                             properties: {
+                                appid: {
+                                    type: 'string',
+                                    index: 'not_analyzed'
+                                },
                                 date: {type: 'date'}
                             }
                         }
@@ -318,8 +326,18 @@
                             properties: {
                                 date: {type: 'date'},
                                 planned_appointments: {
-                                    type: "string",
-                                    index: "not_analyzed"
+                                    type: "object",
+                                    properties: {
+                                        appid: {
+                                            type: 'string',
+                                            index: 'not_analyzed'
+                                        },
+                                        fullname: {
+                                            type: 'string',
+                                            index: "not_analyzed"
+                                        }
+                                    }
+
                                 }
                             }
                         }

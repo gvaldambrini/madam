@@ -172,7 +172,7 @@ var routes = function() {
             <Route path="appointments" component={AppointmentsRoot}>
               <IndexRoute component={Appointments}/>
               <Route path="new" component={Appointment}/>
-              <Route path="edit/:appnum" component={Appointment}/>
+              <Route path="edit/:appid" component={Appointment}/>
             </Route>
           </Route>
         </Route>
