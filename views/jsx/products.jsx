@@ -94,7 +94,7 @@ var ProductForm = React.createClass({
             <FormInput name='brand' value={this.state.data.brand}
               label={i18n.products.brand} handleChange={this.handleChange}/>
             <FormInputDate name='sold_date' value={this.state.data.sold_date}
-              label={i18n.products.sold_date} orientation='top'
+              label={i18n.products.soldDate} orientation='top'
               handleChange={this.handleChange}/>
             <FormTextArea name='notes' value={this.state.data.notes}
               label={i18n.products.notes}
@@ -137,7 +137,7 @@ var ProductsTable = React.createClass({
             <td className="no-padding">
               <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
                 data-toggle="tooltip" data-placement="left"
-                title={object.deleteText} data-obj-id={object.id} ref={
+                title={i18n.products.deleteText} ref={
                   function(span) {
                     if (span != null) {
                       var $span = $(span);
@@ -151,7 +151,7 @@ var ProductsTable = React.createClass({
                         content: i18n.products.deleteMsg,
                         $rootContainer: $('#products-table-container'),
                         onConfirm: function() {
-                          that.deleteItem($span.data('obj-id'));
+                          that.deleteItem(object.id);
                         }
                       });
                     }
@@ -170,7 +170,7 @@ var ProductsTable = React.createClass({
           <td className="no-padding">
             <span className="pull-right glyphicon glyphicon-plus"
               data-toggle="tooltip" data-placement="left"
-              title={product.cloneText}
+              title={i18n.products.cloneText}
               onClick={
                 function(event) {
                   that.history.pushState(null, '/products/clone/' + product.objects[0].id);
@@ -192,8 +192,8 @@ var ProductsTable = React.createClass({
               <table className='table table-hover'>
                   <thead data-toggle="collapse" data-target={'#expanded-row' + index}>
                     <tr>
-                      <th>{product.headerDate}</th>
-                      <th>{product.headerNotes}</th>
+                      <th>{i18n.products.soldDate}</th>
+                      <th>{i18n.products.notes}</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -211,9 +211,9 @@ var ProductsTable = React.createClass({
       <table className='table table-hover'>
         <thead>
           <tr>
-            <th>{this.props.data.headerName}</th>
-            <th>{this.props.data.headerBrand}</th>
-            <th>{this.props.data.headerCount}</th>
+            <th>{i18n.products.name}</th>
+            <th>{i18n.products.brand}</th>
+            <th>{i18n.products.soldCount}</th>
             <th></th>
           </tr>
         </thead>
@@ -258,7 +258,7 @@ var Products = React.createClass({
       products = <ProductsTable data={this.state.data} updateTable={this.updateTable}/>;
     }
     else {
-      products = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;
+      products = <div className="alert alert-info" role="alert">{i18n.products.emptyTableMsg}</div>;
     }
 
     return (

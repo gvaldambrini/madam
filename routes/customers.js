@@ -98,7 +98,6 @@ function processElasticsearchResults(req, hits) {
 
         results[results.length] = {
             id: hits[i]._id,
-            deleteText: req.i18n.__('Delete customer'),
             name: getField(hits[i], 'name', 'autocomplete'),
             surname: surname,
             phone: phone_mobile,
@@ -203,11 +202,6 @@ router.get('/search', function(req, res, next) {
         body: queryBody
     }, function(err, resp, respcode) {
         res.json({
-            headerName: req.i18n.__('Name'),
-            headerSurname: req.i18n.__('Surname'),
-            headerPhone: req.i18n.__('Mobile') + ' / ' + req.i18n.__('Phone'),
-            headerLastSeen: req.i18n.__('Last seen'),
-            emptyMsg: req.i18n.__('No customers to display.'),
             customers: processElasticsearchResults(req, resp.hits.hits)
         });
     });
@@ -329,31 +323,6 @@ CustomerUtils.prototype.toISODate = function(localFormattedDate) {
  */
 CustomerUtils.prototype.toLocalFormattedDate = function(ISODate) {
     return common.toLocalFormattedDate(this.req, ISODate);
-};
-
-/**
- * Returns an object which maps the form fields and buttons of the Customer form
- * with the related translated names.
- * @method
- *
- * @param {bool} editForm true if the form is for edit.
- */
-CustomerUtils.prototype.formNames = function(editForm) {
-    return {
-        name: this.req.i18n.__('Name'),
-        surname: this.req.i18n.__('Surname'),
-        mobile_phone: this.req.i18n.__('Mobile Phone'),
-        allow_sms: this.req.i18n.__('Allow sms'),
-        phone: this.req.i18n.__('Phone'),
-        email: this.req.i18n.__('Email'),
-        allow_email: this.req.i18n.__('Allow email'),
-        first_seen: this.req.i18n.__('First seen'),
-        discount: this.req.i18n.__('Discount'),
-        notes: this.req.i18n.__('Notes'),
-        submit: editForm ? this.req.i18n.__('Edit customer') : this.req.i18n.__('Create customer'),
-        submit_and_add: this.req.i18n.__('Create customer and appointment'),
-        mandatoryFields: this.req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
-    };
 };
 
 /**
@@ -763,8 +732,7 @@ router.get('/:id/appointments', function(req, res, next) {
                 appid: obj.appointments[i].appid,
                 _date: obj.appointments[i].date,
                 date: common.toLocalFormattedDate(req, obj.appointments[i].date),
-                services: obj.appointments[i].services.map(descFn).join(' - '),
-                deleteText: req.i18n.__('Delete appointment')
+                services: obj.appointments[i].services.map(descFn).join(' - ')
             });
         }
         appointments.sort(sortFn);

@@ -50,7 +50,6 @@ function processElasticsearchResults(req, resp) {
 
             objects[objects.length] = {
                 id: obj._id,
-                deleteText: req.i18n.__('Delete product'),
                 date: obj._source.sold_date ? common.toLocalFormattedDate(req, obj._source.sold_date) : '-',
                 notes: obj._source.notes ? obj._source.notes : '-'
             };
@@ -58,12 +57,9 @@ function processElasticsearchResults(req, resp) {
 
         obj = lookup[aggregations[i].hits.hits.hits[0]._id];
         results[results.length] = {
-            cloneText: req.i18n.__('Add another'),
             name: getField(obj, 'name', 'autocomplete'),
             brand: getField(obj, 'brand', 'autocomplete'),
             count: aggregations[i].doc_count,
-            headerDate: req.i18n.__('Sold date'),
-            headerNotes: req.i18n.__('Notes'),
             objects: objects
         };
     }
@@ -141,10 +137,6 @@ router.get('/search', function(req, res, next) {
         body: queryBody
     }, function(err, resp, respcode) {
         res.json({
-            headerName: req.i18n.__('Name'),
-            headerBrand: req.i18n.__('Brand'),
-            headerCount: req.i18n.__('Sold'),
-            emptyMsg: req.i18n.__('No products to display.'),
             products: processElasticsearchResults(req, resp)
         });
     });
@@ -207,24 +199,6 @@ ProductUtils.prototype.toISODate = function(localFormattedDate) {
  */
 ProductUtils.prototype.toLocalFormattedDate = function(ISODate) {
     return common.toLocalFormattedDate(this.req, ISODate);
-};
-
-/**
- * Returns an object which maps the form fields and buttons of the Product form
- * with the related translated names.
- * @method
- *
- * @param {bool} editForm true if the form is for edit.
- */
-ProductUtils.prototype.formNames = function(editForm) {
-    return {
-        name: this.req.i18n.__('Name'),
-        brand: this.req.i18n.__('Brand'),
-        sold_date: this.req.i18n.__('Sold date'),
-        notes: this.req.i18n.__('Notes'),
-        submit: editForm ? this.req.i18n.__('Edit product') : this.req.i18n.__('Add product'),
-        mandatoryFields: this.req.i18n.__('Fields marked with <span className="mandatory">*</span> are mandatory.')
-    };
 };
 
 /**

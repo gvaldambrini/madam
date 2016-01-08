@@ -427,8 +427,7 @@ var AppointmentsTable = React.createClass({
           <td>{appointment.services}</td>
           <td className="no-padding">
             <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
-              data-toggle="tooltip" data-placement="left"
-              title={appointment.deleteText} data-obj-id={appointment.appid} ref={
+              data-toggle="tooltip" data-placement="left" title={i18n.appointments.deleteText} ref={
                 function(span) {
                   if (span != null) {
                     var $span = $(span);
@@ -442,7 +441,7 @@ var AppointmentsTable = React.createClass({
                       content: i18n.appointments.deleteMsg,
                       $rootContainer: $('#appointments-table-container'),
                       onConfirm: function() {
-                        that.deleteItem($span.data('obj-id'));
+                        that.deleteItem(appointment.appid);
                       }
                     });
                   }

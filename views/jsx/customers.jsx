@@ -93,8 +93,8 @@ var CustomerForm = React.createClass({
             <FormInput name='surname' value={this.state.data.surname}
               label={i18n.customers.surname} handleChange={this.handleChange}/>
             <FormInputAndCheckbox type='tel' value={this.state.data.mobile_phone}
-              name='mobile_phone' label={i18n.customers.mobile_phone}
-              cbname='allow_sms' cblabel={i18n.customers.allow_sms}
+              name='mobile_phone' label={i18n.customers.mobilePhone}
+              cbname='allow_sms' cblabel={i18n.customers.allowSms}
               cbvalue={this.state.data.allow_sms}
               handleChange={this.handleChange}/>
             <FormInput type='tel' name='phone' value={this.state.data.phone}
@@ -102,7 +102,7 @@ var CustomerForm = React.createClass({
 
             <FormInputAndCheckbox type='email' value={this.state.data.email}
               name='email' label={i18n.customers.email}
-              cbname='allow_email' cblabel={i18n.customers.allow_email}
+              cbname='allow_email' cblabel={i18n.customers.allowEmail}
               cbvalue={this.state.data.allow_email}
               handleChange={this.handleChange}/>
 
@@ -116,7 +116,7 @@ var CustomerForm = React.createClass({
               handleChange={this.handleChange}/>
 
             <FormInputDate name='first_seen' value={this.state.data.first_seen}
-              label={i18n.customers.first_seen}
+              label={i18n.customers.firstSeen}
               handleChange={this.handleChange}/>
             <FormTextArea name='notes' value={this.state.data.notes}
               label={i18n.customers.notes} handleChange={this.handleChange}/>
@@ -208,8 +208,7 @@ var CustomersTable = React.createClass({
           <td className="hidden-xs">{customer.last_seen}</td>
           <td className="no-padding">
             <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
-              data-toggle="tooltip" data-placement="left"
-              title={customer.deleteText} data-obj-id={customer.id} ref={
+              data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
                 function(span) {
                   if (span != null) {
                     var $span = $(span);
@@ -223,7 +222,7 @@ var CustomersTable = React.createClass({
                       content: i18n.customers.deleteMsg,
                       $rootContainer: $('#customers-table-container'),
                       onConfirm: function() {
-                        that.deleteItem($span.data('obj-id'));
+                        that.deleteItem(customer.id);
                       }
                     });
                   }
@@ -238,10 +237,10 @@ var CustomersTable = React.createClass({
       <table className='table table-hover'>
         <thead>
           <tr>
-            <th>{this.props.data.headerName}</th>
-            <th>{this.props.data.headerSurname}</th>
-            <th className="hidden-xs">{this.props.data.headerPhone}</th>
-            <th className="hidden-xs">{this.props.data.headerLastSeen}</th>
+            <th>{i18n.customers.name}</th>
+            <th>{i18n.customers.surname}</th>
+            <th className="hidden-xs">{i18n.customers.phones}</th>
+            <th className="hidden-xs">{i18n.customers.lastSeen}</th>
             <th></th>
           </tr>
         </thead>
@@ -286,7 +285,7 @@ var Customers = React.createClass({
       customers = <CustomersTable data={this.state.data} updateTable={this.updateTable}/>;
     }
     else {
-      customers = <div className="alert alert-info" role="alert">{this.state.data.emptyMsg}</div>;
+      customers = <div className="alert alert-info" role="alert">{i18n.customers.emptyTableMsg}</div>;
     }
 
     return (
