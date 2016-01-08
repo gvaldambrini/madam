@@ -6,7 +6,7 @@ import Autosuggest from 'react-autosuggest';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 
-import { BaseTableContainer } from './tables';
+import { PopoverTemplate, BaseTableContainer } from './tables';
 import { fnSubmitForm } from './forms';
 
 
@@ -144,12 +144,31 @@ var AppointmentsTable = React.createClass({
       }
 
       return (
-        <tr key={that.props.date + app.fullname + app.planned}>
+        <tr key={app.appid}>
           <td>{content}</td>
           <td className="no-padding">
             <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
               data-toggle="tooltip" data-placement="left"
-              title='delete'></span>
+              title={i18n.homepage.deleteText} ref={
+                function(span) {
+                  if (span != null) {
+                    var $span = $(span);
+                    if ($span.data('tooltip-init'))
+                      return;
+                    $span.data('tooltip-init', true);
+                    $span.tooltip();
+                    $span.confirmPopover({
+                      template: '#popover-template',
+                      title: i18n.homepage.deleteTitle,
+                      content: i18n.homepage.deleteMsg,
+                      $rootContainer: $('#calendar-table-container'),
+                      onConfirm: function() {
+                        that.props.deleteItem(app);
+                      }
+                    });
+                  }
+                }
+              }></span>
           </td>
         </tr>
       );
@@ -169,7 +188,6 @@ var AppointmentsTable = React.createClass({
 var Calendar = React.createClass({
   mixins: [ BaseTableContainer, History ],
   getInitialState: function() {
-
     var date = typeof this.props.params.date !== 'undefined'
       ? this.props.params.date
       : moment().format('YYYY-MM-DD');
@@ -192,6 +210,21 @@ var Calendar = React.createClass({
   },
   updateTable: function(date) {
     this.fetchData('/customers/appointments/' + (typeof date === 'undefined' ? this.state.date : date));
+  },
+  deleteItem: function(app) {
+    var url;
+    if (app.planned) {
+      url = '/customers/planned-appointments/' + this.state.date +'/' + app.appid;
+    }
+    else {
+      url = '/customers/'+ app.id + '/appointments/' + '/' + app.appid;
+    }
+
+    $.ajax({
+      url: url,
+      method: 'delete',
+      complete: function() { this.updateTable() }.bind(this)
+    });
   },
   addAppointment: function(customer) {
     var that = this;
@@ -222,7 +255,12 @@ var Calendar = React.createClass({
 
     var appointments;
     if (this.state.data.appointments.length > 0) {
-      appointments = <AppointmentsTable appointments={this.state.data.appointments} date={this.state.date}/>;
+      appointments = (
+        <AppointmentsTable
+          appointments={this.state.data.appointments}
+          date={this.state.date}
+          deleteItem={this.deleteItem}/>
+      );
     }
 
     return (
@@ -262,8 +300,11 @@ var Calendar = React.createClass({
 var HomePage = React.createClass({
   render: function() {
     return (
-      <div className="content-body">
+      <div id="calendar-table-container" className="content-body">
         {this.props.children}
+        <div id="popover-template">
+          <PopoverTemplate confirm={i18n.homepage.btnConfirm} cancel={i18n.homepage.btnCancel}/>
+        </div>
       </div>
     );
   }

@@ -108,7 +108,12 @@ router.get('*', function(req, res, next) {
                 plan: req.i18n.__('Add'),
                 customerPlaceholder: req.i18n.__('Insert a new customer or select an existing one'),
                 planned: req.i18n.__('Planned'),
-                appointments: req.i18n.__('Appointments')
+                appointments: req.i18n.__('Appointments'),
+                btnConfirm: req.i18n.__('Confirm'),
+                btnCancel: req.i18n.__('Cancel'),
+                deleteTitle: req.i18n.__('Delete the appointment?'),
+                deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
+                deleteText: req.i18n.__('Delete appointment')
             }
         }
     });

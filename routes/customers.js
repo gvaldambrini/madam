@@ -143,10 +143,9 @@ router.get('/simple-search', function(req, res, next) {
     client.search({
         index: req.config.mainIndex,
         type: 'customer',
-        size: req.query.size ?  req.query.size : 50,
+        size: req.query.size ? req.query.size : 50,
         body: queryBody
     }, function(err, resp, respcode) {
-
         var customers = [];
         for (var i = 0; i < resp.hits.hits.length; i++) {
             customers[customers.length] = {
@@ -554,6 +553,15 @@ router.get('/appointments/:date', function(req, res, next) {
     );
 });
 
+router.param('date', function(req, res, next, date) {
+    if (moment(date, 'YYYY-MM-DD').isValid()) {
+        next();
+    }
+    else {
+        res.sendStatus(400);
+    }
+});
+
 router.post('/planned-appointments/:date', function(req, res, next) {
 
     function planOnCustomer(isodate, id) {
@@ -628,22 +636,99 @@ router.post('/planned-appointments/:date', function(req, res, next) {
         });
     }
 
-    var plannedDate = moment(req.params.date);
-    if (!plannedDate.isValid()) {
-        var errors = [{msg: req.i18n.__('The planned date is not valid')}];
-        res.status(400).json({errors: errors});
-        return;
-    }
-
-    var that = this;
-
     if (typeof req.body.id !== 'undefined') {
-        planOnCustomer(plannedDate.format('YYYY-MM-DD'), req.body.id);
+        planOnCustomer(req.params.date, req.body.id);
     }
     else {
-        planOnCalendar(plannedDate.format('YYYY-MM-DD'), req.body.fullname);
+        planOnCalendar(req.params.date, req.body.fullname);
     }
+});
 
+router.delete('/planned-appointments/:date/:appid', function(req, res, next) {
+    var queryBody = {
+        query: {
+            bool: {
+                should: [
+                    { term: { "calendar.days.planned_appointments.appid": req.params.appid }},
+                    { term: { "customer.planned_appointments.appid": req.params.appid }}
+                ],
+                minimum_should_match: 1
+            }
+        }
+    };
+
+    client.search({
+        index: req.config.mainIndex,
+        size: 1,
+        body: queryBody
+    }, function(err, resp, respcode) {
+        if (resp.hits.hits.length != 1) {
+            res.sendStatus(400);
+            return;
+        }
+
+        var obj = resp.hits.hits[0]._source;
+        var docType = resp.hits.hits[0]._type;
+        var docId = resp.hits.hits[0]._id;
+        var index, i;
+        if (docType === 'customer') {
+            index = -1;
+            for (i = 0; i < obj.planned_appointments.length; i++) {
+                if (obj.planned_appointments[i].appid === req.params.appid) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index === -1) {
+                res.sendStatus(404);
+                return;
+            }
+
+            obj.planned_appointments.splice(index, 1);
+        }
+        else {  // calendar
+            var dateIndex = -1;
+            for (i = 0; i < obj.days.length; i++) {
+                if (obj.days[i].date === req.params.date) {
+                    dateIndex = i;
+                    break;
+                }
+            }
+            if (dateIndex === -1) {
+                res.sendStatus(404);
+                return;
+            }
+            index = -1;
+            for (i = 0; i < obj.days[dateIndex].planned_appointments.length; i++) {
+                if (obj.days[dateIndex].planned_appointments[i].appid === req.params.appid) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index === -1) {
+                res.sendStatus(404);
+                return;
+            }
+            obj.days[dateIndex].planned_appointments.splice(index, 1);
+        }
+
+        client.index({
+            index: req.config.mainIndex,
+            type: docType,
+            id: docId,
+            refresh: true,
+            body: obj
+        }, function(err, resp, respcode) {
+            if (err) {
+                console.log(err);
+                res.status(400).end();
+            }
+            else {
+                res.status(200).end();
+            }
+        });
+    });
 });
 
 router.get('/:id/appointments', function(req, res, next) {
