@@ -1,32 +1,35 @@
-var express = require('express');
-var exphbs = require('express-handlebars');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var session = require('cookie-session');
-var passport = require('passport');
-var LocalStrategy = require('passport-local');
-var bcrypt = require('bcrypt-nodejs');
-var elasticsearch = require('elasticsearch');
-var validator = require('express-validator');
-var csrf = require('csurf');
-var moment = require('moment');
-var i18n = require('i18n-2');
+"use strict";
 
-var routes = require('./routes/index');
-var customers = require('./routes/customers');
-var products = require('./routes/products');
-var settings = require('./routes/settings');
-var common = require('./common');
-var client = common.createClient();
+const express = require('express');
+const exphbs = require('express-handlebars');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const session = require('cookie-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const bcrypt = require('bcrypt-nodejs');
+const elasticsearch = require('elasticsearch');
+const validator = require('express-validator');
+const csrf = require('csurf');
+const moment = require('moment');
+const i18n = require('i18n-2');
+
+const routes = require('./routes/index');
+const customers = require('./routes/customers');
+const products = require('./routes/products');
+const settings = require('./routes/settings');
+const common = require('./common');
+const client = common.createClient();
 
 /**
  * The {@link http://expressjs.com/4x/api.html#app|express application}.
  * @var {object}
  */
-var app = express();
+const app = express();
+const appDirname = path.resolve(path.dirname());
 
 i18n.expressBind(app, {
   locales: ['en', 'it'],
@@ -52,25 +55,21 @@ app.use(function(request, response, next) {
 });
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(appDirname, 'views'));
 
-var hbs = exphbs.create({
+const hbs = exphbs.create({
   defaultLayout: 'main',
   helpers: {
     json: function(context) {
       return JSON.stringify(context);
     }
-  },
-  partialsDir: [
-      'views/shared/',
-      'views/partials/'
-  ]
+  }
 });
 
 app.hbs = hbs;
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
-app.use(favicon(__dirname + '/public/images/favicon.ico'));
+app.use(favicon(appDirname + '/public/images/favicon.ico'));
 
 app.use(logger('dev', {
   skip: function(req, res) {
@@ -82,7 +81,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(function(request, response, next) {
-  var validatorOptions = {
+  let validatorOptions = {
     customValidators: {
       isEmpty: function(value) {
         return /^\s+$/.test(value);
@@ -95,8 +94,8 @@ app.use(function(request, response, next) {
   return validator(validatorOptions)(request, response, next);
 });
 
-var cookieKey;
-var cookieSecret;
+let cookieKey;
+let cookieSecret;
 if (process.env.NODE_ENV == 'production') {
   cookieKey = process.env.COOKIE_KEY;
   cookieSecret = process.env.COOKIE_SECRET;
@@ -149,7 +148,6 @@ passport.use('login', new LocalStrategy({
           function filterFn(item) {
               return item.username === username;
           }
-          var users, user;
 
           if (err) {
               return done(err);
@@ -159,12 +157,12 @@ passport.use('login', new LocalStrategy({
             console.log('Users document not found');
             return done(req.i18n.__('Incorrect username.'), false);
           }
-          users = resp._source.users.filter(filterFn);
+          let users = resp._source.users.filter(filterFn);
           if (users.length === 0) {
             return done(req.i18n.__('Incorrect username.'), false);
           }
 
-          user = users[0];
+          let user = users[0];
           if (!bcrypt.compareSync(password, user.password)) {
             return done(req.i18n.__('Incorrect password.'), false);
           }
@@ -176,7 +174,7 @@ passport.use('login', new LocalStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(appDirname, 'public')));
 
 app.use('/', routes);
 app.use(customers.path, customers.router);
@@ -185,7 +183,7 @@ app.use(settings.path, settings.router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  let err = new Error('Not Found');
   err.status = 404;
   next(err);
 });

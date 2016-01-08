@@ -1,11 +1,13 @@
+"use strict";
+
 /**
  * Index module, contains all the homepage and the login/logout views.
  * @module
  */
-var express = require('express');
-var passport = require('passport');
-var router = express.Router();
-var common = require('../common');
+const express = require('express');
+const passport = require('passport');
+const router = express.Router();
+const common = require('../common');
 
 router.get('*', function(req, res, next) {
     if (req.xhr) {

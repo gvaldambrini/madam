@@ -1,17 +1,19 @@
+"use strict";
+
 /**
  * Settings module, contains all the views and code related to settings
  * (workers and services).
  * @module
  */
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var settingsPath = '/settings';
+const settingsPath = '/settings';
 
-var elasticsearch = require('elasticsearch');
-var esErrors = elasticsearch.errors;
-var common = require('../common');
-var client = common.createClient();
+const elasticsearch = require('elasticsearch');
+const esErrors = elasticsearch.errors;
+const common = require('../common');
+const client = common.createClient();
 
 router.use(common.isAuthenticated);
 
@@ -21,7 +23,7 @@ router.get('/workers', function(req, res, next) {
         type: 'workers',
         id: common.workersDocId
     }, function(err, resp, respcode) {
-        var items = [];
+        let items = [];
         if (resp.found && resp._source.workers.length > 0) {
             items = resp._source.workers;
         }
@@ -32,8 +34,8 @@ router.get('/workers', function(req, res, next) {
 });
 
 router.put('/workers', function(req, res, next) {
-    var workers = [];
-    for (var i = 0; i < req.body.workers.length; i++) {
+    let workers = [];
+    for (let i = 0; i < req.body.workers.length; i++) {
         if (req.body.workers[i].name.trim()) {
             workers.push({
                 name: req.body.workers[i].name.trim(),
@@ -43,12 +45,12 @@ router.put('/workers', function(req, res, next) {
     }
 
     if (workers.length === 0) {
-        var errors = [{msg: req.i18n.__('At least one worker is mandatory')}];
+        let errors = [{msg: req.i18n.__('At least one worker is mandatory')}];
         res.status(400).json({errors: errors});
         return;
     }
 
-    var args = {
+    let args = {
         index: req.config.mainIndex,
         type: 'workers',
         refresh: true,
@@ -63,7 +65,7 @@ router.put('/workers', function(req, res, next) {
             res.status(200).json({items: workers});
             return;
         }
-        var errors = [];
+        let errors = [];
         if (err instanceof esErrors.NoConnections)
             errors[errors.length] = {msg: req.i18n.__('Database connection error')};
         else
@@ -86,14 +88,14 @@ router.get('/services', function(req, res, next) {
 });
 
 router.put('/services', function(req, res, next) {
-    var services = common.toArray(req.body.services).filter(function(e) { return e; });
+    let services = common.toArray(req.body.services).filter(function(e) { return e; });
     if (services.length === 0) {
-        var errors = [{msg: req.i18n.__('At least one service is mandatory')}];
+        let errors = [{msg: req.i18n.__('At least one service is mandatory')}];
         res.status(400).json({errors: errors});
         return;
     }
 
-    var args = {
+    let args = {
         index: req.config.mainIndex,
         type: 'services',
         refresh: true,
@@ -109,7 +111,7 @@ router.put('/services', function(req, res, next) {
             return;
         }
 
-        var errors = [];
+        let errors = [];
         if (err instanceof esErrors.NoConnections)
             errors[errors.length] = {msg: req.i18n.__('Database connection error')};
         else

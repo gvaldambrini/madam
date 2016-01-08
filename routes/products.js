@@ -1,16 +1,18 @@
+"use strict";
+
 /**
  * Products module, contains all the views and code related to products.
  * @module
  */
 
-var express = require('express');
-var elasticsearch = require('elasticsearch');
-var router = express.Router();
-var common = require('../common');
-var client = common.createClient();
-var esErrors = elasticsearch.errors;
-var productsPath = '/products';
-var moment = require('moment');
+const express = require('express');
+const elasticsearch = require('elasticsearch');
+const router = express.Router();
+const common = require('../common');
+const client = common.createClient();
+const esErrors = elasticsearch.errors;
+const productsPath = '/products';
+const moment = require('moment');
 
 router.use(common.isAuthenticated);
 
@@ -30,22 +32,19 @@ function processElasticsearchResults(req, resp) {
         return hit._source[field];
     }
 
-    var hits = resp.hits.hits;
-    var aggregations = resp.aggregations.prods.buckets;
+    let hits = resp.hits.hits;
+    let aggregations = resp.aggregations.prods.buckets;
 
-    var lookup = {};
-    for (var i = 0; i < hits.length; i++) {
+    let lookup = {};
+    for (let i = 0; i < hits.length; i++) {
         lookup[hits[i]._id] = hits[i];
     }
 
-    var results = [];
-    var obj;
-    var j;
-    var objects;
-
-    for (i = 0; i < aggregations.length; i++) {
-        objects = [];
-        for (j = 0; j < aggregations[i].hits.hits.hits.length; j++) {
+    let results = [];
+    for (let i = 0; i < aggregations.length; i++) {
+        let objects = [];
+        let obj;
+        for (let j = 0; j < aggregations[i].hits.hits.hits.length; j++) {
             obj = lookup[aggregations[i].hits.hits.hits[j]._id];
 
             objects[objects.length] = {
@@ -96,7 +95,7 @@ var aggregate_product = {
 };
 
 router.get('/search', function(req, res, next) {
-    var queryBody;
+    let queryBody;
     if (req.query.text.trim()) {
         queryBody = {
             query: {
@@ -168,7 +167,7 @@ ProductUtils.formFields = ['name', 'brand', 'sold_date', 'notes'];
  */
 ProductUtils.prototype.validateForm = function() {
     // Trim all the fields that allow the user to write text
-    for (var i = 0; i < ProductUtils.formFields.length; i++)
+    for (let i = 0; i < ProductUtils.formFields.length; i++)
         this.req.sanitize(ProductUtils.formFields[i]).trim();
 
     this.req.checkBody('name', this.req.i18n.__('The name is mandatory')).notEmpty();
@@ -209,9 +208,9 @@ ProductUtils.prototype.toLocalFormattedDate = function(ISODate) {
  * @param {object} sourceObj the source object originated from the Product form.
  */
 ProductUtils.prototype.toElasticsearchFormat = function(sourceObj) {
-    var obj = {};
-    for (var i = 0; i < ProductUtils.formFields.length; i++) {
-        var field = ProductUtils.formFields[i];
+    let obj = {};
+    for (let i = 0; i < ProductUtils.formFields.length; i++) {
+        let field = ProductUtils.formFields[i];
         if (sourceObj[field]) {
             if (field == 'sold_date')
                 obj[field] = this.toISODate(sourceObj[field]);
@@ -236,9 +235,9 @@ ProductUtils.prototype.toElasticsearchFormat = function(sourceObj) {
  * @param {object} sourceObj the source object originated from the elasticsearch response.
  */
 ProductUtils.prototype.toViewFormat = function(sourceObj) {
-    var obj = {};
-    for (var i = 0; i < ProductUtils.formFields.length; i++) {
-        var field = ProductUtils.formFields[i];
+    let obj = {};
+    for (let i = 0; i < ProductUtils.formFields.length; i++) {
+        let field = ProductUtils.formFields[i];
         if (sourceObj[field]) {
             if (field == 'sold_date')
                 obj[field] = this.toLocalFormattedDate(sourceObj[field]);

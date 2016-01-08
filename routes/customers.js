@@ -1,19 +1,24 @@
+"use strict";
+
 /**
  * Customers module, contains all the views and code related to customers (and appointments).
  * @module
  */
 
-var express = require('express');
-var elasticsearch = require('elasticsearch');
-var router = express.Router();
-var common = require('../common');
-var client = common.createClient();
-var esErrors = elasticsearch.errors;
-var customersPath = '/customers';
-var moment = require('moment');
-var util = require('util');
-var async = require('async');
-var uuid = require('node-uuid');
+const express = require('express');
+const elasticsearch = require('elasticsearch');
+
+const router = express.Router();
+
+const common = require('../common');
+const client = common.createClient();
+const esErrors = elasticsearch.errors;
+
+const customersPath = '/customers';
+const moment = require('moment');
+const util = require('util');
+const async = require('async');
+const uuid = require('node-uuid');
 
 router.use(common.isAuthenticated);
 
@@ -31,7 +36,7 @@ function updateLastSeen(obj) {
         obj.last_seen = obj.appointments[0].date;
     }
     else {
-        var reduceFn = function (previousValue, currentValue, index, array) {
+        let reduceFn = function(previousValue, currentValue, index, array) {
             if (typeof previousValue == 'undefined' || currentValue.date > previousValue.date)
                 return currentValue;
             return previousValue;
@@ -59,11 +64,11 @@ function processElasticsearchResults(req, hits) {
 
     // sort by name & surname (ascending)
     function sortFn(a, b) {
-        var aName = a.name.toLowerCase();
-        var bName = b.name.toLowerCase();
+        let aName = a.name.toLowerCase();
+        let bName = b.name.toLowerCase();
 
-        var aSurname = a.surname ? a.surname.toLowerCase() : '';
-        var bSurname = b.surname ? b.surname.toLowerCase() : '';
+        let aSurname = a.surname ? a.surname.toLowerCase() : '';
+        let bSurname = b.surname ? b.surname.toLowerCase() : '';
 
         if (aName < bName)
             return -1;
@@ -77,12 +82,12 @@ function processElasticsearchResults(req, hits) {
         return 0;
     }
 
-    var results = [];
-    for (var i = 0; i < hits.length; i++) {
-        var phone = getField(hits[i], 'phone', 'partial');
-        var mobile = getField(hits[i], 'mobile_phone', 'partial');
+    let results = [];
+    for (let i = 0; i < hits.length; i++) {
+        let phone = getField(hits[i], 'phone', 'partial');
+        let mobile = getField(hits[i], 'mobile_phone', 'partial');
 
-        var phone_mobile;
+        let phone_mobile;
         if (phone && mobile)
             phone_mobile = mobile + ' / ' + phone;
         else if (mobile)
@@ -92,7 +97,7 @@ function processElasticsearchResults(req, hits) {
         else
             phone_mobile = '-';
 
-        var surname = getField(hits[i], 'surname', 'autocomplete');
+        let surname = getField(hits[i], 'surname', 'autocomplete');
         if (!surname)
             surname = '-';
 
@@ -115,7 +120,7 @@ router.use(['*'], function (req, res, next) {
 });
 
 router.get('/simple-search', function(req, res, next) {
-    var queryBody;
+    let queryBody;
     if (req.query.text.trim()) {
         queryBody = {
             query: {
@@ -145,8 +150,8 @@ router.get('/simple-search', function(req, res, next) {
         size: req.query.size ? req.query.size : 50,
         body: queryBody
     }, function(err, resp, respcode) {
-        var customers = [];
-        for (var i = 0; i < resp.hits.hits.length; i++) {
+        let customers = [];
+        for (let i = 0; i < resp.hits.hits.length; i++) {
             customers[customers.length] = {
                 id: resp.hits.hits[i]._id,
                 name: resp.hits.hits[i]._source.name,
@@ -161,7 +166,7 @@ router.get('/simple-search', function(req, res, next) {
 });
 
 router.get('/search', function(req, res, next) {
-    var queryBody;
+    let queryBody;
     if (req.query.text.trim()) {
         queryBody = {
             query: {
@@ -218,13 +223,13 @@ router.get('/:id', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    var errors = req.utils.validateForm();
+    let errors = req.utils.validateForm();
     if (errors) {
         res.status(400).json({errors: errors});
         return;
     }
 
-    var args = {
+    let args = {
         index: req.config.mainIndex,
         type: 'customer',
         refresh: true,
@@ -238,13 +243,13 @@ router.post('/', function(req, res, next) {
 
 
 router.put('/:id', function(req, res, next) {
-    var errors = req.utils.validateForm();
+    let errors = req.utils.validateForm();
     if (errors) {
         res.status(400).json({errors: errors});
         return;
     }
 
-    var args = {
+    let args = {
         index: req.config.mainIndex,
         type: 'customer',
         id: req.params.id,
@@ -333,9 +338,9 @@ CustomerUtils.prototype.toLocalFormattedDate = function(ISODate) {
  * @param {object} sourceObj the source object originated from the Customer form.
  */
 CustomerUtils.prototype.toElasticsearchFormat = function(sourceObj) {
-    var obj = {};
-    for (var i = 0; i < CustomerUtils.formFields.length; i++) {
-        var field = CustomerUtils.formFields[i];
+    let obj = {};
+    for (let i = 0; i < CustomerUtils.formFields.length; i++) {
+        let field = CustomerUtils.formFields[i];
         if (sourceObj[field]) {
             if (field == 'first_seen')
                 obj[field] = this.toISODate(sourceObj[field]);
@@ -358,9 +363,9 @@ CustomerUtils.prototype.toElasticsearchFormat = function(sourceObj) {
  * @param {object} sourceObj the source object originated from the elasticsearch response.
  */
 CustomerUtils.prototype.toViewFormat = function(sourceObj) {
-    var obj = {};
-    for (var i = 0; i < CustomerUtils.formFields.length; i++) {
-        var field = CustomerUtils.formFields[i];
+    let obj = {};
+    for (let i = 0; i < CustomerUtils.formFields.length; i++) {
+        let field = CustomerUtils.formFields[i];
         if (sourceObj[field]) {
             if (field == 'first_seen')
                 obj[field] = this.toLocalFormattedDate(sourceObj[field]);
@@ -379,7 +384,7 @@ CustomerUtils.prototype.toViewFormat = function(sourceObj) {
  */
 CustomerUtils.prototype.validateForm = function() {
     // Trim all the fields that allow the user to write text
-    for (var i = 0; i < CustomerUtils.formFields.length; i++)
+    for (let i = 0; i < CustomerUtils.formFields.length; i++)
         this.req.sanitize(CustomerUtils.formFields[i]).trim();
 
     this.req.checkBody('name', this.req.i18n.__('The name is mandatory')).notEmpty();
@@ -409,7 +414,7 @@ CustomerUtils.prototype.validateForm = function() {
 
 router.get('/appointments/:date', function(req, res, next) {
     function getApps(callback) {
-        var queryBody = {
+        let queryBody = {
             query: {
                 bool: {
                     must: { term: { 'customer.appointments.date': req.params.date }}
@@ -423,11 +428,11 @@ router.get('/appointments/:date', function(req, res, next) {
             size: req.query.size ? req.query.size : 50,
             body: queryBody
         }, function(err, resp, respcode) {
-            var appointments = [];
-            for (var i = 0; i < resp.hits.hits.length; i++) {
-                var hit = resp.hits.hits[i];
+            let appointments = [];
+            for (let i = 0; i < resp.hits.hits.length; i++) {
+                let hit = resp.hits.hits[i];
 
-                for (var j = 0; j < hit._source.appointments.length; j++) {
+                for (let j = 0; j < hit._source.appointments.length; j++) {
                     if (hit._source.appointments[j].date === req.params.date) {
                         appointments[appointments.length] = {
                             id: hit._id,
@@ -458,10 +463,10 @@ router.get('/appointments/:date', function(req, res, next) {
             size: req.query.size ?  req.query.size : 50,
             body: queryBody
         }, function(err, resp, respcode) {
-            var appointments = [];
-            for (var i = 0; i < resp.hits.hits.length; i++) {
-                var hit = resp.hits.hits[i];
-                for (var j = 0; j < hit._source.planned_appointments.length; j++) {
+            let appointments = [];
+            for (let i = 0; i < resp.hits.hits.length; i++) {
+                let hit = resp.hits.hits[i];
+                for (let j = 0; j < hit._source.planned_appointments.length; j++) {
                     if (hit._source.planned_appointments[j].date === req.params.date) {
                         appointments[appointments.length] = {
                             id: hit._id,
@@ -483,13 +488,13 @@ router.get('/appointments/:date', function(req, res, next) {
             type: 'calendar',
             id: common.calendarDocId
         }, function(err, resp, respcode) {
-            var appointments = [];
+            let appointments = [];
 
             if (resp.found && resp._source.days.length > 0) {
-                var calDays = resp._source.days;
-                for (var i = 0; i < calDays.length; i++) {
+                let calDays = resp._source.days;
+                for (let i = 0; i < calDays.length; i++) {
                     if (calDays[i].date === req.params.date) {
-                        for (var j = 0; j < calDays[i].planned_appointments.length; j++) {
+                        for (let j = 0; j < calDays[i].planned_appointments.length; j++) {
                             appointments.push({
                                 id: undefined,
                                 appid: calDays[i].planned_appointments[j].appid,
@@ -508,10 +513,9 @@ router.get('/appointments/:date', function(req, res, next) {
     async.parallel(
         [getApps, getPlannedApps, getPlannedCalendarApps],
         function(err, results) {
-            var appointments = [];
-            var i, j;
-            for (i = 0; i < results.length; i++) {
-                for (j = 0; j < results[i].length; j++) {
+            let appointments = [];
+            for (let i = 0; i < results.length; i++) {
+                for (let j = 0; j < results[i].length; j++) {
                     appointments[appointments.length] = results[i][j];
                 }
             }
@@ -539,9 +543,9 @@ router.post('/planned-appointments/:date', function(req, res, next) {
             type: 'customer',
             id: id
         }, function(err, resp, respcode) {
-            var version = resp._version;
-            var obj = resp._source;
-            var appointmentId = uuid.v4();
+            let version = resp._version;
+            let obj = resp._source;
+            let appointmentId = uuid.v4();
 
             if (typeof obj.planned_appointments == 'undefined')
                 obj.planned_appointments = [];
@@ -569,13 +573,13 @@ router.post('/planned-appointments/:date', function(req, res, next) {
             type: 'calendar',
             id: common.calendarDocId
         }, function(err, resp, respcode) {
-            var calDays = [];
+            let calDays = [];
             if (resp.found && resp._source.days.length > 0) {
                 calDays = resp._source.days;
             }
-            var dateFound = false;
-            var appointmentId = uuid.v4();
-            for (var i = 0; i < calDays.length; i++) {
+            let dateFound = false;
+            let appointmentId = uuid.v4();
+            for (let i = 0; i < calDays.length; i++) {
                 if (calDays[i].date === isodate) {
                     dateFound = true;
                     calDays[i].planned_appointments.push({
@@ -636,13 +640,12 @@ router.delete('/planned-appointments/:date/:appid', function(req, res, next) {
             return;
         }
 
-        var obj = resp.hits.hits[0]._source;
-        var docType = resp.hits.hits[0]._type;
-        var docId = resp.hits.hits[0]._id;
-        var index, i;
+        let obj = resp.hits.hits[0]._source;
+        let docType = resp.hits.hits[0]._type;
+        let docId = resp.hits.hits[0]._id;
         if (docType === 'customer') {
-            index = -1;
-            for (i = 0; i < obj.planned_appointments.length; i++) {
+            let index = -1;
+            for (let i = 0; i < obj.planned_appointments.length; i++) {
                 if (obj.planned_appointments[i].appid === req.params.appid) {
                     index = i;
                     break;
@@ -657,8 +660,8 @@ router.delete('/planned-appointments/:date/:appid', function(req, res, next) {
             obj.planned_appointments.splice(index, 1);
         }
         else {  // calendar
-            var dateIndex = -1;
-            for (i = 0; i < obj.days.length; i++) {
+            let dateIndex = -1;
+            for (let i = 0; i < obj.days.length; i++) {
                 if (obj.days[i].date === req.params.date) {
                     dateIndex = i;
                     break;
@@ -668,8 +671,8 @@ router.delete('/planned-appointments/:date/:appid', function(req, res, next) {
                 res.sendStatus(404);
                 return;
             }
-            index = -1;
-            for (i = 0; i < obj.days[dateIndex].planned_appointments.length; i++) {
+            let index = -1;
+            for (let i = 0; i < obj.days[dateIndex].planned_appointments.length; i++) {
                 if (obj.days[dateIndex].planned_appointments[i].appid === req.params.appid) {
                     index = i;
                     break;
@@ -719,15 +722,15 @@ router.get('/:id/appointments', function(req, res, next) {
             return 0;
         }
 
-        var obj = resp._source;
-        var appointments = [];
+        let obj = resp._source;
+        let appointments = [];
 
         if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0) {
             res.json(appointments);
             return;
         }
 
-        for (var i = 0; i < obj.appointments.length; i++) {
+        for (let i = 0; i < obj.appointments.length; i++) {
             appointments.push({
                 appid: obj.appointments[i].appid,
                 _date: obj.appointments[i].date,
@@ -761,18 +764,18 @@ var AppointmentUtils = function(req, res) {
  * @method
  */
 AppointmentUtils.prototype.handleForm = function() {
-    var that = this;
+    let that = this;
     client.get({
         index: that.req.config.mainIndex,
         type: 'customer',
         id: that.req.params.id
     }, function(err, resp, respcode) {
-        var version = resp._version;
-        var obj = resp._source;
+        let version = resp._version;
+        let obj = resp._source;
 
-        var services = [];
-        for (var i = 0; i < that.req.body.services.length; i++) {
-            var item = that.req.body.services[i];
+        let services = [];
+        for (let i = 0; i < that.req.body.services.length; i++) {
+            let item = that.req.body.services[i];
             if (item.enabled && item.description.trim().length > 0) {
                 services.push({
                     description: item.description.trim(),
@@ -782,14 +785,14 @@ AppointmentUtils.prototype.handleForm = function() {
         }
 
         if (services.length === 0) {
-            var errors = [{msg: that.req.i18n.__('At least one service is mandatory')}];
+            let errors = [{msg: that.req.i18n.__('At least one service is mandatory')}];
             that.res.status(400).json({errors: errors});
             return;
         }
 
 
-        var newItem = false;
-        var appointment = {
+        let newItem = false;
+        let appointment = {
             appid: that.req.params.appid,
             date: common.toISODate(that.req, that.req.body.date),
             services: services,
@@ -808,8 +811,8 @@ AppointmentUtils.prototype.handleForm = function() {
             obj.appointments.push(appointment);
         }
         else {
-            for (var j = 0; j < obj.appointments.length; j++) {
-                if (obj.appointments[i].appid === that.req.params.appid) {
+            for (let j = 0; j < obj.appointments.length; j++) {
+                if (obj.appointments[j].appid === that.req.params.appid) {
                     obj.appointments[j] = appointment;
                     break;
                 }
@@ -838,7 +841,7 @@ AppointmentUtils.prototype.handleForm = function() {
  * @param {object} workers the list of the workers extracted from elasticsearch.
  */
 AppointmentUtils.prototype.getWorkerColor = function(worker, workers) {
-    for (var j = 0; j < workers.length; j++) {
+    for (let j = 0; j < workers.length; j++) {
         if (workers[j].name == worker) {
             return workers[j].color;
         }
@@ -863,8 +866,8 @@ router.get('/:id/appointments/:appid', function(req, res, next) {
         }
     }, function(err, resp, respcode) {
 
-        var appointment;
-        for (var j = 0; j < resp.docs[0]._source.appointments.length; j++) {
+        let appointment;
+        for (let j = 0; j < resp.docs[0]._source.appointments.length; j++) {
             if (resp.docs[0]._source.appointments[j].appid === req.params.appid) {
                 appointment = resp.docs[0]._source.appointments[j];
                 break;
@@ -876,10 +879,10 @@ router.get('/:id/appointments/:appid', function(req, res, next) {
             return;
         }
 
-        var workers = resp.docs[1]._source.workers;
-        var services = [];
+        let workers = resp.docs[1]._source.workers;
+        let services = [];
 
-        for (var i = 0; i < appointment.services.length; i++)
+        for (let i = 0; i < appointment.services.length; i++)
             services.push({
                 description: appointment.services[i].description,
                 worker: {
@@ -912,8 +915,8 @@ router.delete('/:id/appointments/:appid', function(req, res, next) {
         type: 'customer',
         id: req.params.id
     }, function(err, resp, respcode) {
-        var version = resp._version;
-        var obj = resp._source;
+        let version = resp._version;
+        let obj = resp._source;
 
         if (err) {
             console.log(err);
@@ -921,8 +924,8 @@ router.delete('/:id/appointments/:appid', function(req, res, next) {
             return;
         }
 
-        var index = -1;
-        for (var i = 0; i < obj.appointments.length; i++) {
+        let index = -1;
+        for (let i = 0; i < obj.appointments.length; i++) {
             if (obj.appointments[i].appid === req.params.appid) {
                 index = i;
                 break;
