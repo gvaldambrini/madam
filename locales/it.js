@@ -79,5 +79,7 @@
 	"Plan appointment for:": "Pianifica appuntamento per:",
 	"Add": "Aggiungi",
 	"Insert a new customer or select an existing one": "Inserisci nuovo cliente o seleziona uno esistente",
-	"Planned": "Pianificato"
+	"Planned": "Pianificato",
+	"Confirm planned appointment": "Conferma appuntamento pianificato",
+	"Confirm appointment": "Conferma appuntamento"
 }

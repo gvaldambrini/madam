@@ -207,7 +207,7 @@ var CustomersTable = React.createClass({
           <td className="hidden-xs" dangerouslySetInnerHTML={that.renderHighlight(customer.phone)} />
           <td className="hidden-xs">{customer.last_seen}</td>
           <td className="no-padding">
-            <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
+            <span onClick={function(event) {event.stopPropagation();}} className="table-btn pull-right glyphicon glyphicon-trash"
               data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
                 function(span) {
                   if (span != null) {

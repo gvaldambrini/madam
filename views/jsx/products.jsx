@@ -135,7 +135,7 @@ var ProductsTable = React.createClass({
             <td>{object.date}</td>
             <td>{object.notes}</td>
             <td className="no-padding">
-              <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
+              <span onClick={function(event) {event.stopPropagation();}} className="table-btn pull-right glyphicon glyphicon-trash"
                 data-toggle="tooltip" data-placement="left"
                 title={i18n.products.deleteText} ref={
                   function(span) {

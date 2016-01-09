@@ -79,5 +79,7 @@
 	"Plan appointment for:": "Plan appointment for:",
 	"Add": "Add",
 	"Insert a new customer or select an existing one": "Insert a new customer or select an existing one",
-	"Planned": "Planned"
+	"Planned": "Planned",
+	"Confirm planned appointment": "Confirm planned appointment",
+	"Confirm appointment": "Confirm appointment"
 }

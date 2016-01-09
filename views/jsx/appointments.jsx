@@ -223,13 +223,24 @@ var AppointmentForm = React.createClass({
 });
 
 
-var Appointment = React.createClass({
-  mixins: [History],
+var AppointmentFormContainer = React.createClass({
+  propTypes: {
+    editForm: React.PropTypes.bool.isRequired,
+    urlData: React.PropTypes.string,
+    submitText: React.PropTypes.string.isRequired,
+    formTitle: React.PropTypes.string.isRequired,
+    date: React.PropTypes.string,
+    doSubmit: React.PropTypes.func.isRequired
+  },
   getInitialState: function() {
+    var date = typeof this.props.date !== 'undefined'
+      ? moment(this.props.date).format(config.date_format)
+      : moment().format(config.date_format)
+
     return {
       workers: undefined,
       services: undefined,
-      date: moment().format(config.date_format),
+      date: date,
       notes: '',
       errors: []
     }
@@ -249,10 +260,9 @@ var Appointment = React.createClass({
   },
   componentWillMount: function() {
     var that = this;
-
-    if (typeof this.props.params.appid !== 'undefined') {
+    if (this.props.editForm) {
       $.ajax({
-        url: '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid,
+        url: this.props.urlData,
         method: 'get',
         success: that.loadAppointment
       });
@@ -270,6 +280,23 @@ var Appointment = React.createClass({
         success: that.loadServices
       });
     }
+  },
+  handleSubmit: function() {
+    var services = [];
+    for (var i = 0; i < this.state.services.length; i++) {
+      services[services.length] = {
+        description: this.state.services[i].description,
+        enabled: this.state.services[i].checked,
+        worker: this.state.services[i].worker.name
+      }
+    }
+    var data = {
+      services: services,
+      date: this.state.date,
+      notes: this.state.notes
+    };
+
+    this.props.doSubmit(this, data);
   },
   buildServiceMap: function(workers, services) {
     var map = [];
@@ -324,34 +351,7 @@ var Appointment = React.createClass({
 
     this.setState({services: services});
   },
-  handleSubmit: function() {
-    var that = this;
-    var editForm = typeof this.props.params.appid != 'undefined';
-    var baseUrl = '/customers/' + this.props.params.id;
-
-    var services = [];
-    for (var i = 0; i < this.state.services.length; i++) {
-      services[services.length] = {
-        description: this.state.services[i].description,
-        enabled: this.state.services[i].checked,
-        worker: this.state.services[i].worker.name
-      }
-    }
-    var data = {
-      services: services,
-      date: this.state.date,
-      notes: this.state.notes
-    };
-
-    var url = baseUrl + (editForm ? '/appointments/' + this.props.params.appid : '/appointments');
-    var method = editForm ? 'put': 'post';
-    var successCb = function() {
-      that.history.pushState(null, '/customers/edit/' + that.props.params.id + '/appointments');
-    };
-    fnSubmitForm(this, url, method, data, successCb);
-  },
   render: function() {
-
     if (typeof this.state.workers == 'undefined' || typeof this.state.services == 'undefined') {
       return (<div></div>);
     }
@@ -376,16 +376,6 @@ var Appointment = React.createClass({
       );
     }
 
-    var submitText, formTitle;
-    if (typeof this.props.params.appid != 'undefined') {
-      submitText = i18n.appointments.submitEdit;
-      formTitle = i18n.appointments.titleEdit;
-    }
-    else {
-      submitText = i18n.appointments.submitAdd;
-      formTitle = i18n.appointments.titleNew;
-    }
-
     return (
       <div id="appointment-view">
         <AppointmentForm
@@ -394,13 +384,51 @@ var Appointment = React.createClass({
           date={this.state.date}
           notes={this.state.notes}
           errors={this.state.errors}
-          submitText={submitText}
-          formTitle={formTitle}
+          submitText={this.props.submitText}
+          formTitle={this.props.formTitle}
           addService={this.addService}
           handleChange={this.handleChange}
           updateService={this.updateService}
           handleSubmit={this.handleSubmit}/>
       </div>
+    );
+  }
+});
+
+
+var Appointment = React.createClass({
+  mixins: [ History ],
+  doSubmit: function(self, data) {
+    var that = this;
+    var editForm = typeof this.props.params.appid != 'undefined';
+    var baseUrl = '/customers/' + this.props.params.id;
+
+    var url = baseUrl + (editForm ? '/appointments/' + this.props.params.appid : '/appointments');
+    var method = editForm ? 'put': 'post';
+    fnSubmitForm(self, url, method, data, function() {
+      that.history.pushState(null, '/customers/edit/' + that.props.params.id + '/appointments');
+    });
+  },
+  render: function() {
+    var submitText, formTitle, editForm, urlData;
+    if (typeof this.props.params.appid !== 'undefined') {
+      submitText = i18n.appointments.submitEdit;
+      formTitle = i18n.appointments.titleEdit;
+      editForm = true;
+      urlData = '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid;
+    }
+    else {
+      submitText = i18n.appointments.submitAdd;
+      formTitle = i18n.appointments.titleNew;
+      editForm = false;
+    }
+    return (
+      <AppointmentFormContainer
+        doSubmit={this.doSubmit}
+        submitText={submitText}
+        formTitle={formTitle}
+        editForm={editForm}
+        urlData={urlData}/>
     );
   }
 });
@@ -426,7 +454,7 @@ var AppointmentsTable = React.createClass({
           <td>{appointment.date}</td>
           <td>{appointment.services}</td>
           <td className="no-padding">
-            <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
+            <span onClick={function(event) {event.stopPropagation();}} className="table-btn pull-right glyphicon glyphicon-trash"
               data-toggle="tooltip" data-placement="left" title={i18n.appointments.deleteText} ref={
                 function(span) {
                   if (span != null) {
@@ -527,6 +555,7 @@ var AppointmentsRoot = React.createClass({
 
 
 module.exports = {
+  AppointmentFormContainer: AppointmentFormContainer,
   Appointment: Appointment,
   Appointments: Appointments,
   AppointmentsRoot: AppointmentsRoot

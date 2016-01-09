@@ -203,7 +203,11 @@ $sidebar-padding: 20px;
  */
 
 .table {
-  tbody {
+  tbody tr:not(.inactive) {
+    cursor: pointer;
+  }
+
+  .table-btn {
     cursor: pointer;
   }
 

@@ -9,7 +9,7 @@ import { CustomerForm, Customer, Customers, CustomersRoot } from './customers';
 import { ProductForm, Products, ProductsRoot } from './products';
 import { ServicesForm, WorkersForm, SettingsRoot } from './settings';
 import { LoginForm } from './login';
-import { HomePage, Calendar } from './homepage';
+import { HomePage, Calendar, CalendarAppointment } from './homepage';
 
 
 function csrfSafeMethod(method) {
@@ -160,7 +160,9 @@ var routes = function() {
         // This trick (having the main root simply as "calendar") solve the problem.
         <Route path="calendar" component={HomePage}>
           <IndexRoute component={Calendar}/>
-          <Route path="/calendar(/:date)" component={Calendar}/>
+          <Route path=":date" component={Calendar}/>
+          <Route path=":date/customers/:id/appointments/:appid" component={CalendarAppointment}/>
+          <Route path=":date/customers/:id/planned-appointments/:appid" component={CalendarAppointment}/>
         </Route>
         <Route path="customers" component={CustomersRoot}>
           <IndexRoute component={Customers}/>

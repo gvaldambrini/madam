@@ -564,6 +564,7 @@ router.post('/planned-appointments/:date', function(req, res, next) {
                 type: 'customer',
                 id: id,
                 version: version,
+                refresh: true,
                 body: {doc: obj}
             }, function(err, resp, respcode) {
                 common.indexCb(req, res, err, resp, true, appointmentId);
@@ -606,6 +607,7 @@ router.post('/planned-appointments/:date', function(req, res, next) {
                 index: req.config.mainIndex,
                 type: 'calendar',
                 id: common.calendarDocId,
+                refresh: true,
                 body: {days: calDays}
             }, function(err, resp, respcode) {
                 common.indexCb(req, res, err, resp, true, appointmentId);
@@ -800,13 +802,35 @@ AppointmentUtils.prototype.handleForm = function() {
         obj.appointments.push(appointment);
     }
     else {
+        let appFound = false;
         for (let j = 0; j < obj.appointments.length; j++) {
             if (obj.appointments[j].appid === this.req.params.appid) {
                 obj.appointments[j] = appointment;
+                appFound = true;
                 break;
             }
         }
+        // In case we are creating a new appointment based on a planned one,
+        // let's remove the planned appointment and add the real one.
+        if (!appFound) {
+            let index = -1;
+            for (let i = 0; i < obj.planned_appointments.length; i++) {
+                if (obj.planned_appointments[i].appid === this.req.params.appid) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index === -1) {
+                res.sendStatus(404);
+                return;
+            }
+
+            obj.planned_appointments.splice(index, 1);
+            obj.appointments.push(appointment);
+        }
     }
+
     updateLastSeen(obj);
     var that = this;
     client.update({
@@ -814,6 +838,7 @@ AppointmentUtils.prototype.handleForm = function() {
         type: 'customer',
         id: this.req.params.id,
         version: this.req.customerVersion,
+        refresh: true,
         body: {doc: obj}
     }, function(err, resp, respcode) {
         common.indexCb(that.req, that.res, err, resp, newItem, appointment.appid);

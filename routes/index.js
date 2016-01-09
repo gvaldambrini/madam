@@ -124,7 +124,9 @@ router.get('*', function(req, res, next) {
                 btnCancel: req.i18n.__('Cancel'),
                 deleteTitle: req.i18n.__('Delete the appointment?'),
                 deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
-                deleteText: req.i18n.__('Delete appointment')
+                deleteText: req.i18n.__('Delete appointment'),
+                titleConfirmAppointment: req.i18n.__('Confirm planned appointment'),
+                confirmAppointment: req.i18n.__('Confirm appointment')
             }
         }
     });

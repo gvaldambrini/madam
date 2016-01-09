@@ -8,6 +8,7 @@ import moment from 'moment';
 
 import { PopoverTemplate, BaseTableContainer } from './tables';
 import { fnSubmitForm } from './forms';
+import { AppointmentFormContainer } from './appointments';
 
 
 var InputCustomer = React.createClass({
@@ -131,7 +132,9 @@ var PlanAppointment = React.createClass({
   }
 });
 
+
 var AppointmentsTable = React.createClass({
+  mixins: [ History ],
   render: function() {
     var that = this;
     var appointmentRows = this.props.appointments.map(function(app, index) {
@@ -144,7 +147,27 @@ var AppointmentsTable = React.createClass({
       }
 
       return (
-        <tr key={app.appid}>
+        <tr key={app.appid} className={moment(that.props.date) > moment() ? 'inactive' : ''} onClick={
+            function(event) {
+              event.preventDefault();
+              event.stopPropagation();
+
+              if (moment(that.props.date) > moment()) {
+                return;
+              }
+              if (typeof app.id === 'undefined') { // TODO
+                return;
+              }
+              if (app.planned) {
+                that.history.pushState(
+                  null, '/calendar/' + that.props.date + '/customers/' + app.id + '/planned-appointments/' + app.appid);
+              }
+              else {
+                that.history.pushState(
+                  null, '/calendar/' + that.props.date + '/customers/' + app.id + '/appointments/' + app.appid);
+              }
+            }
+          }>
           <td>{content}</td>
           <td className="no-padding">
             <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
@@ -180,6 +203,42 @@ var AppointmentsTable = React.createClass({
         {appointmentRows}
         </tbody>
       </table>
+    );
+  }
+});
+
+
+var CalendarAppointment = React.createClass({
+  mixins: [ History ],
+  doSubmit: function(self, data) {
+    var that = this;
+    var url = '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid;
+    fnSubmitForm(self, url, 'put', data, function() {
+      that.history.pushState(null, '/calendar/' + that.props.params.date);
+    });
+  },
+  render: function() {
+    var submitText, formTitle, planned, urlData, date;
+    if (this.props.location.pathname.indexOf('planned-appointments') === -1) {
+      submitText = i18n.appointments.submitEdit;
+      formTitle = i18n.appointments.titleEdit;
+      planned = true;
+      urlData = '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid;
+    }
+    else {
+      submitText = i18n.homepage.confirmAppointment;
+      formTitle = i18n.homepage.titleConfirmAppointment;
+      planned = false;
+      date = this.props.params.date;
+    }
+    return (
+      <AppointmentFormContainer
+        doSubmit={this.doSubmit}
+        submitText={submitText}
+        formTitle={formTitle}
+        editForm={planned}
+        urlData={urlData}
+        date={date}/>
     );
   }
 });
@@ -312,5 +371,6 @@ var HomePage = React.createClass({
 
 module.exports = {
   HomePage: HomePage,
-  Calendar: Calendar
+  Calendar: Calendar,
+  CalendarAppointment: CalendarAppointment
 };
