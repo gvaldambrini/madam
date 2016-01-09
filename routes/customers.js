@@ -212,14 +212,24 @@ router.get('/search', function(req, res, next) {
     });
 });
 
-router.get('/:id', function(req, res, next) {
+router.param('id', function(req, res, next, id) {
     client.get({
         index: req.config.mainIndex,
         type: 'customer',
-        id: req.params.id
+        id: id
     }, function(err, resp, respcode) {
-        res.json(req.utils.toViewFormat(resp._source));
+        if (err) {
+            res.sendStatus(404);
+            return;
+        }
+        req.customer = resp._source;
+        req.customerVersion = resp._version;
+        next();
     });
+});
+
+router.get('/:id', function(req, res, next) {
+    res.json(req.utils.toViewFormat(req.customer));
 });
 
 router.post('/', function(req, res, next) {
@@ -254,19 +264,13 @@ router.put('/:id', function(req, res, next) {
         type: 'customer',
         id: req.params.id,
         refresh: true,
-        body: req.utils.toElasticsearchFormat(req.body)
+        body: req.utils.toElasticsearchFormat(req.body),
     };
 
-    client.get({
-        index: req.config.mainIndex,
-        type: 'customer',
-        id: args.id
-    }, function(err, resp, respcode) {
-        args.body.appointments = resp._source.appointments;
-        args.body.last_seen = resp._source.last_seen;
-        client.index(args, function(err, resp, respcode) {
-            common.indexCb(req, res, err, resp, true);
-        });
+    args.body.appointments = req.customer.appointments;
+    args.body.last_seen = req.customer.last_seen;
+    client.index(args, function(err, resp, respcode) {
+        common.indexCb(req, res, err, resp, true);
     });
 });
 
@@ -704,43 +708,37 @@ router.delete('/planned-appointments/:date/:appid', function(req, res, next) {
 });
 
 router.get('/:id/appointments', function(req, res, next) {
-    client.get({
-        index: req.config.mainIndex,
-        type: 'customer',
-        id: req.params.id
-    }, function(err, resp, respcode) {
-        function descFn(item) {
-            return item.description;
-        }
+    function descFn(item) {
+        return item.description;
+    }
 
-        // sort by date (descending)
-        function sortFn(a, b) {
-            if (a._date < b._date)
-                return 1;
-            if (a._date > b._date)
-                return -1;
-            return 0;
-        }
+    // sort by date (descending)
+    function sortFn(a, b) {
+        if (a._date < b._date)
+            return 1;
+        if (a._date > b._date)
+            return -1;
+        return 0;
+    }
 
-        let obj = resp._source;
-        let appointments = [];
+    let obj = req.customer;
+    let appointments = [];
 
-        if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0) {
-            res.json(appointments);
-            return;
-        }
-
-        for (let i = 0; i < obj.appointments.length; i++) {
-            appointments.push({
-                appid: obj.appointments[i].appid,
-                _date: obj.appointments[i].date,
-                date: common.toLocalFormattedDate(req, obj.appointments[i].date),
-                services: obj.appointments[i].services.map(descFn).join(' - ')
-            });
-        }
-        appointments.sort(sortFn);
+    if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0) {
         res.json(appointments);
-    });
+        return;
+    }
+
+    for (let i = 0; i < obj.appointments.length; i++) {
+        appointments.push({
+            appid: obj.appointments[i].appid,
+            _date: obj.appointments[i].date,
+            date: common.toLocalFormattedDate(req, obj.appointments[i].date),
+            services: obj.appointments[i].services.map(descFn).join(' - ')
+        });
+    }
+    appointments.sort(sortFn);
+    res.json(appointments);
 });
 
 
@@ -764,71 +762,61 @@ var AppointmentUtils = function(req, res) {
  * @method
  */
 AppointmentUtils.prototype.handleForm = function() {
-    let that = this;
-    client.get({
-        index: that.req.config.mainIndex,
+    let obj = this.req.customer;
+    let services = [];
+    for (let i = 0; i < this.req.body.services.length; i++) {
+        let item = this.req.body.services[i];
+        if (item.enabled && item.description.trim().length > 0) {
+            services.push({
+                description: item.description.trim(),
+                worker: item.worker
+            });
+        }
+    }
+
+    if (services.length === 0) {
+        let errors = [{msg: this.req.i18n.__('At least one service is mandatory')}];
+        this.res.status(400).json({errors: errors});
+        return;
+    }
+
+    let newItem = false;
+    let appointment = {
+        appid: this.req.params.appid,
+        date: common.toISODate(this.req, this.req.body.date),
+        services: services,
+        notes: this.req.body.notes
+    };
+
+    if (typeof this.req.params.appid === 'undefined') {
+        newItem = true;
+        appointment.appid = uuid.v4();
+    }
+
+    if (newItem) {
+        if (typeof obj.appointments == 'undefined')
+            obj.appointments = [];
+
+        obj.appointments.push(appointment);
+    }
+    else {
+        for (let j = 0; j < obj.appointments.length; j++) {
+            if (obj.appointments[j].appid === this.req.params.appid) {
+                obj.appointments[j] = appointment;
+                break;
+            }
+        }
+    }
+    updateLastSeen(obj);
+    var that = this;
+    client.update({
+        index: this.req.config.mainIndex,
         type: 'customer',
-        id: that.req.params.id
+        id: this.req.params.id,
+        version: this.req.customerVersion,
+        body: {doc: obj}
     }, function(err, resp, respcode) {
-        let version = resp._version;
-        let obj = resp._source;
-
-        let services = [];
-        for (let i = 0; i < that.req.body.services.length; i++) {
-            let item = that.req.body.services[i];
-            if (item.enabled && item.description.trim().length > 0) {
-                services.push({
-                    description: item.description.trim(),
-                    worker: item.worker
-                });
-            }
-        }
-
-        if (services.length === 0) {
-            let errors = [{msg: that.req.i18n.__('At least one service is mandatory')}];
-            that.res.status(400).json({errors: errors});
-            return;
-        }
-
-
-        let newItem = false;
-        let appointment = {
-            appid: that.req.params.appid,
-            date: common.toISODate(that.req, that.req.body.date),
-            services: services,
-            notes: that.req.body.notes
-        };
-
-        if (typeof that.req.params.appid === 'undefined') {
-            newItem = true;
-            appointment.appid = uuid.v4();
-        }
-
-        if (newItem) {
-            if (typeof obj.appointments == 'undefined')
-                obj.appointments = [];
-
-            obj.appointments.push(appointment);
-        }
-        else {
-            for (let j = 0; j < obj.appointments.length; j++) {
-                if (obj.appointments[j].appid === that.req.params.appid) {
-                    obj.appointments[j] = appointment;
-                    break;
-                }
-            }
-        }
-        updateLastSeen(obj);
-
-        client.update({
-            index: that.req.config.mainIndex,
-            type: 'customer',
-            id: that.req.params.id,
-            version: version,
-            body: {doc: obj}
-        }, function(err, resp, respcode) {
-            common.indexCb(that.req, that.res, err, resp, newItem, appointment.appid);
-        });
+        common.indexCb(that.req, that.res, err, resp, newItem, appointment.appid);
     });
 };
 
@@ -857,19 +845,16 @@ router.use(['/:id/appointments*'], function (req, res, next) {
 
 
 router.get('/:id/appointments/:appid', function(req, res, next) {
-    client.mget({
-        body: {
-            docs: [
-                {_index: req.config.mainIndex, _type: 'customer', _id: req.params.id},
-                {_index: req.config.mainIndex, _type: 'workers', _id: common.workersDocId}
-            ]
-        }
+    client.get({
+        index: req.config.mainIndex,
+        type: 'workers',
+        id: common.workersDocId
     }, function(err, resp, respcode) {
-
+        let obj = req.customer;
         let appointment;
-        for (let j = 0; j < resp.docs[0]._source.appointments.length; j++) {
-            if (resp.docs[0]._source.appointments[j].appid === req.params.appid) {
-                appointment = resp.docs[0]._source.appointments[j];
+        for (let j = 0; j < obj.appointments.length; j++) {
+            if (obj.appointments[j].appid === req.params.appid) {
+                appointment = obj.appointments[j];
                 break;
             }
         }
@@ -879,7 +864,7 @@ router.get('/:id/appointments/:appid', function(req, res, next) {
             return;
         }
 
-        let workers = resp.docs[1]._source.workers;
+        let workers = resp._source.workers;
         let services = [];
 
         for (let i = 0; i < appointment.services.length; i++)
@@ -910,54 +895,41 @@ router.put('/:id/appointments/:appid', function(req, res, next) {
 });
 
 router.delete('/:id/appointments/:appid', function(req, res, next) {
-    client.get({
+    let obj = req.customer;
+
+    let index = -1;
+    for (let i = 0; i < obj.appointments.length; i++) {
+        if (obj.appointments[i].appid === req.params.appid) {
+            index = i;
+            break;
+        }
+    }
+
+    if (index === -1) {
+        res.sendStatus(404);
+        return;
+    }
+
+    obj.appointments.splice(index, 1);
+    updateLastSeen(obj);
+
+    client.update({
         index: req.config.mainIndex,
         type: 'customer',
-        id: req.params.id
+        id: req.params.id,
+        version: req.customerVersion,
+        refresh: true,
+        body: {
+            doc: obj
+        }
     }, function(err, resp, respcode) {
-        let version = resp._version;
-        let obj = resp._source;
-
         if (err) {
             console.log(err);
             res.status(400).end();
-            return;
         }
-
-        let index = -1;
-        for (let i = 0; i < obj.appointments.length; i++) {
-            if (obj.appointments[i].appid === req.params.appid) {
-                index = i;
-                break;
-            }
+        else {
+            res.status(200).end();
         }
-
-        if (index === -1) {
-            res.sendStatus(404);
-            return;
-        }
-
-        obj.appointments.splice(index, 1);
-        updateLastSeen(obj);
-
-        client.update({
-            index: req.config.mainIndex,
-            type: 'customer',
-            id: req.params.id,
-            version: version,
-            refresh: true,
-            body: {
-                doc: obj
-            }
-        }, function(err, resp, respcode) {
-            if (err) {
-                console.log(err);
-                res.status(400).end();
-            }
-            else {
-                res.status(200).end();
-            }
-        });
     });
 });
 
