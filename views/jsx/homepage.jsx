@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { History } from 'react-router';
+import { History, Link, IndexLink } from 'react-router';
 import Autosuggest from 'react-autosuggest';
 
 import Cookies from 'js-cookie';
@@ -9,6 +9,7 @@ import moment from 'moment';
 import { PopoverTemplate, BaseTableContainer } from './tables';
 import { fnSubmitForm } from './forms';
 import { AppointmentFormContainer } from './appointments';
+import { CustomerFormContainer } from './customers';
 
 
 var InputCustomer = React.createClass({
@@ -155,17 +156,19 @@ var AppointmentsTable = React.createClass({
               if (moment(that.props.date) > moment()) {
                 return;
               }
-              if (typeof app.id === 'undefined') { // TODO
+              if (typeof app.id === 'undefined') {
+                that.history.pushState(
+                  null, '/calendar/' + that.props.date + '/appointments/planned/' + app.appid + '/newcustomer');
                 return;
               }
               if (app.planned) {
                 that.history.pushState(
-                  null, '/calendar/' + that.props.date + '/customers/' + app.id + '/planned-appointments/' + app.appid);
+                  null, '/calendar/' + that.props.date + '/customers/' + app.id + '/appointments/planned/' + app.appid);
+                return;
               }
-              else {
-                that.history.pushState(
-                  null, '/calendar/' + that.props.date + '/customers/' + app.id + '/appointments/' + app.appid);
-              }
+
+              that.history.pushState(
+                null, '/calendar/' + that.props.date + '/customers/' + app.id + '/appointments/' + app.appid);
             }
           }>
           <td>{content}</td>
@@ -208,6 +211,117 @@ var AppointmentsTable = React.createClass({
 });
 
 
+var CalendarCustomerForm = React.createClass({
+  mixins: [ History ],
+  doSubmit: function(self, data, targetName) {
+    var that = this;
+    var editForm = typeof this.props.params.id !== 'undefined';
+    var url = editForm ? '/customers/' + this.props.params.id : '/customers';
+    var method = editForm ? 'put': 'post';
+    data.__appid = this.props.params.appid;
+
+    fnSubmitForm(self, url, method, data, function(obj) {
+      if (editForm) {
+        that.history.pushState(null, '/calendar/' + that.props.params.date);
+      }
+      else {
+        that.history.pushState(
+          null, '/calendar/' + that.props.params.date + '/customers/' + obj.id + '/appointments/planned/' + that.props.params.appid);
+      }
+    });
+  },
+  render: function() {
+    var that = this;
+    var editForm = typeof this.props.params.id !== 'undefined';
+    var submitText, formTitle, customLoad;
+
+    if (editForm) {
+      submitText = i18n.homepage.submitEditCustomer;
+      formTitle = i18n.homepage.editCustomer;
+    }
+    else {
+      submitText = i18n.homepage.submitNewCustomer;
+      formTitle = i18n.homepage.createNewCustomer;
+      customLoad = function(self) {
+        $.ajax({
+          url: '/customers/planned-appointments/' + that.props.params.appid,
+          method: 'get',
+          success: function(data) {
+            var name = data.fullname.split(' ', 1)[0];
+            var surname = data.fullname.substr(name.length + 1);
+            self.setState({
+              data: {
+                name: name,
+                surname: surname
+              },
+              errors: []
+            });
+          }
+        });
+      };
+    }
+
+    return (
+      <CustomerFormContainer
+        doSubmit={this.doSubmit}
+        submitText={submitText}
+        formTitle={formTitle}
+        id={this.props.params.id}
+        customLoad={customLoad}
+      />
+    );
+  }
+});
+
+
+var CalendarCustomer = React.createClass({
+  render: function() {
+    var infoLink;
+    var appLink;
+
+    if (this.props.location.pathname.indexOf('newcustomer') === -1) {
+      infoLink = (
+        <IndexLink to={`/calendar/${this.props.params.date}/customers/${this.props.params.id}/`} activeClassName="active">
+          {i18n.customers.headerInfo}
+        </IndexLink>
+      );
+      appLink = (
+        <Link to={`/calendar/${this.props.params.date}/customers/${this.props.params.id}/appointments`} activeClassName="active">
+          {i18n.customers.headerAppointments}
+        </Link>
+      );
+    }
+    else {
+      infoLink = (
+        <Link to='' className="active" onClick={function(e) {e.preventDefault();}}>
+          {i18n.customers.headerInfo}
+        </Link>
+      );
+      appLink = (
+        <Link to='' className="disabled">
+          {i18n.customers.headerAppointments}
+        </Link>
+      );
+    }
+
+    return (
+      <div>
+        <div className="content-header">
+            <ul>
+                <li role="presentation">
+                    {infoLink}
+                </li>
+                <li role="presentation">
+                    {appLink}
+                </li>
+            </ul>
+        </div>
+        {this.props.children}
+      </div>
+    );
+  }
+});
+
 var CalendarAppointment = React.createClass({
   mixins: [ History ],
   doSubmit: function(self, data) {
@@ -219,7 +333,7 @@ var CalendarAppointment = React.createClass({
   },
   render: function() {
     var submitText, formTitle, planned, urlData, date;
-    if (this.props.location.pathname.indexOf('planned-appointments') === -1) {
+    if (this.props.location.pathname.indexOf('planned') === -1) {
       submitText = i18n.appointments.submitEdit;
       formTitle = i18n.appointments.titleEdit;
       planned = true;
@@ -323,7 +437,7 @@ var Calendar = React.createClass({
     }
 
     return (
-      <div>
+      <div id="calendar-table-container" className="content-body">
         <div className='date-selector-header'>
           <span className="glyphicon glyphicon-menu-left" onClick={function(event) {
             var date = moment(that.state.date).subtract(1, 'days');
@@ -350,6 +464,9 @@ var Calendar = React.createClass({
         <h4>{i18n.homepage.appointments}</h4>
         {appointments}
         <PlanAppointment plan={this.addAppointment}/>
+        <div id="popover-template">
+          <PopoverTemplate confirm={i18n.homepage.btnConfirm} cancel={i18n.homepage.btnCancel}/>
+        </div>
       </div>
     );
   }
@@ -359,11 +476,8 @@ var Calendar = React.createClass({
 var HomePage = React.createClass({
   render: function() {
     return (
-      <div id="calendar-table-container" className="content-body">
+      <div>
         {this.props.children}
-        <div id="popover-template">
-          <PopoverTemplate confirm={i18n.homepage.btnConfirm} cancel={i18n.homepage.btnCancel}/>
-        </div>
       </div>
     );
   }
@@ -372,5 +486,7 @@ var HomePage = React.createClass({
 module.exports = {
   HomePage: HomePage,
   Calendar: Calendar,
-  CalendarAppointment: CalendarAppointment
+  CalendarAppointment: CalendarAppointment,
+  CalendarCustomer: CalendarCustomer,
+  CalendarCustomerForm: CalendarCustomerForm
 };

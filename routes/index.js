@@ -126,7 +126,11 @@ router.get('*', function(req, res, next) {
                 deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
                 deleteText: req.i18n.__('Delete appointment'),
                 titleConfirmAppointment: req.i18n.__('Confirm planned appointment'),
-                confirmAppointment: req.i18n.__('Confirm appointment')
+                confirmAppointment: req.i18n.__('Confirm appointment'),
+                submitNewCustomer: req.i18n.__('Create customer'),
+                submitEditCustomer: req.i18n.__('Edit customer'),
+                editCustomer: req.i18n.__('Edit customer'),
+                createNewCustomer: req.i18n.__('Create new customer and confirm appointment')
             }
         }
     });

@@ -239,16 +239,67 @@ router.post('/', function(req, res, next) {
         return;
     }
 
-    let args = {
-        index: req.config.mainIndex,
-        type: 'customer',
-        refresh: true,
-        body: req.utils.toElasticsearchFormat(req.body)
-    };
+    let customerObj = req.utils.toElasticsearchFormat(req.body);
 
-    client.index(args, function(err, resp, respcode) {
-        common.indexCb(req, res, err, resp, true);
-    });
+    function findAppointmentDate(resp, appid) {
+        if (resp.found && resp._source.days.length > 0) {
+            let calDays = resp._source.days;
+            for (let i = 0; i < calDays.length; i++) {
+                for (let j = 0; j < calDays[i].planned_appointments.length; j++) {
+                    if (calDays[i].planned_appointments[j].appid === appid) {
+                        return {
+                            dateIndex: i,
+                            appIndex: j
+                        };
+                    }
+                }
+            }
+        }
+    }
+
+    if (typeof req.body.__appid !== 'undefined') {
+        client.get({
+            index: req.config.mainIndex,
+            type: 'calendar',
+            id: common.calendarDocId
+        }, function(err, resp, respcode) {
+            let indices = findAppointmentDate(resp, req.body.__appid);
+            if (typeof indices === 'undefined') {
+                res.sendStatus(404);
+                return;
+            }
+            let calendarObj = resp._source;
+            customerObj.planned_appointments = [{
+                appid: req.body.__appid,
+                date: calendarObj.days[indices.dateIndex].date
+            }];
+
+            calendarObj.days[indices.dateIndex].planned_appointments.splice(indices.appIndex, 1);
+            client.bulk({
+                body: [
+                    {index: {_index: req.config.mainIndex, _type: 'customer'}},
+                    customerObj,
+                    {index: {_index: req.config.mainIndex, _type: 'calendar'}},
+                    calendarObj
+                ],
+                refresh: true
+            }, function(err, resp, respcode) {
+                common.indexCb(req, res, err, resp, true, resp.items[0].create._id);
+            });
+        });
+    }
+    else {
+        let args = {
+            index: req.config.mainIndex,
+            type: 'customer',
+            refresh: true,
+            body: customerObj
+        };
+
+        client.index(args, function(err, resp, respcode) {
+            common.indexCb(req, res, err, resp, true);
+        });
+    }
 });
 
 
@@ -623,6 +674,53 @@ router.post('/planned-appointments/:date', function(req, res, next) {
     }
 });
 
+
+router.get('/planned-appointments/:appid', function(req, res, next) {
+    var queryBody = {
+        query: {
+            bool: {
+                should: [
+                    { term: { "calendar.days.planned_appointments.appid": req.params.appid }},
+                    { term: { "customer.planned_appointments.appid": req.params.appid }}
+                ],
+                minimum_should_match: 1
+            }
+        }
+    };
+
+    client.search({
+        index: req.config.mainIndex,
+        size: 1,
+        body: queryBody
+    }, function(err, resp, respcode) {
+        if (resp.hits.hits.length != 1) {
+            res.sendStatus(404);
+            return;
+        }
+
+        let obj = resp.hits.hits[0]._source;
+        let docType = resp.hits.hits[0]._type;
+
+        // TODO: implement for customer objects.
+        if (docType === 'calendar') {
+            for (let i = 0; i < obj.days.length; i++) {
+                for (let j = 0; j < obj.days[i].planned_appointments.length; j++) {
+                    if (obj.days[i].planned_appointments[j].appid === req.params.appid) {
+                        res.json({
+                            fullname: obj.days[i].planned_appointments[j].fullname,
+                            date: obj.days[i].date
+                        });
+                        return;
+                    }
+                }
+            }
+            res.sendStatus(404);
+            return;
+        }
+    });
+});
+
+
 router.delete('/planned-appointments/:date/:appid', function(req, res, next) {
     var queryBody = {
         query: {
@@ -642,7 +740,7 @@ router.delete('/planned-appointments/:date/:appid', function(req, res, next) {
         body: queryBody
     }, function(err, resp, respcode) {
         if (resp.hits.hits.length != 1) {
-            res.sendStatus(400);
+            res.sendStatus(404);
             return;
         }
 
@@ -795,10 +893,10 @@ AppointmentUtils.prototype.handleForm = function() {
         appointment.appid = uuid.v4();
     }
 
-    if (newItem) {
-        if (typeof obj.appointments == 'undefined')
-            obj.appointments = [];
+    if (typeof obj.appointments == 'undefined')
+        obj.appointments = [];
 
+    if (newItem) {
         obj.appointments.push(appointment);
     }
     else {
@@ -822,7 +920,7 @@ AppointmentUtils.prototype.handleForm = function() {
             }
 
             if (index === -1) {
-                res.sendStatus(404);
+                this.res.sendStatus(404);
                 return;
             }
 

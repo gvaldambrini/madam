@@ -9,7 +9,7 @@ import { CustomerForm, Customer, Customers, CustomersRoot } from './customers';
 import { ProductForm, Products, ProductsRoot } from './products';
 import { ServicesForm, WorkersForm, SettingsRoot } from './settings';
 import { LoginForm } from './login';
-import { HomePage, Calendar, CalendarAppointment } from './homepage';
+import { HomePage, Calendar, CalendarCustomer, CalendarAppointment, CalendarCustomerForm } from './homepage';
 
 
 function csrfSafeMethod(method) {
@@ -161,8 +161,16 @@ var routes = function() {
         <Route path="calendar" component={HomePage}>
           <IndexRoute component={Calendar}/>
           <Route path=":date" component={Calendar}/>
-          <Route path=":date/customers/:id/appointments/:appid" component={CalendarAppointment}/>
-          <Route path=":date/customers/:id/planned-appointments/:appid" component={CalendarAppointment}/>
+          <Route path=":date/customers/:id" component={CalendarCustomer}>
+            <IndexRoute component={CalendarCustomerForm}/>
+            <Route path="appointments" component={AppointmentsRoot}>
+              <Route path=":appid" component={CalendarAppointment}/>
+              <Route path="planned/:appid" component={CalendarAppointment}/>
+            </Route>
+          </Route>
+          <Route path=":date/appointments/planned/:appid/newcustomer" component={CalendarCustomer}>
+            <IndexRoute component={CalendarCustomerForm}/>
+          </Route>
         </Route>
         <Route path="customers" component={CustomersRoot}>
           <IndexRoute component={Customers}/>

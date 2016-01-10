@@ -81,5 +81,6 @@
 	"Insert a new customer or select an existing one": "Insert a new customer or select an existing one",
 	"Planned": "Planned",
 	"Confirm planned appointment": "Confirm planned appointment",
-	"Confirm appointment": "Confirm appointment"
+	"Confirm appointment": "Confirm appointment",
+	"Create new customer and confirm appointment": "Create new customer and confirm appointment"
 }

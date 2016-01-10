@@ -1,29 +1,32 @@
 import React from 'react';
 import { Link, IndexLink, History } from 'react-router';
 
-import { BaseForm, FormInputDate, FormInput, FormInputRadio, FormInputAndCheckbox, FormTextArea } from './forms';
+import { BaseForm, FormInputDate, FormInput, FormInputRadio, FormInputAndCheckbox, FormTextArea, fnSubmitForm } from './forms';
 import { PopoverTemplate, InputSearch, BaseTable, BaseTableContainer } from './tables';
 
 
-var CustomerForm = React.createClass({
-  mixins: [BaseForm, History],
+var CustomerFormContainer = React.createClass({
+  mixins: [BaseForm],
   getInitialState: function() {
     return {
       data: {},
-      editForm: false,
       errors: []
     }
   },
   componentWillMount: function() {
+    if (typeof this.props.customLoad !== 'undefined') {
+      this.props.customLoad(this);
+      return;
+    }
+
     var that = this;
-    if (this.props.params.id) {
+    if (typeof this.props.id !== 'undefined') {
       $.ajax({
-        url: '/customers/' + this.props.params.id,
+        url: '/customers/' + this.props.id,
         method: 'get',
         success: function(data) {
           that.setState({
             data: data,
-            editForm: true,
             errors: []
           });
         }
@@ -33,20 +36,7 @@ var CustomerForm = React.createClass({
   handleSubmit: function(event) {
     event.preventDefault();
     event.stopPropagation();
-
-    var targetName = event.currentTarget.name;
-    var url = this.state.editForm ? '/customers/' + this.props.params.id : '/customers';
-    var method = this.state.editForm ? 'put': 'post';
-
-    var successCb = function(data) {
-      if (targetName === 'submit-and-add') {
-        this.history.pushState(null, '/customers/edit/' + data.id + '/appointments/new');
-      }
-      else {
-        this.history.pushState(null, '/customers/');
-      }
-    };
-    this.submitForm(url, method, successCb);
+    this.props.doSubmit(this, this.state.data, event.currentTarget.name);
   },
   renderHtml: function(element) {
     return {
@@ -54,25 +44,16 @@ var CustomerForm = React.createClass({
     }
   },
   render: function() {
-    var submitText, formTitle;
-    if (this.state.editForm) {
-      submitText = i18n.customers.submitEdit;
-      formTitle = i18n.customers.edit;
-    }
-    else {
-      submitText = i18n.customers.submitAdd;
-      formTitle = i18n.customers.createNew;
-    }
-
     var additionalButtons;
-    if (!this.state.editForm) {
+    if (typeof this.props.submitAndAdd !== 'undefined') {
       additionalButtons = (
         <button type="button" className="btn btn-primary" name="submit-and-add"
           onClick={this.handleSubmit}>
-          {i18n.customers.submitAndAdd}
+          {this.props.submitAndAdd}
         </button>
       )
     }
+
     return (
       <div className="content-body">
         {this.renderErrors()}
@@ -80,7 +61,7 @@ var CustomerForm = React.createClass({
           <form id="form" className="form-horizontal customer" method="post"
             action=''>
             <div className="form-group">
-              <h4 className="col-sm-10 col-sm-offset-2">{formTitle}</h4>
+              <h4 className="col-sm-10 col-sm-offset-2">{this.props.formTitle}</h4>
             </div>
             <div className="form-group">
               <div className="col-sm-10 col-sm-offset-2 mandatory-fields"
@@ -124,7 +105,7 @@ var CustomerForm = React.createClass({
             <div className="form-group">
               <div className="col-sm-offset-2 col-sm-10">
                 <button type="button" className="btn btn-primary" name="submit" onClick={this.handleSubmit}>
-                  {submitText}
+                  {this.props.submitText}
                 </button>
                 {additionalButtons}
               </div>
@@ -132,6 +113,49 @@ var CustomerForm = React.createClass({
           </form>
         </div>
       </div>
+    );
+  }
+});
+
+
+var CustomerForm = React.createClass({
+  mixins: [ History ],
+  doSubmit: function(self, data, targetName) {
+    var that = this;
+    var editForm = typeof this.props.params.id !== 'undefined';
+    var url = editForm ? '/customers/' + this.props.params.id : '/customers';
+    var method = editForm ? 'put': 'post';
+
+    fnSubmitForm(self, url, method, data, function(obj) {
+      if (targetName === 'submit-and-add') {
+        that.history.pushState(null, '/customers/edit/' + obj.id + '/appointments/new');
+      }
+      else {
+        that.history.pushState(null, '/customers/');
+      }
+    });
+  },
+  render: function() {
+    var editForm = typeof this.props.params.id !== 'undefined';
+    var submitText, formTitle;
+
+    if (editForm) {
+      submitText = i18n.customers.submitEdit;
+      formTitle = i18n.customers.edit;
+    }
+    else {
+      submitText = i18n.customers.submitAdd;
+      formTitle = i18n.customers.createNew;
+    }
+
+    return (
+      <CustomerFormContainer
+        doSubmit={this.doSubmit}
+        submitText={submitText}
+        submitAndAdd={i18n.customers.submitAndAdd}
+        formTitle={formTitle}
+        id={this.props.params.id}
+      />
     );
   }
 });
@@ -156,12 +180,12 @@ var Customer = React.createClass({
     }
     else {
       infoLink = (
-        <Link to='/customers' className="active" onClick={function(e) {e.preventDefault();}}>
+        <Link to='' className="active" onClick={function(e) {e.preventDefault();}}>
           {i18n.customers.headerInfo}
         </Link>
       );
       appLink = (
-        <Link to='/customers' className="disabled">
+        <Link to='' className="disabled">
           {i18n.customers.headerAppointments}
         </Link>
       );
@@ -318,6 +342,7 @@ var CustomersRoot = React.createClass({
 
 
 module.exports = {
+  CustomerFormContainer: CustomerFormContainer,
   CustomerForm: CustomerForm,
   Customer: Customer,
   Customers: Customers,
