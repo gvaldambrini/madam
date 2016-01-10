@@ -82,5 +82,6 @@
 	"Planned": "Planned",
 	"Confirm planned appointment": "Confirm planned appointment",
 	"Confirm appointment": "Confirm appointment",
-	"Create new customer and confirm appointment": "Create new customer and confirm appointment"
+	"Create new customer and confirm appointment": "Create new customer and confirm appointment",
+	"Details": "Details"
 }

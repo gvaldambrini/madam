@@ -410,8 +410,14 @@ var Appointment = React.createClass({
     });
   },
   render: function() {
-    var submitText, formTitle, editForm, urlData;
-    if (typeof this.props.params.appid !== 'undefined') {
+    var submitText, formTitle, editForm, urlData, date;
+    if (this.props.location.pathname.indexOf('planned') !== -1) {
+      submitText = i18n.appointments.confirmAppointment;
+      formTitle = i18n.appointments.titleConfirmAppointment;
+      date = this.props.params.date;
+      editForm = false;
+    }
+    else if (typeof this.props.params.appid !== 'undefined') {
       submitText = i18n.appointments.submitEdit;
       formTitle = i18n.appointments.titleEdit;
       editForm = true;
@@ -428,7 +434,8 @@ var Appointment = React.createClass({
         submitText={submitText}
         formTitle={formTitle}
         editForm={editForm}
-        urlData={urlData}/>
+        urlData={urlData}
+        date={date}/>
     );
   }
 });
@@ -441,18 +448,34 @@ var AppointmentsTable = React.createClass({
   },
   render: function() {
     var that = this;
-    var appointmentRows = this.props.data.map(function(appointment) {
+    var appointmentRows = this.props.data.map(function(app) {
+      var appClass = app.planned ? 'planned-appointment' : '';
+      var date = moment(app.date, config.date_format);
       return (
-        <tr key={appointment.appid} onClick={
+        <tr key={app.appid}
+          className={date > moment() ? 'inactive' : ''}
+          onClick={
             function(event) {
-              that.history.pushState(
-                null, '/customers/edit/' + that.props.customer + '/appointments/edit/' + appointment.appid);
               event.preventDefault();
               event.stopPropagation();
+
+              if (app.planned) {
+                if (date > moment()) {
+                  return;
+                }
+                that.history.pushState(
+                  null,
+                    '/customers/edit/' + that.props.customer + '/appointments/planned/' +
+                    date.format('YYYY-MM-DD') + '/' + app.appid);
+              }
+              else {
+                that.history.pushState(
+                  null, '/customers/edit/' + that.props.customer + '/appointments/edit/' + app.appid);
+              }
             }
           }>
-          <td>{appointment.date}</td>
-          <td>{appointment.services}</td>
+          <td className={appClass}>{app.date}</td>
+          <td className={appClass}>{app.planned ? i18n.appointments.planned : app.services}</td>
           <td className="no-padding">
             <span onClick={function(event) {event.stopPropagation();}} className="table-btn pull-right glyphicon glyphicon-trash"
               data-toggle="tooltip" data-placement="left" title={i18n.appointments.deleteText} ref={
@@ -469,7 +492,7 @@ var AppointmentsTable = React.createClass({
                       content: i18n.appointments.deleteMsg,
                       $rootContainer: $('#appointments-table-container'),
                       onConfirm: function() {
-                        that.deleteItem(appointment.appid);
+                        that.deleteItem(app.appid);
                       }
                     });
                   }
@@ -485,8 +508,8 @@ var AppointmentsTable = React.createClass({
         <table className='table table-hover'>
           <thead>
             <tr>
-              <th>{this.props.headerDate}</th>
-              <th>{this.props.headerServices}</th>
+              <th>{i18n.appointments.date}</th>
+              <th>{i18n.appointments.details}</th>
               <th></th>
             </tr>
           </thead>
@@ -520,11 +543,12 @@ var Appointments = React.createClass({
     }
 
     var table;
-    if (this.state.data.length > 0) {
+    if (typeof this.state.data.appointments !== 'undefined' && this.state.data.appointments.length > 0) {
       table =  (
         <AppointmentsTable
-          headerDate={i18n.appointments.date} headerServices={i18n.appointments.services}
-          customer={this.props.params.id} data={this.state.data} updateTable={this.updateTable}/>
+          customer={this.props.params.id}
+          data={this.state.data.appointments}
+          updateTable={this.updateTable}/>
       );
     }
 
@@ -533,6 +557,7 @@ var Appointments = React.createClass({
         <Link to={`/customers/edit/${this.props.params.id}/appointments/new`} className='btn btn-primary'>
           {i18n.appointments.createNew}
         </Link>
+        <p className="hidden-xs pull-right">{this.state.data.name} {this.state.data.surname}</p>
         {table}
         <div id="popover-template">
           <PopoverTemplate confirm={i18n.appointments.btnConfirm} cancel={i18n.appointments.btnCancel}/>

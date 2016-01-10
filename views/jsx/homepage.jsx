@@ -139,13 +139,7 @@ var AppointmentsTable = React.createClass({
   render: function() {
     var that = this;
     var appointmentRows = this.props.appointments.map(function(app, index) {
-      var content;
-      if (app.planned) {
-        content = <i style={{color: '#999'}}>({i18n.homepage.planned}) {app.fullname}</i>
-      }
-      else {
-        content = app.fullname;
-      }
+      var appClass = app.planned ? 'planned-appointment' : '';
 
       return (
         <tr key={app.appid} className={moment(that.props.date) > moment() ? 'inactive' : ''} onClick={
@@ -171,7 +165,9 @@ var AppointmentsTable = React.createClass({
                 null, '/calendar/' + that.props.date + '/customers/' + app.id + '/appointments/' + app.appid);
             }
           }>
-          <td>{content}</td>
+
+          <td className={appClass}>{app.fullname}</td>
+          <td className={appClass}>{app.planned ? i18n.homepage.planned : app.services}</td>
           <td className="no-padding">
             <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
               data-toggle="tooltip" data-placement="left"
@@ -202,6 +198,13 @@ var AppointmentsTable = React.createClass({
 
     return (
       <table className='table table-hover'>
+        <thead>
+          <tr>
+            <th>{i18n.homepage.fullname}</th>
+            <th>{i18n.homepage.appDetails}</th>
+            <th></th>
+          </tr>
+        </thead>
         <tbody>
         {appointmentRows}
         </tbody>
@@ -322,6 +325,7 @@ var CalendarCustomer = React.createClass({
   }
 });
 
+
 var CalendarAppointment = React.createClass({
   mixins: [ History ],
   doSubmit: function(self, data) {
@@ -336,13 +340,13 @@ var CalendarAppointment = React.createClass({
     if (this.props.location.pathname.indexOf('planned') === -1) {
       submitText = i18n.appointments.submitEdit;
       formTitle = i18n.appointments.titleEdit;
-      planned = true;
+      planned = false;
       urlData = '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid;
     }
     else {
-      submitText = i18n.homepage.confirmAppointment;
-      formTitle = i18n.homepage.titleConfirmAppointment;
-      planned = false;
+      submitText = i18n.appointments.confirmAppointment;
+      formTitle = i18n.appointments.titleConfirmAppointment;
+      planned = true;
       date = this.props.params.date;
     }
     return (
@@ -350,7 +354,7 @@ var CalendarAppointment = React.createClass({
         doSubmit={this.doSubmit}
         submitText={submitText}
         formTitle={formTitle}
-        editForm={planned}
+        editForm={!planned}
         urlData={urlData}
         date={date}/>
     );

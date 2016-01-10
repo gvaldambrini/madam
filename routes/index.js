@@ -54,7 +54,8 @@ router.get('*', function(req, res, next) {
             },
             appointments: {
                 date: req.i18n.__('Date'),
-                services: req.i18n.__('Services'),
+                details: req.i18n.__('Details'),
+                planned: req.i18n.__('Planned'),
                 createNew: req.i18n.__('Create new appointment'),
                 btnConfirm: req.i18n.__('Confirm'),
                 btnCancel: req.i18n.__('Cancel'),
@@ -63,8 +64,10 @@ router.get('*', function(req, res, next) {
                 deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
                 titleNew: req.i18n.__('New appointment'),
                 titleEdit: req.i18n.__('Edit appointment'),
+                titleConfirmAppointment: req.i18n.__('Confirm planned appointment'),
                 submitAdd: req.i18n.__('Create appointment'),
                 submitEdit: req.i18n.__('Edit appointment'),
+                confirmAppointment: req.i18n.__('Confirm appointment'),
                 notes: req.i18n.__('Notes'),
                 addService: req.i18n.__('Add service'),
                 setWorkersMsg: req.i18n.__(
@@ -125,12 +128,12 @@ router.get('*', function(req, res, next) {
                 deleteTitle: req.i18n.__('Delete the appointment?'),
                 deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
                 deleteText: req.i18n.__('Delete appointment'),
-                titleConfirmAppointment: req.i18n.__('Confirm planned appointment'),
-                confirmAppointment: req.i18n.__('Confirm appointment'),
                 submitNewCustomer: req.i18n.__('Create customer'),
                 submitEditCustomer: req.i18n.__('Edit customer'),
                 editCustomer: req.i18n.__('Edit customer'),
-                createNewCustomer: req.i18n.__('Create new customer and confirm appointment')
+                createNewCustomer: req.i18n.__('Create new customer and confirm appointment'),
+                fullname: req.i18n.__('Name'),
+                appDetails: req.i18n.__('Details')
             }
         }
     });

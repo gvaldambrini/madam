@@ -82,5 +82,6 @@
 	"Planned": "Pianificato",
 	"Confirm planned appointment": "Conferma appuntamento pianificato",
 	"Confirm appointment": "Conferma appuntamento",
-	"Create new customer and confirm appointment": "Crea nuovo cliente e conferma appuntamento"
+	"Create new customer and confirm appointment": "Crea nuovo cliente e conferma appuntamento",
+	"Details": "Dettagli"
 }

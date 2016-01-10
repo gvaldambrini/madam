@@ -477,6 +477,10 @@ router.get('/appointments/:date', function(req, res, next) {
             }
         };
 
+        function descFn(item) {
+            return item.description;
+        }
+
         client.search({
             index: req.config.mainIndex,
             type: 'customer',
@@ -493,6 +497,7 @@ router.get('/appointments/:date', function(req, res, next) {
                             id: hit._id,
                             appid: hit._source.appointments[j].appid,
                             fullname: util.format('%s %s', hit._source.name, hit._source.surname),
+                            services: hit._source.appointments[j].services.map(descFn).join(' - '),
                             planned: false
                         };
                         break;
@@ -824,21 +829,38 @@ router.get('/:id/appointments', function(req, res, next) {
     let obj = req.customer;
     let appointments = [];
 
-    if (typeof obj.appointments == 'undefined' || obj.appointments.length === 0) {
-        res.json(appointments);
-        return;
+    if (typeof obj.appointments !== 'undefined') {
+        for (let i = 0; i < obj.appointments.length; i++) {
+            appointments.push({
+                appid: obj.appointments[i].appid,
+                _date: obj.appointments[i].date,
+                date: common.toLocalFormattedDate(req, obj.appointments[i].date),
+                services: obj.appointments[i].services.map(descFn).join(' - '),
+                planned: false
+            });
+        }
     }
 
-    for (let i = 0; i < obj.appointments.length; i++) {
-        appointments.push({
-            appid: obj.appointments[i].appid,
-            _date: obj.appointments[i].date,
-            date: common.toLocalFormattedDate(req, obj.appointments[i].date),
-            services: obj.appointments[i].services.map(descFn).join(' - ')
-        });
+    if (typeof obj.planned_appointments !== 'undefined') {
+        for (let i = 0; i < obj.planned_appointments.length; i++) {
+            appointments.push({
+                appid: obj.planned_appointments[i].appid,
+                _date: obj.planned_appointments[i].date,
+                date: common.toLocalFormattedDate(req, obj.planned_appointments[i].date),
+                planned: true
+            });
+        }
     }
-    appointments.sort(sortFn);
-    res.json(appointments);
+
+    if (appointments.length > 0) {
+        appointments.sort(sortFn);
+    }
+
+    res.json({
+        name: obj.name,
+        surname: obj.surname,
+        appointments: appointments
+    });
 });
 
 

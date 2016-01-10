@@ -305,6 +305,11 @@ $sidebar-padding: 20px;
   font-weight: bold;
 }
 
+.planned-appointment {
+  font-style: italic;
+  color: #999;
+}
+
 /*
  * Popover
  */
@@ -437,5 +442,14 @@ $sidebar-padding: 20px;
     &:hover {
       cursor: pointer;
     }
+  }
+}
+
+#calendar-table-container {
+  margin-top: 10px;
+
+  h4 {
+    border-bottom: 2px solid $primary-color;
+    padding-bottom: 15px;
   }
 }

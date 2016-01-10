@@ -183,6 +183,7 @@ var routes = function() {
               <IndexRoute component={Appointments}/>
               <Route path="new" component={Appointment}/>
               <Route path="edit/:appid" component={Appointment}/>
+              <Route path="planned/:date/:appid" component={Appointment}/>
             </Route>
           </Route>
         </Route>
