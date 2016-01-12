@@ -7,7 +7,7 @@ import { BaseForm, FormInputDate, FormInput, FormTextArea } from './forms';
 import { PopoverTemplate, InputSearch, BaseTableContainer, BaseTable } from './tables';
 
 
-var ProductForm = React.createClass({
+const ProductForm = React.createClass({
   mixins: [BaseForm, History],
   getInitialState: function() {
     return {
@@ -17,9 +17,9 @@ var ProductForm = React.createClass({
     }
   },
   componentWillMount: function() {
-    var that = this;
-    var editForm = this.props.route.path.startsWith('edit');
-    var cloneForm = this.props.route.path.startsWith('clone');
+    const that = this;
+    const editForm = this.props.route.path.startsWith('edit');
+    const cloneForm = this.props.route.path.startsWith('clone');
     if (this.props.params.id) {
       $.ajax({
         url: '/products/' + this.props.params.id,
@@ -51,12 +51,9 @@ var ProductForm = React.createClass({
     event.preventDefault();
     event.stopPropagation();
 
-    var successCb = function(data) {
-      this.history.pushState(null, '/products');
-    };
-    var url = this.state.editForm ? '/products/' + this.props.params.id : '/products';
-    var method = this.state.editForm ? 'put': 'post';
-    this.submitForm(url, method, successCb);
+    const url = this.state.editForm ? `/products/${this.props.params.id}` : '/products';
+    const method = this.state.editForm ? 'put': 'post';
+    this.submitForm(url, method, data => this.history.pushState(null, '/products'));
   },
   renderHtml(element) {
     return {
@@ -64,7 +61,7 @@ var ProductForm = React.createClass({
     }
   },
   render: function() {
-    var submitText, formTitle;
+    let submitText, formTitle;
     if (this.state.editForm) {
       submitText = i18n.products.submitEdit;
       formTitle = i18n.products.edit;
@@ -115,15 +112,15 @@ var ProductForm = React.createClass({
 });
 
 
-var ProductsTable = React.createClass({
+const ProductsTable = React.createClass({
   mixins: [BaseTable, History],
   deleteItem: function(objId) {
     this.deleteRow('/products/' + objId);
   },
   render: function() {
-    var that = this;
-    var productRows = this.props.data.products.map(function(product, index) {
-      var productDetails = product.objects.map(function(object) {
+    const that = this;
+    const productRows = this.props.data.products.map(function(product, index) {
+      const productDetails = product.objects.map(function(object) {
         return (
           <tr key={object.id} onClick={
             function(event) {
@@ -140,7 +137,7 @@ var ProductsTable = React.createClass({
                 title={i18n.products.deleteText} ref={
                   function(span) {
                     if (span != null) {
-                      var $span = $(span);
+                      const $span = $(span);
                       if ($span.data('tooltip-init'))
                         return;
                       $span.data('tooltip-init', true);
@@ -150,9 +147,7 @@ var ProductsTable = React.createClass({
                         title: i18n.products.deleteTitle,
                         content: i18n.products.deleteMsg,
                         $rootContainer: $('#products-table-container'),
-                        onConfirm: function() {
-                          that.deleteItem(object.id);
-                        }
+                        onConfirm: () => that.deleteItem(object.id)
                       });
                     }
                   }
@@ -226,7 +221,7 @@ var ProductsTable = React.createClass({
 });
 
 
-var Products = React.createClass({
+const Products = React.createClass({
   mixins: [BaseTableContainer, History],
   getInitialState: function() {
     return {
@@ -249,7 +244,7 @@ var Products = React.createClass({
     this.search(this.state.filterText);
   },
   render: function() {
-    var products;
+    let products;
     if (!this.state.loaded) {
       return <div></div>;
     }
@@ -279,7 +274,7 @@ var Products = React.createClass({
   }
 });
 
-var ProductsRoot = React.createClass({
+const ProductsRoot = React.createClass({
   render: function() {
     return (
       <div>

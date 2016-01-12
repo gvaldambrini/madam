@@ -7,7 +7,7 @@ import { SimpleInput, FormInputDate, fnRenderErrors, fnSubmitForm } from './form
 import { BaseTable, BaseTableContainer, PopoverTemplate } from './tables';
 
 
-var AppointmentService = React.createClass({
+const AppointmentService = React.createClass({
   getInitialState: function() {
     return {
       description: '',
@@ -30,8 +30,8 @@ var AppointmentService = React.createClass({
     });
   },
   handleChange: function(event) {
-    var target = event.currentTarget;
-    var data = this.state;
+    const target = event.currentTarget;
+    const data = this.state;
     if (target.name ===  'service') {
       data.description = target.value;
     }
@@ -42,18 +42,18 @@ var AppointmentService = React.createClass({
   },
   switchWorker: function(event) {
     // change the current worker to be the next one
-    var $button = $(event.currentTarget);
-    var $groupBtn = $button.closest('.input-group-btn');
-    var $workers = $groupBtn.find('ul a');
-    var newIndex = 0;
+    const $button = $(event.currentTarget);
+    const $groupBtn = $button.closest('.input-group-btn');
+    const $workers = $groupBtn.find('ul a');
+    let newIndex = 0;
     for (var i = 0; i < $workers.length; i++) {
         if ($($workers[i]).text() == $button.text()) {
             newIndex = (i + 1) % $workers.length;
             break;
         }
     }
-    var $newWorker = $($workers[newIndex]);
-    var data = this.state;
+    const $newWorker = $($workers[newIndex]);
+    const data = this.state;
     data.worker = {
       name: $newWorker.text(),
       color: $newWorker.css('color')
@@ -66,9 +66,9 @@ var AppointmentService = React.createClass({
     event.stopPropagation();
 
     // set the current worker from the selected one in the dropdown
-    var $target = $(event.currentTarget);
+    const $target = $(event.currentTarget);
 
-    var data = this.state;
+    const data = this.state;
     data.worker = {
       name: $target.text(),
       color: $target.css('color')
@@ -78,28 +78,25 @@ var AppointmentService = React.createClass({
     $target.closest('ul').parent().find('.dropdown-toggle').dropdown('toggle');
   },
   render: function() {
-    var that = this;
-    var workers = this.props.workers.map(function(worker) {
-      var aStyle = {color: worker.color};
-      return (
-        <li key={worker.name}>
-          <a style={aStyle} href="#" ref={function(a) {
-            // Probably due to a react.js bug, the standard onClick
-            // method does not call the selectWorker when the click
-            // is performed via javascript (using the console or
-            // nightwatch).
-            // The jQuery approach does not suffer this problem.
-            $(a)
-              .unbind('click', that.selectWorker)
-              .on('click', that.selectWorker);
-          }}>
-            {worker.name}
-          </a>
-        </li>
-      );
-    });
+    const that = this;
+    const workers = this.props.workers.map(
+      worker =>
+      <li key={worker.name}>
+        <a style={{color: worker.color}} href="#" ref={function(a) {
+          // Probably due to a react.js bug, the standard onClick
+          // method does not call the selectWorker when the click
+          // is performed via javascript (using the console or
+          // nightwatch).
+          // The jQuery approach does not suffer this problem.
+          $(a)
+            .unbind('click', that.selectWorker)
+            .on('click', that.selectWorker);
+        }}>
+          {worker.name}
+        </a>
+      </li>
+    );
 
-    var buttonStyle = {color: this.state.worker.color};
     return (
       <div className="form-group service">
         <div className="col-sm-12">
@@ -128,7 +125,7 @@ var AppointmentService = React.createClass({
               />
             <div className="input-group-btn">
               <button type="button" className="btn btn-default btn-click"
-                style={buttonStyle} onClick={this.switchWorker}>
+                style={{color: this.state.worker.color}} onClick={this.switchWorker}>
                 {this.state.worker.name}
               </button>
               <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -146,7 +143,7 @@ var AppointmentService = React.createClass({
 });
 
 
-var AppointmentTextArea = React.createClass({
+const AppointmentTextArea = React.createClass({
   mixins: [SimpleInput],
   getInitialState: function() {
     return {value: ''}
@@ -173,17 +170,15 @@ var AppointmentTextArea = React.createClass({
 });
 
 
-var AppointmentForm = React.createClass({
+const AppointmentForm = React.createClass({
   render: function() {
-    var that = this;
-    var services = this.props.services.map(function(service, index) {
-      return (
-        <AppointmentService index={index}
-          data={service}
-          updateService={that.props.updateService}
-          workers={that.props.workers} key={index} />
-      );
-    });
+    const services = this.props.services.map(
+      (service, index) =>
+      <AppointmentService index={index}
+        data={service}
+        updateService={this.props.updateService}
+        workers={this.props.workers} key={index} />
+    );
     return (
       <div className="content-body">
         {fnRenderErrors(this.props.errors)}
@@ -223,7 +218,7 @@ var AppointmentForm = React.createClass({
 });
 
 
-var AppointmentFormContainer = React.createClass({
+const AppointmentFormContainer = React.createClass({
   propTypes: {
     editForm: React.PropTypes.bool.isRequired,
     urlData: React.PropTypes.string,
@@ -233,7 +228,7 @@ var AppointmentFormContainer = React.createClass({
     doSubmit: React.PropTypes.func.isRequired
   },
   getInitialState: function() {
-    var date = typeof this.props.date !== 'undefined'
+    const date = typeof this.props.date !== 'undefined'
       ? moment(this.props.date).format(config.date_format)
       : moment().format(config.date_format)
 
@@ -246,7 +241,7 @@ var AppointmentFormContainer = React.createClass({
     }
   },
   updateService: function(index, service) {
-    var services = this.state.services;
+    const services = this.state.services;
     services[index] = service;
     this.setState({services: services});
   },
@@ -259,38 +254,37 @@ var AppointmentFormContainer = React.createClass({
     }
   },
   componentWillMount: function() {
-    var that = this;
     if (this.props.editForm) {
       $.ajax({
         url: this.props.urlData,
         method: 'get',
-        success: that.loadAppointment
+        success: this.loadAppointment
       });
     }
     else {
       $.ajax({
         url: '/settings/workers',
         method: 'get',
-        success: that.loadWorkers
+        success: this.loadWorkers
       });
 
       $.ajax({
         url: '/settings/services',
         method: 'get',
-        success: that.loadServices
+        success: this.loadServices
       });
     }
   },
   handleSubmit: function() {
-    var services = [];
-    for (var i = 0; i < this.state.services.length; i++) {
+    const services = [];
+    for (let i = 0; i < this.state.services.length; i++) {
       services[services.length] = {
         description: this.state.services[i].description,
         enabled: this.state.services[i].checked,
         worker: this.state.services[i].worker.name
       }
     }
-    var data = {
+    const data = {
       services: services,
       date: this.state.date,
       notes: this.state.notes
@@ -299,9 +293,9 @@ var AppointmentFormContainer = React.createClass({
     this.props.doSubmit(this, data);
   },
   buildServiceMap: function(workers, services) {
-    var map = [];
+    const map = [];
     // new appointment
-    for (var i = 0; i < services.length; i++) {
+    for (let i = 0; i < services.length; i++) {
       map.push({
         description: services[i],
         worker: workers[0],
@@ -319,7 +313,7 @@ var AppointmentFormContainer = React.createClass({
     })
   },
   loadWorkers: function(data) {
-    var newState = {};
+    const newState = {};
     newState.workers = data.items;
 
     if (typeof this._services != 'undefined') {
@@ -342,7 +336,7 @@ var AppointmentFormContainer = React.createClass({
   addService: function(event) {
     event.preventDefault();
     event.stopPropagation();
-    var services = this.state.services.slice();
+    const services = this.state.services.slice();
     services.push({
       checked: true,
       description: '',
@@ -399,18 +393,25 @@ var AppointmentFormContainer = React.createClass({
 var Appointment = React.createClass({
   mixins: [History],
   doSubmit: function(self, data) {
-    var that = this;
-    var editForm = typeof this.props.params.appid != 'undefined';
-    var baseUrl = '/customers/' + this.props.params.id;
-
-    var url = baseUrl + (editForm ? '/appointments/' + this.props.params.appid : '/appointments');
-    var method = editForm ? 'put': 'post';
-    fnSubmitForm(self, url, method, data, function() {
-      that.history.pushState(null, '/customers/edit/' + that.props.params.id + '/appointments');
-    });
+    const editForm = typeof this.props.params.appid != 'undefined';
+    let url;
+    if (editForm) {
+      url = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`
+    }
+    else {
+      url = `/customers/${this.props.params.id}/appointments`
+    }
+    const method = editForm ? 'put': 'post';
+    fnSubmitForm(
+      self,
+      url,
+      method,
+      data,
+      () => this.history.pushState(null, `/customers/edit/${this.props.params.id}/appointments`)
+    );
   },
   render: function() {
-    var submitText, formTitle, editForm, urlData, date;
+    let submitText, formTitle, editForm, urlData, date;
     if (this.props.location.pathname.indexOf('planned') !== -1) {
       submitText = i18n.appointments.confirmAppointment;
       formTitle = i18n.appointments.titleConfirmAppointment;
@@ -421,7 +422,7 @@ var Appointment = React.createClass({
       submitText = i18n.appointments.submitEdit;
       formTitle = i18n.appointments.titleEdit;
       editForm = true;
-      urlData = '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid;
+      urlData = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`;
     }
     else {
       submitText = i18n.appointments.submitAdd;
@@ -441,16 +442,16 @@ var Appointment = React.createClass({
 });
 
 
-var AppointmentsTable = React.createClass({
+const AppointmentsTable = React.createClass({
   mixins: [BaseTable],
   deleteItem: function(objId) {
-    this.deleteRow('/customers/' + this.props.customer + '/appointments/' + objId);
+    this.deleteRow(`/customers/${this.props.customer}/appointments/${objId}`);
   },
   render: function() {
-    var that = this;
-    var appointmentRows = this.props.data.map(function(app) {
-      var appClass = app.planned ? 'planned-appointment' : '';
-      var date = moment(app.date, config.date_format);
+    const that = this;
+    const appointmentRows = this.props.data.map(function(app) {
+      const appClass = app.planned ? 'planned-appointment' : '';
+      const date = moment(app.date, config.date_format);
       return (
         <tr key={app.appid}
           className={date > moment() ? 'inactive' : ''}
@@ -468,7 +469,7 @@ var AppointmentsTable = React.createClass({
               data-toggle="tooltip" data-placement="left" title={i18n.appointments.deleteText} ref={
                 function(span) {
                   if (span != null) {
-                    var $span = $(span);
+                    const $span = $(span);
                     if ($span.data('tooltip-init'))
                       return;
                     $span.data('tooltip-init', true);
@@ -478,9 +479,7 @@ var AppointmentsTable = React.createClass({
                       title: i18n.appointments.deleteTitle,
                       content: i18n.appointments.deleteMsg,
                       $rootContainer: $('#appointments-table-container'),
-                      onConfirm: function() {
-                        that.deleteItem(app.appid);
-                      }
+                      onConfirm: () => that.deleteItem(app.appid)
                     });
                   }
                 }
@@ -510,22 +509,20 @@ var AppointmentsTable = React.createClass({
 });
 
 
-var CustomerAppointments = React.createClass({
+const CustomerAppointments = React.createClass({
   mixins: [History],
   handleRowClick(app) {
-    var date = moment(app.date, config.date_format);
+    const date = moment(app.date, config.date_format);
     if (app.planned) {
       if (date > moment()) {
         return;
       }
       this.history.pushState(
-        null,
-          '/customers/edit/' + this.props.customer + '/appointments/planned/' +
-          date.format('YYYY-MM-DD') + '/' + app.appid);
+        null, `/customers/edit/${this.props.customer}/appointments/planned/${date.format('YYYY-MM-DD')}/${app.appid}`);
     }
     else {
       this.history.pushState(
-        null, '/customers/edit/' + this.props.customer + '/appointments/edit/' + app.appid);
+        null, `/customers/edit/${this.props.customer}/appointments/edit/${app.appid}`);
     }
   },
   render: function() {
@@ -552,16 +549,16 @@ var Appointments = React.createClass({
     this.updateTable();
   },
   updateTable: function() {
-    this.fetchData('/customers/' + this.props.params.id + '/appointments');
+    this.fetchData(`/customers/${this.props.params.id}/appointments`);
   },
   render: function() {
     if (!this.state.loaded) {
       return <div></div>;
     }
 
-    var table;
+    let table;
     if (typeof this.state.data.appointments !== 'undefined' && this.state.data.appointments.length > 0) {
-      table =  (
+      table = (
         <CustomerAppointments
           customer={this.props.params.id}
           data={this.state.data.appointments}
@@ -585,7 +582,7 @@ var Appointments = React.createClass({
 });
 
 
-var AppointmentsRoot = React.createClass({
+const AppointmentsRoot = React.createClass({
   render: function() {
     return (
       <div className='content-body'>

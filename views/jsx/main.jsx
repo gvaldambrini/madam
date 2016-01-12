@@ -34,7 +34,7 @@ $.fn.datepicker.defaults.weekStart = 1;
 $.fn.datepicker.defaults.todayHighlight = true;
 
 
-var Sidebar = React.createClass({
+const Sidebar = React.createClass({
   render: function() {
     return (
       <div className="col-sm-2 sidebar collapse">
@@ -58,12 +58,12 @@ var Sidebar = React.createClass({
 });
 
 
-var Navbar = React.createClass({
+const Navbar = React.createClass({
   mixins: [History],
   render: function() {
-    var that = this;
-    var logout;
-    var currentUser = Cookies.get('user');
+    const that = this;
+    let logout;
+    const currentUser = Cookies.get('user');
     if (typeof currentUser !== 'undefined') {
       logout =  (
         <div className="navbar-user">
@@ -90,7 +90,7 @@ var Navbar = React.createClass({
       );
     }
 
-    var toggle;
+    let toggle;
     if (this.props.showToggle) {
       toggle = (
         <button type="button" className="navbar-toggle" data-toggle="collapse" data-target=".sidebar">
@@ -114,7 +114,7 @@ var Navbar = React.createClass({
 });
 
 
-var Root = React.createClass({
+const Root = React.createClass({
   render: function() {
     return (
       <div className="row">
@@ -128,9 +128,9 @@ var Root = React.createClass({
 });
 
 
-var App = React.createClass({
+const App = React.createClass({
   render: function() {
-    var showToggle = typeof Cookies.get('user') !== 'undefined';
+    const showToggle = typeof Cookies.get('user') !== 'undefined';
     return (
       <div className="container-fluid">
         <Navbar
@@ -149,7 +149,7 @@ function requireAuth(nextState, replaceState) {
 }
 
 
-var routes = function() {
+const routes = function() {
   return (
     <Route component={App}>
       <Route path="/" component={Root} onEnter={requireAuth}>
@@ -206,8 +206,8 @@ var routes = function() {
   );
 }
 
-var createBrowserHistory = require('history/lib/createBrowserHistory');
-var history = createBrowserHistory();
+const createBrowserHistory = require('history/lib/createBrowserHistory');
+const history = createBrowserHistory();
 
 ReactDOM.render(
   <Router routes={routes()} history={history}/>,

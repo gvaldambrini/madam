@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import { BaseForm, FormInput } from './forms';
 
 
-var LoginForm = React.createClass({
+const LoginForm = React.createClass({
   mixins: [BaseForm, History],
   getInitialState: function() {
     return {
@@ -21,12 +21,10 @@ var LoginForm = React.createClass({
     event.preventDefault();
     event.stopPropagation();
 
-    var successCb = function(data) {
+    this.submitForm('/login', 'post', function(data) {
       Cookies.set('user', data.user);
       this.history.pushState(null, '/');
-    };
-
-    this.submitForm('/login', 'post', successCb);
+    });
   },
   render: function() {
     return (

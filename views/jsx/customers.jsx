@@ -5,7 +5,7 @@ import { BaseForm, FormInputDate, FormInput, FormInputRadio, FormInputAndCheckbo
 import { PopoverTemplate, InputSearch, BaseTable, BaseTableContainer } from './tables';
 
 
-var CustomerFormContainer = React.createClass({
+const CustomerFormContainer = React.createClass({
   mixins: [BaseForm],
   getInitialState: function() {
     return {
@@ -19,17 +19,16 @@ var CustomerFormContainer = React.createClass({
       return;
     }
 
-    var that = this;
     if (typeof this.props.id !== 'undefined') {
       $.ajax({
         url: '/customers/' + this.props.id,
         method: 'get',
-        success: function(data) {
-          that.setState({
+        success:
+          data =>
+          this.setState({
             data: data,
             errors: []
-          });
-        }
+          })
       });
     }
   },
@@ -44,7 +43,7 @@ var CustomerFormContainer = React.createClass({
     }
   },
   render: function() {
-    var additionalButtons;
+    let additionalButtons;
     if (typeof this.props.submitAndAdd !== 'undefined') {
       additionalButtons = (
         <button type="button" className="btn btn-primary" name="submit-and-add"
@@ -118,17 +117,18 @@ var CustomerFormContainer = React.createClass({
 });
 
 
-var CustomerForm = React.createClass({
+const CustomerForm = React.createClass({
   mixins: [ History ],
   doSubmit: function(self, data, targetName) {
-    var that = this;
-    var editForm = typeof this.props.params.id !== 'undefined';
-    var url = editForm ? '/customers/' + this.props.params.id : '/customers';
-    var method = editForm ? 'put': 'post';
+    const that = this;
+    const editForm = typeof this.props.params.id !== 'undefined';
+    const url = editForm ? `/customers/${this.props.params.id}` : '/customers';
+    const method = editForm ? 'put': 'post';
 
     fnSubmitForm(self, url, method, data, function(obj) {
       if (targetName === 'submit-and-add') {
-        that.history.pushState(null, '/customers/edit/' + obj.id + '/appointments/new');
+        that.history.pushState(
+          null, `/customers/edit/${obj.id}/appointments/new`);
       }
       else {
         that.history.pushState(null, '/customers/');
@@ -136,8 +136,8 @@ var CustomerForm = React.createClass({
     });
   },
   render: function() {
-    var editForm = typeof this.props.params.id !== 'undefined';
-    var submitText, formTitle;
+    const editForm = typeof this.props.params.id !== 'undefined';
+    let submitText, formTitle, submitAndAdd;
 
     if (editForm) {
       submitText = i18n.customers.submitEdit;
@@ -146,13 +146,14 @@ var CustomerForm = React.createClass({
     else {
       submitText = i18n.customers.submitAdd;
       formTitle = i18n.customers.createNew;
+      submitAndAdd = i18n.customers.submitAndAdd;
     }
 
     return (
       <CustomerFormContainer
         doSubmit={this.doSubmit}
         submitText={submitText}
-        submitAndAdd={i18n.customers.submitAndAdd}
+        submitAndAdd={submitAndAdd}
         formTitle={formTitle}
         id={this.props.params.id}
       />
@@ -161,10 +162,10 @@ var CustomerForm = React.createClass({
 });
 
 
-var Customer = React.createClass({
+const Customer = React.createClass({
   render: function() {
-    var infoLink;
-    var appLink;
+    let infoLink;
+    let appLink;
 
     if (this.props.location.pathname.startsWith('/customers/edit')) {
       infoLink = (
@@ -210,52 +211,49 @@ var Customer = React.createClass({
 });
 
 
-var CustomersTable = React.createClass({
+const CustomersTable = React.createClass({
   mixins: [BaseTable, History],
   deleteItem: function(objId) {
     this.deleteRow('/customers/' + objId);
   },
   render: function() {
-    var that = this;
-    var customerRows = this.props.data.customers.map(function(customer, index) {
-      return (
-        <tr key={customer.id} onClick={
-            function(event) {
-              that.history.pushState(null, '/customers/edit/' + customer.id);
-              event.preventDefault();
-              event.stopPropagation();
-            }
-          }>
-          <td dangerouslySetInnerHTML={that.renderHighlight(customer.name)} />
-          <td dangerouslySetInnerHTML={that.renderHighlight(customer.surname)} />
-          <td className="hidden-xs" dangerouslySetInnerHTML={that.renderHighlight(customer.phone)} />
-          <td className="hidden-xs">{customer.last_seen}</td>
-          <td className="no-padding">
-            <span onClick={function(event) {event.stopPropagation();}} className="table-btn pull-right glyphicon glyphicon-trash"
-              data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
-                function(span) {
-                  if (span != null) {
-                    var $span = $(span);
-                    if ($span.data('tooltip-init'))
-                      return;
-                    $span.data('tooltip-init', true);
-                    $span.tooltip();
-                    $span.confirmPopover({
-                      template: '#popover-template',
-                      title: i18n.customers.deleteTitle,
-                      content: i18n.customers.deleteMsg,
-                      $rootContainer: $('#customers-table-container'),
-                      onConfirm: function() {
-                        that.deleteItem(customer.id);
-                      }
-                    });
-                  }
+    const that = this;
+    const customerRows = this.props.data.customers.map(
+      (customer, index) =>
+      <tr key={customer.id} onClick={
+          function(event) {
+            that.history.pushState(null, `/customers/edit/${customer.id}`);
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }>
+        <td dangerouslySetInnerHTML={this.renderHighlight(customer.name)} />
+        <td dangerouslySetInnerHTML={this.renderHighlight(customer.surname)} />
+        <td className="hidden-xs" dangerouslySetInnerHTML={this.renderHighlight(customer.phone)} />
+        <td className="hidden-xs">{customer.last_seen}</td>
+        <td className="no-padding">
+          <span onClick={function(event) {event.stopPropagation();}} className="table-btn pull-right glyphicon glyphicon-trash"
+            data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
+              function(span) {
+                if (span != null) {
+                  var $span = $(span);
+                  if ($span.data('tooltip-init'))
+                    return;
+                  $span.data('tooltip-init', true);
+                  $span.tooltip();
+                  $span.confirmPopover({
+                    template: '#popover-template',
+                    title: i18n.customers.deleteTitle,
+                    content: i18n.customers.deleteMsg,
+                    $rootContainer: $('#customers-table-container'),
+                    onConfirm: () => that.deleteItem(customer.id)
+                  });
                 }
-              }></span>
-          </td>
-        </tr>
-      );
-    });
+              }
+            }></span>
+        </td>
+      </tr>
+    );
 
     return (
       <table className='table table-hover'>
@@ -277,7 +275,7 @@ var CustomersTable = React.createClass({
 });
 
 
-var Customers = React.createClass({
+const Customers = React.createClass({
   mixins: [BaseTableContainer, History],
   getInitialState: function() {
     return {
@@ -304,7 +302,7 @@ var Customers = React.createClass({
       return <div></div>
     }
 
-    var customers;
+    let customers;
     if (this.state.data.customers.length > 0) {
       customers = <CustomersTable data={this.state.data} updateTable={this.updateTable}/>;
     }
@@ -330,7 +328,7 @@ var Customers = React.createClass({
 });
 
 
-var CustomersRoot = React.createClass({
+const CustomersRoot = React.createClass({
   render: function() {
     return (
       <div>

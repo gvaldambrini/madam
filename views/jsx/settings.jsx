@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { fnRenderErrors, fnSubmitForm } from './forms';
 
 
-var BaseRow = {
+const BaseRow = {
   add: function(event) {
     event.preventDefault();
     event.stopPropagation();
@@ -50,10 +50,10 @@ var BaseRow = {
 };
 
 
-var BaseSettingsForm = {
+const BaseSettingsForm = {
   uuid4: function () {
     //// return uuid of form xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-    var uuid = '', ii;
+    let uuid = '', ii;
     for (ii = 0; ii < 32; ii += 1) {
       switch (ii) {
       case 8:
@@ -76,8 +76,8 @@ var BaseSettingsForm = {
     return uuid;
   },
   addRow: function() {
-    var items = this.state.items.slice();
-    var obj = this.newEmptyObj();
+    const items = this.state.items.slice();
+    const obj = this.newEmptyObj();
 
     obj.id = this.uuid4();
     items.push(obj);
@@ -87,7 +87,7 @@ var BaseSettingsForm = {
     });
   },
   removeRow: function(index) {
-    var items = this.state.items.slice();
+    const items = this.state.items.slice();
     items.splice(index, 1);
     this.setState({
       items: items
@@ -100,7 +100,7 @@ var BaseSettingsForm = {
         </div>
       );
     }
-    var settingsItems = this.state.items.map(this.settingsItem);
+    const settingsItems = this.state.items.map(this.settingsItem);
 
     return (
       <div className="content-body">
@@ -128,7 +128,7 @@ var BaseSettingsForm = {
 };
 
 
-var SettingsRow = React.createClass({
+const SettingsRow = React.createClass({
   mixins: [BaseRow],
   getInitialState: function() {
     return {
@@ -142,12 +142,12 @@ var SettingsRow = React.createClass({
     this.setState({value: nextProps.value});
   },
   textChanged: function(event) {
-    var $target = $(event.currentTarget);
-    var rowId = $target.data('row-id');
+    const $target = $(event.currentTarget);
+    const rowId = $target.data('row-id');
     this.props.handleChange(rowId, $target.val());
   },
   input: function() {
-    var that = this;
+    const that = this;
     return (
       <input className="form-control" type="text" name="name"
         value={this.state.value}
@@ -172,7 +172,7 @@ var SettingsRow = React.createClass({
 });
 
 
-var ServicesForm = React.createClass({
+const ServicesForm = React.createClass({
   mixins: [BaseSettingsForm],
   newEmptyObj: function() {
     return {
@@ -183,14 +183,14 @@ var ServicesForm = React.createClass({
     // We need an unique and stable id so that React can perform
     // the reconciliation to understand who is the child removed
     // or added.
-    var items = [];
+    const items = [];
     if (data.items.length === 0) {
-      var emptyItem = this.newEmptyObj()
+      const emptyItem = this.newEmptyObj()
       emptyItem.id = this.uuid4();
       items[0] = emptyItem;
     }
     else {
-      for (var i = 0; i < data.items.length; i++) {
+      for (let i = 0; i < data.items.length; i++) {
         items[items.length] = {
           name: data.items[i],
           id: this.uuid4()
@@ -205,11 +205,10 @@ var ServicesForm = React.createClass({
     });
   },
   componentWillMount: function() {
-    var that = this;
     $.ajax({
       url: '/settings/services',
       method: 'get',
-      success: that.loadItems
+      success: this.loadItems
     });
   },
   getInitialState: function() {
@@ -232,18 +231,18 @@ var ServicesForm = React.createClass({
       return;
     }
 
-    var items = [];
-    for (var i = 0; i < this.state.items.length; i++) {
+    const items = [];
+    for (let i = 0; i < this.state.items.length; i++) {
       items[items.length] = this.state.items[i].name;
     }
 
-    var data = {services: items};
+    const data = {services: items};
     fnSubmitForm(this, '/settings/services', 'put', data, this.loadItems);
   },
   handleChange: function(rowId, text) {
-    var items = this.state.items;
+    const items = this.state.items;
 
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       if (items[i].id == rowId) {
         if (items[i].name == text) {
           return;
@@ -271,7 +270,7 @@ var ServicesForm = React.createClass({
 });
 
 
-var SettingsColorRow = React.createClass({
+const SettingsColorRow = React.createClass({
   mixins: [BaseRow],
   getInitialState: function() {
     return {
@@ -308,27 +307,27 @@ var SettingsColorRow = React.createClass({
     });
   },
   colorChanged: function(event) {
-    var $target = $(event.currentTarget);
-    var rowId = $target.parent().data('row-id');
-    var color = $target.val();
-    var text = $target.parent().find('input[type=text]').val();
+    const $target = $(event.currentTarget);
+    const rowId = $target.parent().data('row-id');
+    const color = $target.val();
+    const text = $target.parent().find('input[type=text]').val();
     this.props.handleChange(rowId, text, color);
   },
   textChanged: function(event) {
-    var $target = $(event.currentTarget);
-    var rowId = $target.parent().data('row-id');
-    var color = $target.parent().find('input[name=color]').val();
-    var text = $target.val();
+    const $target = $(event.currentTarget);
+    const rowId = $target.parent().data('row-id');
+    const color = $target.parent().find('input[name=color]').val();
+    const text = $target.val();
     this.props.handleChange(rowId, text, color);
   },
   input: function() {
-    var that = this;
+    const that = this;
 
     return (
       <div className="input-group" data-row-id={this.props.rowId} ref={
         function(div) {
           if (div != null) {
-            var $div = $(div);
+            const $div = $(div);
             that.setColorPicker($div);
             // forward the native change event to the react event handler
             $div.find('input[name=color]')
@@ -360,7 +359,7 @@ var SettingsColorRow = React.createClass({
             value={this.state.color}/>
           <span className="input-group-addon colorpicker-selector" ref={
             function(span) {
-              var $span = $(span);
+              const $span = $(span);
               if (that.props.disabled) {
                 $span.addClass('disabled');
               }
@@ -377,7 +376,7 @@ var SettingsColorRow = React.createClass({
 });
 
 
-var WorkersForm = React.createClass({
+const WorkersForm = React.createClass({
   mixins: [BaseSettingsForm],
   newEmptyObj: function() {
     return {
@@ -389,14 +388,14 @@ var WorkersForm = React.createClass({
     // We need an unique and stable id so that React can perform
     // the reconciliation to understand who is the child removed
     // or added.
-    var items = [];
+    const items = [];
     if (data.items.length === 0) {
-      var emptyItem = this.newEmptyObj()
+      const emptyItem = this.newEmptyObj()
       emptyItem.id = this.uuid4();
       items[0] = emptyItem;
     }
     else {
-      for (var i = 0; i < data.items.length; i++) {
+      for (let i = 0; i < data.items.length; i++) {
         items[items.length] = {
           name: data.items[i].name,
           color: data.items[i].color,
@@ -412,11 +411,10 @@ var WorkersForm = React.createClass({
     });
   },
   componentWillMount: function() {
-    var that = this;
     $.ajax({
       url: '/settings/workers',
       method: 'get',
-      success: that.loadItems
+      success: this.loadItems
     });
   },
   getInitialState: function() {
@@ -429,9 +427,9 @@ var WorkersForm = React.createClass({
     };
   },
   handleChange: function(rowId, text, color) {
-    var items = this.state.items;
+    const items = this.state.items;
 
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       if (items[i].id == rowId) {
         if (items[i].name == text && items[i].color == color) {
           return;
@@ -456,7 +454,7 @@ var WorkersForm = React.createClass({
       return;
     }
 
-    var data = {workers: this.state.items};
+    const data = {workers: this.state.items};
     fnSubmitForm(this, '/settings/workers', 'put', data, this.loadItems);
   },
   settingsItem: function(item, index) {
@@ -474,7 +472,7 @@ var WorkersForm = React.createClass({
 });
 
 
-var SettingsRoot = React.createClass({
+const SettingsRoot = React.createClass({
   render: function() {
     return (
       <div>

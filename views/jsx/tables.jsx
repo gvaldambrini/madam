@@ -3,7 +3,7 @@ import React from 'react';
 import Cookies from 'js-cookie';
 
 
-var InputSearch = React.createClass({
+const InputSearch = React.createClass({
   propTypes: {
       search: React.PropTypes.func.isRequired,
       placeholder: React.PropTypes.string.isRequired
@@ -26,7 +26,7 @@ var InputSearch = React.createClass({
     )
   },
   search: function() {
-    var text = this.searchInput().val();
+    const text = this.searchInput().val();
     this.searchClear().toggle(Boolean(text));
     this.props.search(text);
   },
@@ -38,7 +38,7 @@ var InputSearch = React.createClass({
 });
 
 
-var PopoverTemplate = React.createClass({
+const PopoverTemplate = React.createClass({
   propTypes: {
       confirm: React.PropTypes.string.isRequired,
       cancel: React.PropTypes.string.isRequired,
@@ -60,7 +60,7 @@ var PopoverTemplate = React.createClass({
 });
 
 
-var BaseTable = {
+const BaseTable = {
   deleteRow: function(url) {
     $.ajax({
       url: url,
@@ -81,17 +81,17 @@ var BaseTable = {
 };
 
 
-var BaseTableContainer = {
+const BaseTableContainer = {
   fetchData: function(url, filterText) {
     var that = this;
-    var ajaxArgs = {
+    const ajaxArgs = {
       url: url,
-      success: function(data) {
+      success:
+        data =>
         that.setState({
           data: data,
           loaded: true
-        });
-      },
+        }),
       error: function(xhr, textStatus, errorThrown) {
         if (xhr.status === 401) {
           Cookies.remove('user');

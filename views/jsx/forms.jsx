@@ -3,14 +3,14 @@ import React from 'react';
 import Cookies from 'js-cookie';
 
 
-var SimpleInput = {
+const SimpleInput = {
   handleChange: function(event) {
     this.props.handleChange(this.props.name, event.currentTarget.value);
   }
 };
 
 
-var FormInputDate = React.createClass({
+const FormInputDate = React.createClass({
   propTypes: {
       handleChange: React.PropTypes.func.isRequired,
       name: React.PropTypes.string.isRequired,
@@ -22,14 +22,14 @@ var FormInputDate = React.createClass({
     this.props.handleChange(this.props.name, $(event.currentTarget).val());
   },
   render: function() {
-    var that = this;
+    const that = this;
     return (
       <div className="form-group">
         <label htmlFor={this.props.name} className="control-label col-sm-2">{this.props.label}</label>
         <div className="col-sm-10">
           <div className="input-group date" ref={
             function(div) {
-              var $div = $(div);
+              const $div = $(div);
               $div.datepicker({endDate: "0d"});
               $div.datepicker('setDate', that.props.value);
             }
@@ -87,7 +87,7 @@ var FormInput = React.createClass({
     this.setState({value: nextProps.value});
   },
   render: function() {
-    var mandatoryStar;
+    let mandatoryStar;
     if (this.props.mandatory) {
       mandatoryStar = <span className="mandatory">*</span>;
     }
@@ -111,7 +111,7 @@ var FormInput = React.createClass({
 });
 
 
-var FormInputRadio = React.createClass({
+const FormInputRadio = React.createClass({
   mixins: [SimpleInput],
   propTypes: {
       handleChange: React.PropTypes.func.isRequired,
@@ -132,17 +132,15 @@ var FormInputRadio = React.createClass({
     this.setState({value: nextProps.value});
   },
   render: function() {
-    var that = this;
-    var radioValues = this.props.values.map(function(obj) {
-      return (
-        <label className="radio-inline" key={obj.value}>
-          <input type="radio" name={that.props.name} value={obj.value}
-          checked={that.state.value === obj.value}
-          onChange={that.handleChange}/>
-          {obj.name}
-        </label>
-      );
-    });
+    const radioValues = this.props.values.map(
+      obj =>
+      <label className="radio-inline" key={obj.value}>
+        <input type="radio" name={this.props.name} value={obj.value}
+        checked={this.state.value === obj.value}
+        onChange={this.handleChange}/>
+        {obj.name}
+      </label>
+    );
 
     return (
       <div className="form-group">
@@ -158,7 +156,7 @@ var FormInputRadio = React.createClass({
 });
 
 
-var FormInputAndCheckbox = React.createClass({
+const FormInputAndCheckbox = React.createClass({
   propTypes: {
       handleChange: React.PropTypes.func.isRequired,
       name: React.PropTypes.string.isRequired,
@@ -188,8 +186,8 @@ var FormInputAndCheckbox = React.createClass({
     });
   },
   handleChange: function(event) {
-    var target = event.currentTarget;
-    var value = target.type == "checkbox" ? target.checked : target.value;
+    const target = event.currentTarget;
+    const value = target.type == "checkbox" ? target.checked : target.value;
     this.props.handleChange(target.name, value);
   },
   render: function() {
@@ -220,7 +218,7 @@ var FormInputAndCheckbox = React.createClass({
 });
 
 
-var FormTextArea = React.createClass({
+const FormTextArea = React.createClass({
   mixins: [SimpleInput],
   propTypes: {
       handleChange: React.PropTypes.func.isRequired,
@@ -254,11 +252,8 @@ var FormTextArea = React.createClass({
 
 
 function fnRenderErrors(errors) {
-  var errors;
   if (errors.length > 0) {
-    var errorMessages = errors.map(function(err) {
-      return (<li key={err}>{err}</li>);
-    });
+    const errorMessages = errors.map(err => <li key={err}>{err}</li>);
 
     errors = (
       <div className="alert alert-danger">
@@ -272,7 +267,7 @@ function fnRenderErrors(errors) {
 }
 
 function fnSubmitForm(self, url, method, data, successCb) {
-  var that = self;
+  const that = self;
 
   $.ajax({
     url: url,
@@ -289,8 +284,8 @@ function fnSubmitForm(self, url, method, data, successCb) {
         that.history.pushState(null, '/login');
       }
 
-      var errors = [];
-      for (var i = 0; i < xhr.responseJSON.errors.length; i++) {
+      const errors = [];
+      for (let i = 0; i < xhr.responseJSON.errors.length; i++) {
         errors[errors.length] = xhr.responseJSON.errors[i].msg;
       }
       that.setState({
@@ -301,9 +296,9 @@ function fnSubmitForm(self, url, method, data, successCb) {
   });
 }
 
-var BaseForm = {
+const BaseForm = {
   handleChange: function(name, value) {
-    var data = this.state.data;
+    const data = this.state.data;
     if (data[name] != value) {
       data[name] = value;
 
