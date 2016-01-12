@@ -397,7 +397,7 @@ var AppointmentFormContainer = React.createClass({
 
 
 var Appointment = React.createClass({
-  mixins: [ History ],
+  mixins: [History],
   doSubmit: function(self, data) {
     var that = this;
     var editForm = typeof this.props.params.appid != 'undefined';
@@ -442,7 +442,7 @@ var Appointment = React.createClass({
 
 
 var AppointmentsTable = React.createClass({
-  mixins: [BaseTable, History],
+  mixins: [BaseTable],
   deleteItem: function(objId) {
     this.deleteRow('/customers/' + this.props.customer + '/appointments/' + objId);
   },
@@ -458,20 +458,7 @@ var AppointmentsTable = React.createClass({
             function(event) {
               event.preventDefault();
               event.stopPropagation();
-
-              if (app.planned) {
-                if (date > moment()) {
-                  return;
-                }
-                that.history.pushState(
-                  null,
-                    '/customers/edit/' + that.props.customer + '/appointments/planned/' +
-                    date.format('YYYY-MM-DD') + '/' + app.appid);
-              }
-              else {
-                that.history.pushState(
-                  null, '/customers/edit/' + that.props.customer + '/appointments/edit/' + app.appid);
-              }
+              that.props.handleRowClick(app);
             }
           }>
           <td className={appClass}>{app.date}</td>
@@ -523,8 +510,38 @@ var AppointmentsTable = React.createClass({
 });
 
 
+var CustomerAppointments = React.createClass({
+  mixins: [History],
+  handleRowClick(app) {
+    var date = moment(app.date, config.date_format);
+    if (app.planned) {
+      if (date > moment()) {
+        return;
+      }
+      this.history.pushState(
+        null,
+          '/customers/edit/' + this.props.customer + '/appointments/planned/' +
+          date.format('YYYY-MM-DD') + '/' + app.appid);
+    }
+    else {
+      this.history.pushState(
+        null, '/customers/edit/' + this.props.customer + '/appointments/edit/' + app.appid);
+    }
+  },
+  render: function() {
+    return (
+        <AppointmentsTable
+          customer={this.props.customer}
+          data={this.props.data}
+          updateTable={this.props.updateTable}
+          handleRowClick={this.handleRowClick}/>
+    );
+  }
+});
+
+
 var Appointments = React.createClass({
-  mixins: [BaseTableContainer, History],
+  mixins: [BaseTableContainer],
   getInitialState: function() {
     return {
       data: [],
@@ -545,7 +562,7 @@ var Appointments = React.createClass({
     var table;
     if (typeof this.state.data.appointments !== 'undefined' && this.state.data.appointments.length > 0) {
       table =  (
-        <AppointmentsTable
+        <CustomerAppointments
           customer={this.props.params.id}
           data={this.state.data.appointments}
           updateTable={this.updateTable}/>
@@ -581,6 +598,7 @@ var AppointmentsRoot = React.createClass({
 
 module.exports = {
   AppointmentFormContainer: AppointmentFormContainer,
+  AppointmentsTable: AppointmentsTable,
   Appointment: Appointment,
   Appointments: Appointments,
   AppointmentsRoot: AppointmentsRoot

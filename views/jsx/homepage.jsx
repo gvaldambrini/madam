@@ -8,12 +8,12 @@ import moment from 'moment';
 
 import { PopoverTemplate, BaseTableContainer } from './tables';
 import { fnSubmitForm } from './forms';
-import { AppointmentFormContainer } from './appointments';
+import { AppointmentFormContainer, AppointmentsTable } from './appointments';
 import { CustomerFormContainer } from './customers';
 
 
 var InputCustomer = React.createClass({
-  mixins: [ History ],
+  mixins: [History],
   propTypes: {
     setCustomer: React.PropTypes.func.isRequired,
     getCustomer: React.PropTypes.func.isRequired
@@ -134,8 +134,8 @@ var PlanAppointment = React.createClass({
 });
 
 
-var AppointmentsTable = React.createClass({
-  mixins: [ History ],
+var DateAppointments = React.createClass({
+  mixins: [History],
   render: function() {
     var that = this;
     var appointmentRows = this.props.appointments.map(function(app, index) {
@@ -215,7 +215,7 @@ var AppointmentsTable = React.createClass({
 
 
 var CalendarCustomerForm = React.createClass({
-  mixins: [ History ],
+  mixins: [History],
   doSubmit: function(self, data, targetName) {
     var that = this;
     var editForm = typeof this.props.params.id !== 'undefined';
@@ -277,6 +277,83 @@ var CalendarCustomerForm = React.createClass({
 });
 
 
+var CalendarCustomerAppointments = React.createClass({
+  mixins: [History],
+  handleRowClick(app) {
+    var date = moment(app.date, config.date_format);
+    if (app.planned) {
+      if (date > moment()) {
+        return;
+      }
+      this.history.pushState(
+        null,
+          '/calendar/' + date.format('YYYY-MM-DD') + '/customers/' + this.props.customer +
+          '/appointments/planned/' + app.appid);
+    }
+    else {
+      this.history.pushState(
+        null,
+          '/calendar/' + date.format('YYYY-MM-DD') + '/customers/' + this.props.customer +
+          '/appointments/' + app.appid);
+    }
+  },
+  render: function() {
+    return (
+        <AppointmentsTable
+          customer={this.props.customer}
+          data={this.props.data}
+          updateTable={this.props.updateTable}
+          handleRowClick={this.handleRowClick}/>
+    );
+  }
+});
+
+
+var CalendarAppointments = React.createClass({
+  mixins: [BaseTableContainer],
+  getInitialState: function() {
+    return {
+      data: [],
+      loaded: false
+    };
+  },
+  componentWillMount: function() {
+    this.updateTable();
+  },
+  updateTable: function() {
+    this.fetchData('/customers/' + this.props.params.id + '/appointments');
+  },
+  render: function() {
+    if (!this.state.loaded) {
+      return <div></div>;
+    }
+
+    var table;
+    if (typeof this.state.data.appointments !== 'undefined' && this.state.data.appointments.length > 0) {
+      table =  (
+        <CalendarCustomerAppointments
+          customer={this.props.params.id}
+          data={this.state.data.appointments}
+          updateTable={this.updateTable}/>
+      );
+    }
+    var isotoday = moment().format('YYYY-MM-DD');
+    return (
+      <div className="content-body">
+        <Link to={`/calendar/${isotoday}/customers/${this.props.params.id}/appointments/new`} className='btn btn-primary'>
+          {i18n.appointments.createNew}
+        </Link>
+        <p className="hidden-xs pull-right">{this.state.data.name} {this.state.data.surname}</p>
+        {table}
+        <div id="popover-template">
+          <PopoverTemplate confirm={i18n.appointments.btnConfirm} cancel={i18n.appointments.btnCancel}/>
+        </div>
+      </div>
+    );
+  }
+});
+
+
 var CalendarCustomer = React.createClass({
   render: function() {
     var infoLink;
@@ -310,14 +387,14 @@ var CalendarCustomer = React.createClass({
     return (
       <div>
         <div className="content-header">
-            <ul>
-                <li role="presentation">
-                    {infoLink}
-                </li>
-                <li role="presentation">
-                    {appLink}
-                </li>
-            </ul>
+          <ul>
+            <li role="presentation">
+              {infoLink}
+            </li>
+            <li role="presentation">
+              {appLink}
+            </li>
+          </ul>
         </div>
         {this.props.children}
       </div>
@@ -327,34 +404,45 @@ var CalendarCustomer = React.createClass({
 
 
 var CalendarAppointment = React.createClass({
-  mixins: [ History ],
+  mixins: [History],
   doSubmit: function(self, data) {
     var that = this;
-    var url = '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid;
-    fnSubmitForm(self, url, 'put', data, function() {
+    var editForm = typeof this.props.params.appid != 'undefined';
+    var baseUrl = '/customers/' + this.props.params.id;
+
+    var url = baseUrl + (editForm ? '/appointments/' + this.props.params.appid : '/appointments');
+    var method = editForm ? 'put': 'post';
+
+    fnSubmitForm(self, url, method, data, function() {
       that.history.pushState(null, '/calendar/' + that.props.params.date);
     });
   },
   render: function() {
-    var submitText, formTitle, planned, urlData, date;
-    if (this.props.location.pathname.indexOf('planned') === -1) {
+    var submitText, formTitle, editForm, urlData, date;
+    if (this.props.location.pathname.indexOf('planned') !== -1) {
+      submitText = i18n.appointments.confirmAppointment;
+      formTitle = i18n.appointments.titleConfirmAppointment;
+      editForm = false;
+      date = this.props.params.date;
+    }
+    else if (typeof this.props.params.appid !== 'undefined') {
       submitText = i18n.appointments.submitEdit;
       formTitle = i18n.appointments.titleEdit;
-      planned = false;
+      editForm = true;
       urlData = '/customers/' + this.props.params.id + '/appointments/' + this.props.params.appid;
     }
     else {
-      submitText = i18n.appointments.confirmAppointment;
-      formTitle = i18n.appointments.titleConfirmAppointment;
-      planned = true;
-      date = this.props.params.date;
+      submitText = i18n.appointments.submitAdd;
+      formTitle = i18n.appointments.titleNew;
+      editForm = false;
     }
+
     return (
       <AppointmentFormContainer
         doSubmit={this.doSubmit}
         submitText={submitText}
         formTitle={formTitle}
-        editForm={!planned}
+        editForm={editForm}
         urlData={urlData}
         date={date}/>
     );
@@ -363,7 +451,7 @@ var CalendarAppointment = React.createClass({
 
 
 var Calendar = React.createClass({
-  mixins: [ BaseTableContainer, History ],
+  mixins: [BaseTableContainer, History],
   getInitialState: function() {
     var date = typeof this.props.params.date !== 'undefined'
       ? this.props.params.date
@@ -433,7 +521,7 @@ var Calendar = React.createClass({
     var appointments;
     if (this.state.data.appointments.length > 0) {
       appointments = (
-        <AppointmentsTable
+        <DateAppointments
           appointments={this.state.data.appointments}
           date={this.state.date}
           deleteItem={this.deleteItem}/>
@@ -492,5 +580,6 @@ module.exports = {
   Calendar: Calendar,
   CalendarAppointment: CalendarAppointment,
   CalendarCustomer: CalendarCustomer,
-  CalendarCustomerForm: CalendarCustomerForm
+  CalendarCustomerForm: CalendarCustomerForm,
+  CalendarAppointments: CalendarAppointments
 };
