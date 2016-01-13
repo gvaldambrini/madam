@@ -83,5 +83,8 @@
 	"Confirm planned appointment": "Confirm planned appointment",
 	"Confirm appointment": "Confirm appointment",
 	"Create new customer and confirm appointment": "Create new customer and confirm appointment",
-	"Details": "Details"
+	"Details": "Details",
+	"Unable to save the appointment: there is already an appointment for the same date.": "Unable to save the appointment: there is already an appointment for the same date.",
+	"Unable to plan the appointment: there is already a planned appointment for the same date.": "Unable to plan the appointment: there is already a planned appointment for the same date.",
+	"Unable to plan the appointment: there is already an appointment for the same date.": "Unable to plan the appointment: there is already an appointment for the same date."
 }

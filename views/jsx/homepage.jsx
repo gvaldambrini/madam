@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 import moment from 'moment';
 
 import { PopoverTemplate, BaseTableContainer } from './tables';
-import { fnSubmitForm } from './forms';
+import { fnSubmitForm, fnRenderErrors } from './forms';
 import { AppointmentFormContainer, AppointmentsTable } from './appointments';
 import { CustomerFormContainer } from './customers';
 
@@ -528,6 +528,7 @@ const Calendar = React.createClass({
 
     return (
       <div id="calendar-table-container" className="content-body">
+        {fnRenderErrors(this.state.errors)}
         <div className='date-selector-header'>
           <span className="glyphicon glyphicon-menu-left" onClick={function(event) {
             const date = moment(that.state.date).subtract(1, 'days');

@@ -607,6 +607,37 @@ router.post('/planned-appointments/:date', function(req, res, next) {
             let obj = resp._source;
             let appointmentId = uuid.v4();
 
+            let alreadyPresent = false;
+            if (obj.appointment !== 'undefined') {
+                for (let j = 0; j < obj.appointments.length; j++) {
+                    if (moment(obj.appointments[j].date).isSame(moment(isodate), 'day')) {
+                        alreadyPresent = true;
+                    }
+                }
+            }
+            if (alreadyPresent) {
+                let errors = [{msg: req.i18n.__(
+                    'Unable to plan the appointment: there is already an appointment for the same date.')}];
+                res.status(400).json({errors: errors});
+                return;
+            }
+
+            let plannedIndex = -1;
+            if (typeof obj.planned_appointments !== 'undefined') {
+                for (let i = 0; i < obj.planned_appointments.length; i++) {
+                    if (moment(obj.planned_appointments[i].date).isSame(moment(isodate), 'day')) {
+                        plannedIndex = i;
+                        break;
+                    }
+                }
+            }
+            if (plannedIndex !== -1) {
+                let errors = [{msg: req.i18n.__(
+                    'Unable to plan the appointment: there is already a planned appointment for the same date.')}];
+                res.status(400).json({errors: errors});
+                return;
+            }
+
             if (typeof obj.planned_appointments == 'undefined')
                 obj.planned_appointments = [];
 
@@ -902,14 +933,32 @@ AppointmentUtils.prototype.handleForm = function() {
         return;
     }
 
-    let newItem = false;
+    let isodate = common.toISODate(this.req, this.req.body.date);
+    let alreadyPresent = false;
+    if (typeof obj.appointments !== 'undefined') {
+        for (let j = 0; j < obj.appointments.length; j++) {
+            if (obj.appointments[j].appid !== this.req.params.appid) {
+                if (moment(obj.appointments[j].date).isSame(moment(isodate), 'day')) {
+                    alreadyPresent = true;
+                }
+            }
+        }
+    }
+    if (alreadyPresent) {
+        let errors = [{msg: this.req.i18n.__(
+            'Unable to save the appointment: there is already an appointment for the same date.')}];
+        this.res.status(400).json({errors: errors});
+        return;
+    }
+
     let appointment = {
         appid: this.req.params.appid,
-        date: common.toISODate(this.req, this.req.body.date),
+        date: isodate,
         services: services,
         notes: this.req.body.notes
     };
 
+    let newItem = false;
     if (typeof this.req.params.appid === 'undefined') {
         newItem = true;
         appointment.appid = uuid.v4();
@@ -918,8 +967,21 @@ AppointmentUtils.prototype.handleForm = function() {
     if (typeof obj.appointments == 'undefined')
         obj.appointments = [];
 
+    let plannedIndex = -1;
+    if (typeof obj.planned_appointments !== 'undefined') {
+        for (let i = 0; i < obj.planned_appointments.length; i++) {
+            if (moment(obj.planned_appointments[i].date).isSame(moment(isodate), 'day')) {
+                plannedIndex = i;
+                break;
+            }
+        }
+    }
+
     if (newItem) {
         obj.appointments.push(appointment);
+        if (plannedIndex !== -1) {
+            obj.planned_appointments.splice(plannedIndex, 1);
+        }
     }
     else {
         let appFound = false;
@@ -933,20 +995,12 @@ AppointmentUtils.prototype.handleForm = function() {
         // In case we are creating a new appointment based on a planned one,
         // let's remove the planned appointment and add the real one.
         if (!appFound) {
-            let index = -1;
-            for (let i = 0; i < obj.planned_appointments.length; i++) {
-                if (obj.planned_appointments[i].appid === this.req.params.appid) {
-                    index = i;
-                    break;
-                }
-            }
-
-            if (index === -1) {
+            if (plannedIndex === -1) {
                 this.res.sendStatus(404);
                 return;
             }
 
-            obj.planned_appointments.splice(index, 1);
+            obj.planned_appointments.splice(plannedIndex, 1);
             obj.appointments.push(appointment);
         }
     }

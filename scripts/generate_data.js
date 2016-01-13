@@ -99,6 +99,7 @@
 
             var appointments = [];
             var offset = getRandomInt(0, 3);
+            var initialOffset = offset;
             for (var j = 0; j < getRandomInt(minApp, maxApp); j++) {
                 var appServices = [];
                 var serviceNames = services.slice();
@@ -119,6 +120,10 @@
             }
 
             offset = getRandomInt(0, 3);
+            if (initialOffset === 0 && offset === 0) {
+                // we cannot have an appointment and a planned one on the same day.
+                offset = 1;
+            }
             var planned_appointments = [];
             for (var k = 0; k < getRandomInt(minPlannedApp, maxPlannedApp); k++) {
                 planned_appointments[planned_appointments.length] = {

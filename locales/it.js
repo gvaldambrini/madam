@@ -83,5 +83,8 @@
 	"Confirm planned appointment": "Conferma appuntamento pianificato",
 	"Confirm appointment": "Conferma appuntamento",
 	"Create new customer and confirm appointment": "Crea nuovo cliente e conferma appuntamento",
-	"Details": "Dettagli"
+	"Details": "Dettagli",
+	"Unable to save the appointment: there is already an appointment for the same date.": "Impossibile salvare l'appuntamento: esiste già un appuntamento con la stessa data.",
+	"Unable to plan the appointment: there is already a planned appointment for the same date.": "Impossibile pianificare l'appuntamento: esiste già un appuntamento pianificato con la stessa data.",
+	"Unable to plan the appointment: there is already an appointment for the same date.": "Impossibile pianificare l'appuntamento: esiste già un appuntamento con la stessa data."
 }
