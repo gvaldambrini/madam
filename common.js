@@ -47,7 +47,7 @@ Common.prototype.isAuthenticated = function(req, res, next) {
  * @param {string} localFormattedDate the local formatted date.
  */
 Common.prototype.toISODate = function(req, localFormattedDate) {
-    return moment.utc(localFormattedDate, req.config.date_format).format('YYYY-MM-DD');
+    return moment(localFormattedDate, req.config.date_format).format('YYYY-MM-DD');
 };
 
 /**
@@ -60,7 +60,7 @@ Common.prototype.toISODate = function(req, localFormattedDate) {
 Common.prototype.toLocalFormattedDate = function(req, ISODate) {
     if (typeof ISODate == 'undefined' || !ISODate)
         return '-';
-    return moment.utc(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
+    return moment(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
 };
 
 /**
