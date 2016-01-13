@@ -78,7 +78,7 @@ const InputCustomer = React.createClass({
 });
 
 
-var PlanAppointment = React.createClass({
+var PlanAppointmentForm = React.createClass({
   getInitialState: function() {
     return {
       customer: {
@@ -133,12 +133,12 @@ const DateAppointments = React.createClass({
   render: function() {
     const that = this;
     const appointmentRows = this.props.appointments.map((app, index) =>
-      <tr key={app.appid} className={moment(this.props.date) > moment() ? 'inactive' : ''} onClick={
+      <tr key={app.appid} className={moment(this.props.date).isAfter(moment(), 'day') ? 'inactive' : ''} onClick={
           function(event) {
             event.preventDefault();
             event.stopPropagation();
 
-            if (moment(that.props.date) > moment()) {
+            if (moment(that.props.date).isAfter(moment(), 'day')) {
               return;
             }
             if (typeof app.id === 'undefined') {
@@ -274,7 +274,7 @@ const CalendarCustomerAppointments = React.createClass({
   handleRowClick(app) {
     const date = moment(app.date, config.date_format);
     if (app.planned) {
-      if (date > moment()) {
+      if (date.isAfter(moment(), 'day')) {
         return;
       }
       this.history.pushState(
@@ -521,6 +521,11 @@ const Calendar = React.createClass({
       );
     }
 
+    let planAppointmentForm;
+    if (moment(this.state.date).isAfter(moment(), 'day') ||
+        moment(this.state.date).isSame(moment(), 'day'))
+      planAppointmentForm = <PlanAppointmentForm plan={this.addAppointment}/>;
+
     return (
       <div id="calendar-table-container" className="content-body">
         <div className='date-selector-header'>
@@ -548,7 +553,7 @@ const Calendar = React.createClass({
         </div>
         <h4>{i18n.homepage.appointments}</h4>
         {appointments}
-        <PlanAppointment plan={this.addAppointment}/>
+        {planAppointmentForm}
         <div id="popover-template">
           <PopoverTemplate confirm={i18n.homepage.btnConfirm} cancel={i18n.homepage.btnCancel}/>
         </div>
