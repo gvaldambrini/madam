@@ -84,7 +84,7 @@ else {
       './node_modules/.bin/jsdoc -c jsdoc.json -r README.md']));
 
     gulp.task('lint', function() {
-      return gulp.src(["*.js", "routes/*.js"])
+      return gulp.src(["*.js", "routes/*.js", "routehandlers/*.js"])
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
     });
@@ -135,8 +135,8 @@ else {
     });
 
     gulp.task('default', ['build', 'webpack-dev-server', 'nodemon', 'browser-sync'], function () {
-      gulp.watch(["*.js", "routes/*.js"], ['lint']);
-      gulp.watch(["*.js", "routes/*.js", "README.md", "jsdoc.json"], ['doc']);
+      gulp.watch(["*.js", "routes/*.js", "routehandlers/*.js"], ['lint']);
+      gulp.watch(["*.js", "routes/*.js", "routehandlers/*.js", "README.md", "jsdoc.json"], ['doc']);
       gulp.watch("views/stylesheets/*.scss", ['sass']);
       gulp.watch(["views/*.handlebars"], reload);
     });

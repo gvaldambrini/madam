@@ -1,13 +1,19 @@
 "use strict";
 
 /**
- * Index module, contains all the homepage and the login/logout views.
+ * Index module, contains the route that serves the static assets and the routes related
+ * to the authentication.
  * @module
  */
 const express = require('express');
-const passport = require('passport');
 const router = express.Router();
 const common = require('../common');
+
+const AuthenticationHandler = require('../routehandlers/authentication');
+
+const handlers = {
+    authentication: AuthenticationHandler
+};
 
 router.get('*', function(req, res, next) {
     if (req.xhr) {
@@ -139,37 +145,8 @@ router.get('*', function(req, res, next) {
     });
 });
 
-router.post('/login', function(req, res, next) {
-    passport.authenticate('login', function(err, user, info) {
-        if (!user) {
-            if (typeof info !== 'undefined' && info.message === 'Missing credentials') {
-                // The verify callback (the function passed as second argument to the LocalStrategy
-                // class) is not called if the username or the password is missing. Instead,
-                // the returned error is null, the username false but the info is equal to the
-                // standard string 'Missing credentials', which is the one used here to provide
-                // a meaningful message to the frontend.
-                err = req.i18n.__(req.body.username  ? 'Missing password.' : 'Missing username.');
-                res.status(400).json({errors: [{msg: err}]});
-                return;
-            }
-
-            res.status(401).json({errors: [{msg: err}]});
-            return;
-        }
-
-        req.logIn(user, function(err) {
-            if (err) {
-                return next(err);
-            }
-            res.status(200).json({user: user});
-        });
-    })(req, res, next);
-});
-
-router.post('/logout', function(req, res, next) {
-  req.logout();
-  res.status(200).end();
-});
+router.post('/login', handlers.authentication.login);
+router.post('/logout', handlers.authentication.logout);
 
 /** The index router. */
 module.exports = router;

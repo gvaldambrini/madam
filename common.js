@@ -1,18 +1,20 @@
+"use strict";
+
 /**
  * Common module.
  * @module
  */
 
-var elasticsearch = require('elasticsearch');
-var esErrors = elasticsearch.errors;
-var moment = require('moment');
+const elasticsearch = require('elasticsearch');
+const esErrors = elasticsearch.errors;
+const moment = require('moment');
 
 /**
  * Creates a new Common object, which encapsulates some common utility
  * functions and properties.
  * @class Common
  */
-var Common = function() {};
+const Common = function() {};
 
 
 /**
@@ -58,7 +60,7 @@ Common.prototype.toISODate = function(req, localFormattedDate) {
  * @param {string} ISODate the iso date.
  */
 Common.prototype.toLocalFormattedDate = function(req, ISODate) {
-    if (typeof ISODate == 'undefined' || !ISODate)
+    if (typeof ISODate === 'undefined' || !ISODate)
         return '-';
     return moment(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
 };
@@ -70,39 +72,40 @@ Common.prototype.toLocalFormattedDate = function(req, ISODate) {
  * @param {array|string} container the container to converts.
  */
 Common.prototype.toArray = function(container) {
-    if (typeof container == 'string')
+    if (typeof container === 'string')
         container = [container];
     return container;
 };
 
 /**
- * Helper function which manages the result of an operation (index or update)
+ * Helper function which manages the result of a save operation (index or update)
  * on a item and sends to the client the appropriate response.
  * @method
  *
  * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
  * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
- * @param {object} error the error returned by the elasticsearch client.
- * @oaram {object} resp the elasticsearch response.
- * @param newItem bool true if the index is perfomed for creating a new item.
- * @oaram string objId the optional object id if it is not the es document id.
+ * @param {object} esErr the error returned by the elasticsearch client.
+ * @oaram {object} esResp the elasticsearch response.
+ * @param newItem bool true if the operation creates a new item.
+ * @oaram {object} resData the data to return in the response in case of success. If not
+ * provided the default response data will be {id: <object id>}.
  */
-Common.prototype.indexCb = function(req, res, err, resp, newItem, objId) {
-    if (!err) {
-        res.status(newItem ? 201 : 200).json({
-            id: typeof objId === 'undefined' ? resp._id : objId
-        });
+Common.prototype.saveCallback = function(req, res, esErr, esResp, newItem, resData) {
+    if (!esErr) {
+        const data = typeof resData !== 'undefined' ? resData : {id: esResp._id};
+        res.status(newItem ? 201 : 200).json(data);
         return;
     }
 
-    var errors = [];
-    if (err instanceof esErrors.NoConnections)
+    const errors = [];
+    if (esErr instanceof esErrors.NoConnections)
         errors[errors.length] = {msg: req.i18n.__('Database connection error')};
     else
         errors[errors.length] = {msg: req.i18n.__('Database error')};
 
     res.status(500).json({errors: errors});
 };
+
 
 /**
  * The id of the workers document.
