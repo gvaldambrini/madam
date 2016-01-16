@@ -217,7 +217,7 @@ var CalendarCustomerForm = React.createClass({
 
     fnSubmitForm(self, url, method, data, function(obj) {
       if (editForm) {
-        that.history.pushState(null, '/calendar/' + that.props.params.date);
+        that.history.pushState(null, `/calendar/${that.props.params.date}`);
       }
       else {
         that.history.pushState(
@@ -239,7 +239,7 @@ var CalendarCustomerForm = React.createClass({
       formTitle = i18n.homepage.createNewCustomer;
       customLoad = function(self) {
         $.ajax({
-          url: '/customers/planned-appointments/' + that.props.params.appid,
+          url: `/customers/planned-appointments/${that.props.params.date}/${that.props.params.appid}`,
           method: 'get',
           success: function(data) {
             const name = data.fullname.split(' ', 1)[0];

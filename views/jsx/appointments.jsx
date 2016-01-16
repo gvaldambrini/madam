@@ -444,8 +444,16 @@ var Appointment = React.createClass({
 
 const AppointmentsTable = React.createClass({
   mixins: [BaseTable],
-  deleteItem: function(objId) {
-    this.deleteRow(`/customers/${this.props.customer}/appointments/${objId}`);
+  deleteItem: function(app) {
+
+    let url;
+    if (app.planned) {
+      url = `/customers/planned-appointments/${moment(app.date, config.date_format).format('YYYY-MM-DD')}/${app.appid}`;
+    }
+    else {
+      url = `/customers/${this.props.customer}/appointments/${app.appid}`;
+    }
+    this.deleteRow(url);
   },
   render: function() {
     const that = this;
@@ -479,7 +487,7 @@ const AppointmentsTable = React.createClass({
                       title: i18n.appointments.deleteTitle,
                       content: i18n.appointments.deleteMsg,
                       $rootContainer: $('#appointments-table-container'),
-                      onConfirm: () => that.deleteItem(app.appid)
+                      onConfirm: () => that.deleteItem(app)
                     });
                   }
                 }

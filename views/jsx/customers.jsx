@@ -21,7 +21,7 @@ const CustomerFormContainer = React.createClass({
 
     if (typeof this.props.id !== 'undefined') {
       $.ajax({
-        url: '/customers/' + this.props.id,
+        url: `/customers/${this.props.id}`,
         method: 'get',
         success:
           data =>

@@ -60,13 +60,15 @@ router.param('date', function(req, res, next, date) {
 });
 
 router.get('/appointments/:date', handlers.appointment.fetchByDate);
+
 router.post('/planned-appointments/:date', handlers.appointment.plan);
-router.get('/planned-appointments/:appid', handlers.appointment.fetchPlanned);
+router.get('/planned-appointments/:date/:appid', handlers.appointment.fetchPlanned);
 router.delete('/planned-appointments/:date/:appid', handlers.appointment.deletePlanned);
+
 router.get('/:id/appointments', handlers.appointment.fetchByCustomer);
 
-router.get('/:id/appointments/:appid', handlers.appointment.fetch);
 router.post('/:id/appointments', handlers.appointment.save);
+router.get('/:id/appointments/:appid', handlers.appointment.fetch);
 router.put('/:id/appointments/:appid', handlers.appointment.save);
 router.delete('/:id/appointments/:appid', handlers.appointment.delete);
 
