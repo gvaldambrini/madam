@@ -14,7 +14,8 @@ const moment = require('moment');
 const aggregateProduct = {
     prods: {
       terms: {
-        field: 'complete_name'
+        field: 'complete_name',
+        size: 0  // no limits on the aggregation terms returned
       },
       aggs: {
         hits: {
