@@ -48,7 +48,9 @@ class AppointmentHandler {
                             appointments[appointments.length] = {
                                 id: hit._id,
                                 appid: hit._source.appointments[j].appid,
-                                fullname: `${hit._source.name} ${hit._source.surname}`,
+                                fullname: typeof hit._source.surname !== 'undefined'
+                                    ? `${hit._source.name} ${hit._source.surname}`
+                                    : hit._source.name,
                                 services: hit._source.appointments[j].services.map(el => el.description).join(' - '),
                                 planned: false
                             };
@@ -83,7 +85,9 @@ class AppointmentHandler {
                             appointments[appointments.length] = {
                                 id: hit._id,
                                 appid: hit._source.planned_appointments[j].appid,
-                                fullname: `${hit._source.name} ${hit._source.surname}`,
+                                fullname: typeof hit._source.surname !== 'undefined'
+                                    ? `${hit._source.name} ${hit._source.surname}`
+                                    : hit._source.name,
                                 planned: true
                             };
                             break;
@@ -117,8 +121,8 @@ class AppointmentHandler {
                             break;
                         }
                     }
-                    callback(null, appointments);
                 }
+                callback(null, appointments);
             });
         }
 
@@ -183,7 +187,7 @@ class AppointmentHandler {
                 const appointmentId = uuid.v4();
 
                 let alreadyPresent = false;
-                if (obj.appointment !== 'undefined') {
+                if (typeof obj.appointments !== 'undefined') {
                     for (let j = 0; j < obj.appointments.length; j++) {
                         if (moment(obj.appointments[j].date).isSame(moment(isodate), 'day')) {
                             alreadyPresent = true;

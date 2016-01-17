@@ -53,8 +53,16 @@ const InputCustomer = React.createClass({
       }
     });
   },
-  renderSuggestion: (suggestion, input) => suggestion.name + ' ' + suggestion.surname,
-  getSuggestionValue: suggestion => suggestion.name + ' ' + suggestion.surname,
+  renderSuggestion:
+    (suggestion, input) =>
+    typeof suggestion.surname != 'undefined'
+    ? `${suggestion.name} ${suggestion.surname}`
+    : suggestion.name,
+  getSuggestionValue:
+    suggestion =>
+    typeof suggestion.surname != 'undefined'
+    ? `${suggestion.name} ${suggestion.surname}`
+    : suggestion.name,
   onSuggestionSelected: function(suggestion, event) {
     event.preventDefault();
     this.props.setCustomer({

@@ -277,7 +277,7 @@ function fnSubmitForm(self, url, method, data, successCb) {
     },
     contentType: 'application/json',
     data: JSON.stringify(data),
-    success: successCb.bind(self),
+    success: successCb,
     error: function(xhr, textStatus, errorThrown) {
       if (xhr.status === 401) {
         Cookies.remove('user');

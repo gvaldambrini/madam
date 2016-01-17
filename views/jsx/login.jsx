@@ -24,7 +24,7 @@ const LoginForm = React.createClass({
     this.submitForm('/login', 'post', function(data) {
       Cookies.set('user', data.user);
       this.history.pushState(null, '/');
-    });
+    }.bind(this));
   },
   render: function() {
     return (
