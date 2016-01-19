@@ -48,9 +48,8 @@ class AppointmentHandler {
                             appointments[appointments.length] = {
                                 id: hit._id,
                                 appid: hit._source.appointments[j].appid,
-                                fullname: typeof hit._source.surname !== 'undefined'
-                                    ? `${hit._source.name} ${hit._source.surname}`
-                                    : hit._source.name,
+                                fullname: typeof hit._source.surname !== 'undefined' ?
+                                    `${hit._source.name} ${hit._source.surname}` : hit._source.name,
                                 services: hit._source.appointments[j].services.map(el => el.description).join(' - '),
                                 planned: false
                             };
@@ -85,9 +84,8 @@ class AppointmentHandler {
                             appointments[appointments.length] = {
                                 id: hit._id,
                                 appid: hit._source.planned_appointments[j].appid,
-                                fullname: typeof hit._source.surname !== 'undefined'
-                                    ? `${hit._source.name} ${hit._source.surname}`
-                                    : hit._source.name,
+                                fullname: typeof hit._source.surname !== 'undefined' ?
+                                    `${hit._source.name} ${hit._source.surname}` : hit._source.name,
                                 planned: true
                             };
                             break;

@@ -38,17 +38,17 @@ const client = common.createClient();
  */
 function setupConfig(app) {
     app.use(function(request, response, next) {
-    if (typeof process.env.NODE_CONFIG_FILE != 'undefined') {
-        request.config = require(process.env.NODE_CONFIG_FILE);
-    }
-    else {
-        request.config = require('./config.json');
-    }
-    request.i18n.setLocale(request.config.language);
-    // Let the configuration available also in templates.
-    response.locals.config = request.config;
-    response.locals.isProduction = process.env.NODE_ENV == 'production';
-    next();
+        if (typeof process.env.NODE_CONFIG_FILE != 'undefined') {
+            request.config = require(process.env.NODE_CONFIG_FILE);
+        }
+        else {
+            request.config = require('./config.json');
+        }
+        request.i18n.setLocale(request.config.language);
+        // Let the configuration available also in templates.
+        response.locals.config = request.config;
+        response.locals.isProduction = process.env.NODE_ENV == 'production';
+        next();
     });
 }
 
