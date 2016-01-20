@@ -103,7 +103,7 @@ else {
       return nodemon({
         script: 'bin/www',
         ext: 'js',
-        ignore: ['public/*', 'views/*']
+        ignore: ['public/*', 'views/*', 'test/*']
       }).on('start', function () {
         if (!called) {
           called = true;

@@ -1,0 +1,8 @@
+{
+  "date_format": "DD/MM/YYYY",
+  "language": "en",
+  "defaultWorkerColor": "#000000",
+  "mainIndex": "main_test",
+  "logger": false,
+  "disableCsrf": true
+}

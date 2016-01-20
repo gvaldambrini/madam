@@ -30,6 +30,11 @@ class CustomerHandler {
      * @param {function} next the next middleware function to invoke, if any.
      */
     static simpleSearch(req, res, next) {
+        if (typeof req.query.text === 'undefined') {
+            res.sendStatus(400);
+            return;
+        }
+
         let queryBody;
         if (req.query.text.trim()) {
             queryBody = {
@@ -86,6 +91,11 @@ class CustomerHandler {
      * @param {function} next the next middleware function to invoke, if any.
      */
     static search(req, res, next) {
+        if (typeof req.query.text === 'undefined') {
+            res.sendStatus(400);
+            return;
+        }
+
         let queryBody;
         if (req.query.text.trim()) {
             queryBody = {

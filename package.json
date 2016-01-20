@@ -62,6 +62,8 @@
   },
   "devDependencies": {
     "nightwatch-custom-commands-assertions": "^1.0.2",
-    "selenium-server-standalone-jar": "2.45.0"
+    "selenium-server-standalone-jar": "2.45.0",
+    "should": "^8.1.1",
+    "supertest": "^1.1.0"
   }
 }

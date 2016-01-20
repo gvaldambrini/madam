@@ -132,7 +132,17 @@ function setupCookies(app) {
         maxAge: 1 * 60 * 60 * 1000 // 1 hour (rolling)
     }));
 
-    app.use(csrf({ cookie: true }));
+    app.use(function(req, res, next) {
+        // The csrf protection is important for security, disable it only for
+        // testing!
+        if (req.config.disableCsrf) {
+            next();
+            return;
+        }
+
+        csrf({ cookie: true })(req, res, next);
+    });
+
     app.use(function(req, res, next) {
         // To update the session expiration time we need to send the new
         // expiration in the response cookie.
@@ -140,8 +150,10 @@ function setupCookies(app) {
         // update the session object.
         req.session.fake = Date.now();
 
-        // Pass the csrf token to use to the frontend.
-        res.cookie('csrf', req.csrfToken());
+        if (!req.config.disableCsrf) {
+            // Pass the csrf token to use to the frontend.
+            res.cookie('csrf', req.csrfToken());
+        }
         next();
     });
 }
