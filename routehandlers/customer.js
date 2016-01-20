@@ -407,15 +407,15 @@ class CustomerHandler {
             type: 'customer',
             id: req.params.id,
             refresh: true,
-            body: Object.assign(
-                req.customer,
-                CustomerHandler.toElasticsearchFormat(req, req.body)
-            )
+            body: CustomerHandler.toElasticsearchFormat(req, req.body)
         };
 
+        args.body.appointments = req.customer.appointments;
+        args.body.last_seen = req.customer.last_seen;
+        args.body.planned_appointments = req.customer.planned_appointments;
         client.index(args,
             (err, resp, respcode) =>
-            common.saveCallback(req, res, err, resp, true)
+            common.saveCallback(req, res, err, resp, false)
         );
     }
 
