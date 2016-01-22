@@ -305,9 +305,31 @@ const AppointmentFormContainer = React.createClass({
     return map;
   },
   loadAppointment: function(data) {
+
+    function getColor(worker, workers) {
+      for (let i = 0; i < workers.length; i++) {
+        if (workers[i].name === worker) {
+          return workers[i].color;
+        }
+      }
+      return config.defaultWorkerColor;
+    }
+
+    let services = [];
+    for (let i = 0; i < data.services.length; i++) {
+      services[i] = {
+        description: data.services[i].description,
+        worker: {
+          name: data.services[i].worker,
+          color: getColor(data.services[i].worker, data.workers)
+        },
+        checked: true
+      }
+    }
+
     this.setState({
       workers: data.workers,
-      services: data.services,
+      services: services,
       date: data.date,
       notes: data.notes
     })

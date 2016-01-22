@@ -491,23 +491,6 @@ class AppointmentHandler {
     }
 
     /**
-     * Returns the color associated to the given worker.
-     * @method
-     *
-     * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
-     * @param {string} worker the name of the worker.
-     * @param {object} workers the list of the workers extracted from elasticsearch.
-     */
-    static getWorkerColor(req, worker, workers) {
-        for (let j = 0; j < workers.length; j++) {
-            if (workers[j].name == worker) {
-                return workers[j].color;
-            }
-        }
-        return req.config.defaultWorkerColor;
-    }
-
-    /**
      * The handler that returns the data for the appointment identified by the given appid.
      * @method
      *
@@ -539,14 +522,7 @@ class AppointmentHandler {
             const services = [];
 
             for (let i = 0; i < appointment.services.length; i++)
-                services.push({
-                    description: appointment.services[i].description,
-                    worker: {
-                        name: appointment.services[i].worker,
-                        color: AppointmentHandler.getWorkerColor(req, appointment.services[i].worker, workers)
-                    },
-                    checked: true
-                });
+                services[i] = appointment.services[i];
 
             res.json({
                 workers: workers,
@@ -558,8 +534,8 @@ class AppointmentHandler {
     }
 
     /**
-     * The handler that creates / updates the appointment if the data validation passes, or
-     + returning an error message if not.
+     * The handler that creates / updates an appointment if the data validation passes, or
+     + returns an error message if not.
      * @method
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
