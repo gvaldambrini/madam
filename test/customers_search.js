@@ -76,7 +76,7 @@ describe('API tests: customers search', function() {
                     if (err)
                         throw err;
 
-                    res.body.customers.length.should.equal(0);
+                    res.body.customers.should.be.an.Array().and.have.length(0);
                     done();
                 });
         });
@@ -108,7 +108,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(2);
+                        customers.should.be.an.Array().and.have.length(2);
                         customers[0].name.should.equal('Norris');
                         customers[0].surname.should.equal('Blake');
                         customers[1].name.should.equal('Margarita');
@@ -126,7 +126,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(1);
+                        customers.should.be.an.Array().and.have.length(1);
                         customers[0].name.should.equal('Margarita');
                         customers[0].surname.should.equal('Norman');
                         done();
@@ -142,7 +142,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(1);
+                        customers.should.be.an.Array().and.have.length(1);
                         customers[0].name.should.equal('Deon');
                         customers[0].surname.should.equal('Gibbs');
                         done();
@@ -158,7 +158,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(1);
+                        customers.should.be.an.Array().and.have.length(1);
                         customers[0].name.should.equal('Margarita');
                         customers[0].surname.should.equal('Norman');
                         done();
@@ -173,7 +173,7 @@ describe('API tests: customers search', function() {
                         if (err)
                             throw err;
 
-                        res.body.customers.length.should.equal(4);
+                        res.body.customers.should.be.an.Array().and.have.length(4);
                         done();
                     });
             });
@@ -186,12 +186,12 @@ describe('API tests: customers search', function() {
                         if (err)
                             throw err;
 
-                        res.body.customers.length.should.equal(2);
+                        res.body.customers.should.be.an.Array().and.have.length(2);
                         done();
                     });
             });
 
-            it('should return an empty list if the searched text does not match anyone', function(done) {
+            it('should return an empty list if the single searched word does not match anyone', function(done) {
                 getRequest('/customers/simple-search')
                     .query({text: 'noone'})
                     .expect(200)
@@ -199,7 +199,20 @@ describe('API tests: customers search', function() {
                         if (err)
                             throw err;
 
-                        res.body.customers.length.should.equal(0);
+                        res.body.customers.should.be.an.Array().and.have.length(0);
+                        done();
+                    });
+            });
+
+            it('should return an empty list if the searched multi words text does not match anyone', function(done) {
+                getRequest('/customers/simple-search')
+                    .query({text: 'deo giv'})
+                    .expect(200)
+                    .end(function(err, res) {
+                        if (err)
+                            throw err;
+
+                        res.body.customers.should.be.an.Array().and.have.length(0);
                         done();
                     });
             });
@@ -223,7 +236,7 @@ describe('API tests: customers search', function() {
                     if (err)
                         throw err;
 
-                    res.body.customers.length.should.equal(0);
+                    res.body.customers.should.be.an.Array().and.have.length(0);
                     done();
                 });
         });
@@ -255,7 +268,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(2);
+                        customers.should.be.an.Array().and.have.length(2);
                         customers[0].name.should.equal('<b>No</b>rris');
                         customers[0].surname.should.equal('Blake');
                         customers[0].phone.should.equal('55589658 / 44423811');
@@ -278,7 +291,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(1);
+                        customers.should.be.an.Array().and.have.length(1);
                         customers[0].name.should.equal('<b>Lor</b>y');
                         customers[0].surname.should.equal('Taylor');
                         customers[0].phone.should.equal('55566921');
@@ -296,7 +309,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(2);
+                        customers.should.be.an.Array().and.have.length(2);
                         customers[0].name.should.equal('Deon');
                         customers[0].surname.should.equal('Gibbs');
                         customers[0].phone.should.equal('4443<b>8</b><b>8</b>23');
@@ -320,7 +333,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(1);
+                        customers.should.be.an.Array().and.have.length(1);
                         customers[0].name.should.equal('Norris');
                         customers[0].surname.should.equal('Blake');
                         customers[0].phone.should.equal('555<b>89</b>658 / 44423811');
@@ -338,7 +351,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(1);
+                        customers.should.be.an.Array().and.have.length(1);
                         customers[0].name.should.equal('<b>Margarita</b>');
                         customers[0].surname.should.equal('Norman');
                         customers[0].phone.should.equal('-');
@@ -356,7 +369,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(1);
+                        customers.should.be.an.Array().and.have.length(1);
                         customers[0].name.should.equal('<b>No</b>rris');
                         customers[0].surname.should.equal('<b>B</b>lake');
                         customers[0].phone.should.equal('55589658 / 44423<b>811</b>');
@@ -374,8 +387,7 @@ describe('API tests: customers search', function() {
                             throw err;
 
                         var customers = res.body.customers;
-                        customers.length.should.equal(4);
-
+                        customers.should.be.an.Array().and.have.length(4);
                         customers[0].name.should.equal('Deon');
                         customers[0].surname.should.equal('Gibbs');
                         customers[0].phone.should.equal('44438823');
@@ -395,7 +407,7 @@ describe('API tests: customers search', function() {
                     });
             });
 
-            it('should return an empty list if the searched text does not match anyone', function(done) {
+            it('should return an empty list if the single searched word does not match anyone', function(done) {
                 getRequest('/customers/search')
                     .query({text: 'noone'})
                     .expect(200)
@@ -403,10 +415,24 @@ describe('API tests: customers search', function() {
                         if (err)
                             throw err;
 
-                        res.body.customers.length.should.equal(0);
+                        res.body.customers.should.be.an.Array().and.have.length(0);
                         done();
                     });
             });
+
+            it('should return an empty list if the searched multi words text does not match anyone', function(done) {
+                getRequest('/customers/search')
+                    .query({text: 'deo giv'})
+                    .expect(200)
+                    .end(function(err, res) {
+                        if (err)
+                            throw err;
+
+                        res.body.customers.should.be.an.Array().and.have.length(0);
+                        done();
+                    });
+            });
+
         });
     });
 

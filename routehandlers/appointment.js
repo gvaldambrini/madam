@@ -147,7 +147,7 @@ class AppointmentHandler {
      * @param {object} obj the customer object fetched from elasticsearch
      */
     static updateLastSeen(obj) {
-        if (obj.appointments.length === 0) {
+        if (typeof obj.appointments === 'undefined' || obj.appointments.length === 0) {
             obj.last_seen = null;
         }
         else if (obj.appointments.length === 1) {
@@ -506,6 +506,12 @@ class AppointmentHandler {
         }, function(err, resp, respcode) {
             const obj = req.customer;
             let appointment;
+
+            if (typeof obj.appointments === 'undefined') {
+                res.sendStatus(404);
+                return;
+            }
+
             for (let j = 0; j < obj.appointments.length; j++) {
                 if (obj.appointments[j].appid === req.params.appid) {
                     appointment = obj.appointments[j];
@@ -543,7 +549,60 @@ class AppointmentHandler {
      * @param {function} next the next middleware function to invoke, if any.
      */
     static save(req, res, next) {
+
         const obj = req.customer;
+
+        // Check & set the date
+        if (!moment(req.body.date, req.config.date_format).isValid()) {
+            res.sendStatus(400);
+            return;
+        }
+        const isodate = common.toISODate(req, req.body.date);
+
+        // If we want to update an existing appointment (appid !== undefined)
+        // check if the id really exists.
+        let newItem = false;
+        if (typeof req.params.appid === 'undefined') {
+            newItem = true;
+        }
+
+        if (typeof obj.appointments == 'undefined') {
+            obj.appointments = [];
+        }
+
+        let plannedIndex = -1;
+        if (typeof obj.planned_appointments !== 'undefined') {
+            for (let i = 0; i < obj.planned_appointments.length; i++) {
+                if (moment(obj.planned_appointments[i].date).isSame(moment(isodate), 'day')) {
+                    plannedIndex = i;
+                    break;
+                }
+            }
+        }
+
+        let appIndex = -1;
+        if (!newItem) {
+            for (let i = 0; i < obj.appointments.length; i++) {
+                if (obj.appointments[i].appid === req.params.appid) {
+                    appIndex = i;
+                    break;
+                }
+            }
+        }
+
+        if (!newItem && appIndex === -1 && plannedIndex === -1) {
+            // The passed app id is not in the customer appointments or in the
+            // planned ones, let's return NOT FOUND.
+            res.sendStatus(404);
+            return;
+        }
+
+        // Check & set the services
+        if (typeof req.body.services === 'undefined') {
+            res.sendStatus(400);
+            return;
+        }
+
         const services = [];
         for (let i = 0; i < req.body.services.length; i++) {
             let item = req.body.services[i];
@@ -561,17 +620,16 @@ class AppointmentHandler {
             return;
         }
 
-        const isodate = common.toISODate(req, req.body.date);
+        // Check if there is already an appointment for the requested date
         let alreadyPresent = false;
-        if (typeof obj.appointments !== 'undefined') {
-            for (let j = 0; j < obj.appointments.length; j++) {
-                if (obj.appointments[j].appid !== req.params.appid) {
-                    if (moment(obj.appointments[j].date).isSame(moment(isodate), 'day')) {
-                        alreadyPresent = true;
-                    }
+        for (let j = 0; j < obj.appointments.length; j++) {
+            if (obj.appointments[j].appid !== req.params.appid) {
+                if (moment(obj.appointments[j].date).isSame(moment(isodate), 'day')) {
+                    alreadyPresent = true;
                 }
             }
         }
+
         if (alreadyPresent) {
             const errors = [{msg: req.i18n.__(
                 'Unable to save the appointment: there is already an appointment for the same date.')}];
@@ -586,50 +644,22 @@ class AppointmentHandler {
             notes: req.body.notes
         };
 
-        let newItem = false;
-        if (typeof req.params.appid === 'undefined') {
-            newItem = true;
-            appointment.appid = uuid.v4();
-        }
-
-        if (typeof obj.appointments == 'undefined')
-            obj.appointments = [];
-
-        let plannedIndex = -1;
-        if (typeof obj.planned_appointments !== 'undefined') {
-            for (let i = 0; i < obj.planned_appointments.length; i++) {
-                if (moment(obj.planned_appointments[i].date).isSame(moment(isodate), 'day')) {
-                    plannedIndex = i;
-                    break;
-                }
-            }
-        }
-
         if (newItem) {
+            appointment.appid = uuid.v4();
             obj.appointments.push(appointment);
             if (plannedIndex !== -1) {
                 obj.planned_appointments.splice(plannedIndex, 1);
             }
         }
         else {
-            let appFound = false;
-            for (let j = 0; j < obj.appointments.length; j++) {
-                if (obj.appointments[j].appid === req.params.appid) {
-                    obj.appointments[j] = appointment;
-                    appFound = true;
-                    break;
-                }
-            }
             // In case we are creating a new appointment based on a planned one,
             // let's remove the planned appointment and add the real one.
-            if (!appFound) {
-                if (plannedIndex === -1) {
-                    res.sendStatus(404);
-                    return;
-                }
-
+            if (appIndex === -1) {
                 obj.planned_appointments.splice(plannedIndex, 1);
                 obj.appointments.push(appointment);
+            }
+            else {
+                obj.appointments[appIndex] = appointment;
             }
         }
 
@@ -658,6 +688,11 @@ class AppointmentHandler {
      */
     static delete(req, res, next) {
         const obj = req.customer;
+
+        if (typeof obj.appointments === 'undefined') {
+            res.sendStatus(404);
+            return;
+        }
 
         let index = -1;
         for (let i = 0; i < obj.appointments.length; i++) {

@@ -72,6 +72,7 @@ describe('API tests: customer CRUD', function() {
                     if (err)
                         throw err;
 
+                    res.body.errors.should.be.an.Array().and.have.length(1);
                     res.body.errors[0].msg.should.equal('The name is mandatory');
                     done();
                 });
@@ -85,6 +86,7 @@ describe('API tests: customer CRUD', function() {
                     if (err)
                         throw err;
 
+                    res.body.errors.should.be.an.Array().and.have.length(1);
                     res.body.errors[0].msg.should.equal('The email does not seem a valid email');
                     done();
                 });
@@ -98,6 +100,7 @@ describe('API tests: customer CRUD', function() {
                     if (err)
                         throw err;
 
+                    res.body.errors.should.be.an.Array().and.have.length(1);
                     res.body.errors[0].msg.should.equal('The first date seen does not seem a valid date');
                     done();
                 });
@@ -111,6 +114,7 @@ describe('API tests: customer CRUD', function() {
                     if (err)
                         throw err;
 
+                    res.body.errors.should.be.an.Array().and.have.length(1);
                     res.body.errors[0].msg.should.equal('To set allow sms, you must specify a mobile phone');
                     done();
                 });
@@ -124,12 +128,13 @@ describe('API tests: customer CRUD', function() {
                     if (err)
                         throw err;
 
+                    res.body.errors.should.be.an.Array().and.have.length(1);
                     res.body.errors[0].msg.should.equal('To set allow email, you must specify an email');
                     done();
                 });
         });
 
-        it('should return CREATED and the customer data if the submitted data contains only the name', function(done) {
+        it('should return CREATED and the customer id if the submitted data contains only the name', function(done) {
             postRequest('/customers/')
                 .send({name: 'someone'})
                 .expect(201)
@@ -137,6 +142,7 @@ describe('API tests: customer CRUD', function() {
                     if (err)
                         throw err;
 
+                    res.body.should.not.have.property('errors');
                     res.body.should.have.property('id');
                     var customerId = res.body.id;
                     setTimeout(function() {
@@ -153,7 +159,7 @@ describe('API tests: customer CRUD', function() {
                 });
         });
 
-        it('should return CREATED and the customer data if the submitted data contains every field', function(done) {
+        it('should return CREATED and the customer id if the submitted data contains every field', function(done) {
             postRequest('/customers/')
                 .send({
                     name: 'thename',
@@ -172,6 +178,7 @@ describe('API tests: customer CRUD', function() {
                     if (err)
                         throw err;
 
+                    res.body.should.not.have.property('errors');
                     res.body.should.have.property('id');
                     var customerId = res.body.id;
                     setTimeout(function() {
@@ -294,6 +301,7 @@ describe('API tests: customer CRUD', function() {
                     .end(function(err, res) {
                         if (err)
                             throw err;
+                        res.body.errors.should.be.an.Array().and.have.length(1);
                         res.body.errors[0].msg.should.equal('The name is mandatory');
                         done();
                     });
@@ -307,6 +315,7 @@ describe('API tests: customer CRUD', function() {
                         if (err)
                             throw err;
 
+                        res.body.errors.should.be.an.Array().and.have.length(1);
                         res.body.errors[0].msg.should.equal('The email does not seem a valid email');
                         done();
                     });
@@ -320,6 +329,7 @@ describe('API tests: customer CRUD', function() {
                         if (err)
                             throw err;
 
+                        res.body.errors.should.be.an.Array().and.have.length(1);
                         res.body.errors[0].msg.should.equal('The first date seen does not seem a valid date');
                         done();
                     });
@@ -333,6 +343,7 @@ describe('API tests: customer CRUD', function() {
                         if (err)
                             throw err;
 
+                        res.body.errors.should.be.an.Array().and.have.length(1);
                         res.body.errors[0].msg.should.equal('To set allow sms, you must specify a mobile phone');
                         done();
                     });
@@ -346,6 +357,7 @@ describe('API tests: customer CRUD', function() {
                         if (err)
                             throw err;
 
+                        res.body.errors.should.be.an.Array().and.have.length(1);
                         res.body.errors[0].msg.should.equal('To set allow email, you must specify an email');
                         done();
                     });
@@ -359,6 +371,7 @@ describe('API tests: customer CRUD', function() {
                         if (err)
                             throw err;
 
+                        res.body.should.not.have.property('errors');
                         res.body.should.have.property('id');
                         var customerId = res.body.id;
                         setTimeout(function() {
@@ -395,6 +408,7 @@ describe('API tests: customer CRUD', function() {
                         if (err)
                             throw err;
 
+                        res.body.should.not.have.property('errors');
                         res.body.should.have.property('id');
                         var customerId = res.body.id;
                         setTimeout(function() {
@@ -479,7 +493,6 @@ describe('API tests: customer CRUD', function() {
 
         after(deleteCustomers);
     });
-
 
     after(deleteCustomers);
 });
