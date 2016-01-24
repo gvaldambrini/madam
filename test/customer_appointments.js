@@ -34,7 +34,7 @@ describe('API tests: customer appointments', function() {
 
         var customer2 = {
             name: 'othername',
-            surname: 'othername',
+            surname: 'othersurname',
             appointments: [{
                 appid: 'eaafdf3b-6a76-4836-9cad-969ba0ca9a17',
                 date: '2015-06-11',

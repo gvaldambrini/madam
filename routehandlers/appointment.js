@@ -180,6 +180,10 @@ class AppointmentHandler {
                 type: 'customer',
                 id: id
             }, function(err, resp, respcode) {
+                if (!resp.found) {
+                    res.sendStatus(400);
+                    return;
+                }
                 const version = resp._version;
                 const obj = resp._source;
                 const appointmentId = uuid.v4();
@@ -283,6 +287,10 @@ class AppointmentHandler {
             planOnCustomer(req.params.date, req.body.id);
         }
         else {
+            if (typeof req.body.fullname === 'undefined') {
+                res.sendStatus(400);
+                return;
+            }
             planOnCalendar(req.params.date, req.body.fullname);
         }
     }
@@ -296,12 +304,13 @@ class AppointmentHandler {
      * @param {function} next the next middleware function to invoke, if any.
      */
     static fetchPlanned(req, res, next) {
+        // NOTE: not implemented for planned appointments part of a customer, since the
+        // ui does not need that.
         const queryBody = {
             query: {
                 bool: {
                     should: [
-                        { term: { "calendar.days.planned_appointments.appid": req.params.appid }},
-                        { term: { "customer.planned_appointments.appid": req.params.appid }}
+                        { term: { "calendar.days.planned_appointments.appid": req.params.appid }}
                     ],
                     minimum_should_match: 1
                 }
@@ -321,14 +330,12 @@ class AppointmentHandler {
             const obj = resp.hits.hits[0]._source;
             const docType = resp.hits.hits[0]._type;
 
-            // TODO: implement for customer objects.
             if (docType === 'calendar') {
                 for (let i = 0; i < obj.days.length; i++) {
                     for (let j = 0; j < obj.days[i].planned_appointments.length; j++) {
                         if (obj.days[i].planned_appointments[j].appid === req.params.appid) {
                             res.json({
-                                fullname: obj.days[i].planned_appointments[j].fullname,
-                                date: obj.days[i].date
+                                fullname: obj.days[i].planned_appointments[j].fullname
                             });
                             return;
                         }
@@ -366,7 +373,7 @@ class AppointmentHandler {
             size: 1,
             body: queryBody
         }, function(err, resp, respcode) {
-            if (resp.hits.hits.length != 1) {
+            if (resp.hits.hits.length !== 1) {
                 res.sendStatus(404);
                 return;
             }

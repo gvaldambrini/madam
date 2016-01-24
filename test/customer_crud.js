@@ -363,7 +363,7 @@ describe('API tests: customer CRUD', function() {
                     });
             });
 
-            it('should return OK and the customer data if the submitted data contains only the name', function(done) {
+            it('should return OK and the customer id if the submitted data contains only the name', function(done) {
                 putRequest('/customers/' + customerId)
                     .send({name: 'newname'})
                     .expect(200)
@@ -389,7 +389,7 @@ describe('API tests: customer CRUD', function() {
                     });
             });
 
-            it('should return OK and the customer data if the submitted data contains every field', function(done) {
+            it('should return OK and the customer id if the submitted data contains every field', function(done) {
                 putRequest('/customers/' + customerId)
                     .send({
                         name: 'othername',
@@ -483,7 +483,6 @@ describe('API tests: customer CRUD', function() {
                         type: 'customer',
                         id: customerId
                     }, function(error, exists) {
-                        console.log('exists:', exists);
                         exists.should.equal(false);
                         done();
                     });

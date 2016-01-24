@@ -55,7 +55,7 @@ router.param('date', function(req, res, next, date) {
         next();
     }
     else {
-        res.sendStatus(400);
+        res.sendStatus(404);
     }
 });
 
