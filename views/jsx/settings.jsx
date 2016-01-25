@@ -174,6 +174,22 @@ const SettingsRow = React.createClass({
 
 const ServicesForm = React.createClass({
   mixins: [BaseSettingsForm],
+  getInitialState: function() {
+    return {
+      items: [],
+      errors: [],
+      disabled: true,
+      submitText: this.props.route.i18n.save,
+      loaded: false
+    };
+  },
+  componentWillMount: function() {
+    $.ajax({
+      url: '/settings/services',
+      method: 'get',
+      success: this.loadItems
+    });
+  },
   newEmptyObj: function() {
     return {
       name: ''
@@ -184,15 +200,15 @@ const ServicesForm = React.createClass({
     // the reconciliation to understand who is the child removed
     // or added.
     const items = [];
-    if (data.items.length === 0) {
+    if (data.services.length === 0) {
       const emptyItem = this.newEmptyObj()
       emptyItem.id = this.uuid4();
       items[0] = emptyItem;
     }
     else {
-      for (let i = 0; i < data.items.length; i++) {
+      for (let i = 0; i < data.services.length; i++) {
         items[items.length] = {
-          name: data.items[i],
+          name: data.services[i],
           id: this.uuid4()
         }
       }
@@ -203,22 +219,6 @@ const ServicesForm = React.createClass({
       loaded: true,
       disabled: true
     });
-  },
-  componentWillMount: function() {
-    $.ajax({
-      url: '/settings/services',
-      method: 'get',
-      success: this.loadItems
-    });
-  },
-  getInitialState: function() {
-    return {
-      items: [],
-      errors: [],
-      disabled: true,
-      submitText: this.props.route.i18n.save,
-      loaded: false
-    };
   },
   handleSubmit: function(event) {
     event.preventDefault();
@@ -378,6 +378,22 @@ const SettingsColorRow = React.createClass({
 
 const WorkersForm = React.createClass({
   mixins: [BaseSettingsForm],
+  getInitialState: function() {
+    return {
+      items: [],
+      errors: [],
+      disabled: true,
+      submitText: this.props.route.i18n.save,
+      loaded: false
+    };
+  },
+  componentWillMount: function() {
+    $.ajax({
+      url: '/settings/workers',
+      method: 'get',
+      success: this.loadItems
+    });
+  },
   newEmptyObj: function() {
     return {
       name: '',
@@ -389,16 +405,16 @@ const WorkersForm = React.createClass({
     // the reconciliation to understand who is the child removed
     // or added.
     const items = [];
-    if (data.items.length === 0) {
+    if (data.workers.length === 0) {
       const emptyItem = this.newEmptyObj()
       emptyItem.id = this.uuid4();
       items[0] = emptyItem;
     }
     else {
-      for (let i = 0; i < data.items.length; i++) {
+      for (let i = 0; i < data.workers.length; i++) {
         items[items.length] = {
-          name: data.items[i].name,
-          color: data.items[i].color,
+          name: data.workers[i].name,
+          color: data.workers[i].color,
           id: this.uuid4()
         }
       }
@@ -409,22 +425,6 @@ const WorkersForm = React.createClass({
       loaded: true,
       disabled: true
     });
-  },
-  componentWillMount: function() {
-    $.ajax({
-      url: '/settings/workers',
-      method: 'get',
-      success: this.loadItems
-    });
-  },
-  getInitialState: function() {
-    return {
-      items: [],
-      errors: [],
-      disabled: true,
-      submitText: this.props.route.i18n.save,
-      loaded: false
-    };
   },
   handleChange: function(rowId, text, color) {
     const items = this.state.items;

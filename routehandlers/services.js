@@ -26,7 +26,7 @@ class ServicesHandler {
             id: common.servicesDocId
         }, (err, resp, respcode) =>
             res.json({
-                items: resp.found && resp._source.names.length > 0 ? resp._source.names : []
+                services: resp.found && resp._source.names.length > 0 ? resp._source.names : []
             })
         );
     }
@@ -59,7 +59,7 @@ class ServicesHandler {
 
         client.index(args,
             (err, resp, respcode) =>
-            common.saveCallback(req, res, err, resp, false, {items: services})
+            common.saveCallback(req, res, err, resp, false, {services: services})
         );
     }
 }

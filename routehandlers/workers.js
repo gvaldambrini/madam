@@ -25,12 +25,12 @@ class WorkersHandler {
             type: 'workers',
             id: common.workersDocId
         }, function(err, resp, respcode) {
-            let items = [];
+            let workers = [];
             if (resp.found && resp._source.workers.length > 0) {
-                items = resp._source.workers;
+                workers = resp._source.workers;
             }
             res.json({
-                items: items
+                workers: workers
             });
         });
     }
@@ -72,7 +72,7 @@ class WorkersHandler {
 
         client.index(args,
             (err, resp, respcode) =>
-            common.saveCallback(req, res, err, resp, false, {items: workers})
+            common.saveCallback(req, res, err, resp, false, {workers: workers})
         );
     }
 }

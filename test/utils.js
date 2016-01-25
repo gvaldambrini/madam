@@ -106,6 +106,16 @@ function deleteWorkers(cb) {
     });
 }
 
+function deleteServices(cb) {
+    client.delete({
+        index: mainIndex,
+        type: 'services',
+        id: common.servicesDocId
+    }, function(err, resp) {
+        cb();
+    });
+}
+
 function getCustomer(customerId, cb) {
     client.get({
         index: mainIndex,
@@ -121,6 +131,26 @@ function getCalendar(cb) {
         index: mainIndex,
         type: 'calendar',
         id: common.calendarDocId
+    }, function(err, resp, respcode) {
+        cb(resp._source);
+    });
+}
+
+function getWorkers(cb) {
+    client.get({
+        index: mainIndex,
+        type: 'workers',
+        id: common.workersDocId
+    }, function(err, resp, respcode) {
+        cb(resp._source);
+    });
+}
+
+function getServices(cb) {
+    client.get({
+        index: mainIndex,
+        type: 'services',
+        id: common.servicesDocId
     }, function(err, resp, respcode) {
         cb(resp._source);
     });
@@ -155,9 +185,12 @@ module.exports = {
     waterfall: waterfall,
     pause: pause,
     es: {
-        deleteCustomers: deleteCustomers,
         getCustomer: getCustomer,
         getCalendar: getCalendar,
-        deleteWorkers: deleteWorkers
+        getWorkers: getWorkers,
+        getServices: getServices,
+        deleteCustomers: deleteCustomers,
+        deleteWorkers: deleteWorkers,
+        deleteServices: deleteServices
     }
 };
