@@ -1,9 +1,8 @@
-var supertest = require('supertest');
 var should = require('should');
+var utils = require('./utils');
+
 
 describe('API tests: customer planned appointments', function() {
-    var port = '7891';  // defined in global.js
-    var request = supertest('http://localhost:' + port);
     var cookies;
     var common = require('../common');
     var client = common.createClient();
@@ -101,66 +100,22 @@ describe('API tests: customer planned appointments', function() {
             customer2Id = resp.items[1].create._id;
             customer3Id = resp.items[2].create._id;
 
-            request
-                .post('/login')
-                .set('Accept','application/json')
-                .send({'username': 'admin', 'password': 'pwdadmin'})
-                .expect(200)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
-                    res.body.user.should.equal('admin');
-                    var re = new RegExp('; path=/; httponly', 'gi');
-                    cookies = res
-                        .headers['set-cookie']
-                        .map(function(r) { return r.replace(re, '');}).join("; ");
-
-                    done();
-                });
+            utils.login(function(c) {
+                cookies = c;
+                done();
+            });
         });
     });
 
-    function deleteCustomers(done) {
-        client.search({
-            idnex: mainIndex,
-            type: 'customer',
-            size: 100,
-            body: { query: { match_all: {}}}
-        }, function(err, resp, respcode) {
-            var items = [];
-            for (var i = 0; i < resp.hits.hits.length; i++)
-                items[items.length] = {
-                    delete: {
-                        _index: mainIndex,
-                        _type: 'customer',
-                        _id: resp.hits.hits[i]._id }
-                }
-            if (items) {
-                client.bulk({body: items, refresh: true});
-                setTimeout(function() { done(); }, 50);
-            }
-            else
-                done();
-        });
-    }
-
-    function getRequest(url) {
-        return request
-            .get(url)
-            .set('Cookie', cookies)
-            .set('Accept','application/json')
-            .set('x-requested-with', 'XmlHttpRequest');
-    }
-
     describe('Read appointments', function() {
-        it('should return both planned and normal appointments if the customer contains them', function(done) {
-            getRequest('/customers/' + customer2Id + '/appointments')
-                .expect(200)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
+        it('should return both planned and normal appointments if the customer has them', function(done) {
+            utils.waterfall([
+                function(callback) {
+                    utils.request.get(cookies, '/customers/' + customer2Id + '/appointments')
+                        .expect(200)
+                        .end(callback);
+                },
+                function(res, callback) {
                     res.body.appointments.should.be.an.Array().and.have.length(3);
                     var app = res.body.appointments;
                     app[0].appid.should.equal('015f5d45-9e90-4523-8484-b006c3b9fc0c');
@@ -177,29 +132,33 @@ describe('API tests: customer planned appointments', function() {
                     app[2].date.should.equal('11/06/2015');
                     app[2].services.should.equal('shampoo - conditioning');
                     app[2].planned.should.equal(false);
-                    done();
-                });
+                    callback(null, null);
+                }
+            ], done);
         });
 
         it('should return an empty list if the requested date does not contain anything', function(done) {
-            getRequest('/customers/appointments/2015-12-13')
-                .expect(200)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
+            utils.waterfall([
+                function(callback) {
+                    utils.request.get(cookies, '/customers/appointments/2015-12-13')
+                        .expect(200)
+                        .end(callback);
+                },
+                function(res, callback) {
                     res.body.appointments.should.be.an.Array().and.have.length(0);
-                    done();
-            });
+                    callback(null, null);
+                }
+            ], done);
         });
 
         it('should return all the different appointment types if the requested date contains them', function(done) {
-            getRequest('/customers/appointments/2015-12-05')
-                .expect(200)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
+            utils.waterfall([
+                function(callback) {
+                    utils.request.get(cookies, '/customers/appointments/2015-12-05')
+                        .expect(200)
+                        .end(callback);
+                },
+                function(res, callback) {
                     var apps = res.body.appointments;
                     apps.should.be.an.Array().and.have.length(3);
                     apps[0].id.should.equal(customer3Id);
@@ -216,178 +175,164 @@ describe('API tests: customer planned appointments', function() {
                     apps[2].appid.should.equal('1187a4d2-4c2b-4e20-94ce-22e16871b53e');
                     apps[2].should.not.have.property('services');
                     apps[2].planned.should.equal(true);
-                    done();
-            });
+                    callback(null, null);
+                }
+            ], done);
         });
     });
 
     describe('Read planned appointment', function() {
         it('should return NOT FOUND if the date is invalid', function(done) {
-            getRequest('/customers/planned-appointments/2015-41-15/m3e39od2a')
+            utils.request.get(cookies, '/customers/planned-appointments/2015-41-15/m3e39od2a')
                 .expect(404, done);
         });
 
         it('should return NOT FOUND if the requested appointment does not exists', function(done) {
-            getRequest('/customers/planned-appointments/2015-12-05/m3e39od2a')
+            utils.request.get(cookies, '/customers/planned-appointments/2015-12-05/m3e39od2a')
                 .expect(404, done);
         });
 
         it('should return the planned info if the requested appointment exists', function(done) {
-            getRequest('/customers/planned-appointments/2015-12-15/aa5173e1-8f4f-4c3a-8f92-1acab1f4848d')
-                .expect(200)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
+            utils.waterfall([
+                function(callback) {
+                    utils.request.get(cookies, '/customers/planned-appointments/2015-12-15/aa5173e1-8f4f-4c3a-8f92-1acab1f4848d')
+                        .expect(200)
+                        .end(callback);
+                },
+                function(res, callback) {
                     res.body.fullname.should.equal('new customer2');
-                    done();
-                });
+                    callback(null, null);
+                }
+            ], done);
         });
 
     });
 
     describe('Create planned appointment', function() {
-        function postRequest(url) {
-            return request
-                .post(url)
-                .set('Cookie', cookies)
-                .set('Accept','application/json')
-                .set('x-requested-with', 'XmlHttpRequest');
-        }
 
         it('should return NOT FOUND if the date is invalid', function(done) {
-            postRequest('/customers/planned-appointments/2015-02-30')
+            utils.request.post(cookies, '/customers/planned-appointments/2015-02-30')
                 .expect(404, done);
         });
 
         it('should return BAD REQUEST if the submitted data does not contain the fullname and the id', function(done) {
-            postRequest('/customers/planned-appointments/2015-12-05')
+            utils.request.post(cookies, '/customers/planned-appointments/2015-12-05')
                 .expect(400, done);
         });
 
         it('should return BAD REQUEST if the customer id is not an existing one', function(done) {
-            postRequest('/customers/planned-appointments/2015-12-05')
+            utils.request.post(cookies, '/customers/planned-appointments/2015-12-05')
                 .send({id: 'l2dWdl8kSa2'})
                 .expect(400, done);
         });
 
         it('should return CREATED and the id if the submitted data contains the new customer fullname', function(done) {
-            postRequest('/customers/planned-appointments/2015-02-28')
-                .send({fullname: 'iron man'})
-                .expect(201)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
+            utils.waterfall([
+                function(callback) {
+                    utils.request.post(cookies, '/customers/planned-appointments/2015-02-28')
+                        .send({fullname: 'iron man'})
+                        .expect(201)
+                        .end(callback);
+                },
+                function(res, callback) {
                     res.body.should.have.property('id');
-                    var appId = res.body.id;
-
-                    client.get({
-                        index: mainIndex,
-                        type: 'calendar',
-                        id: common.calendarDocId
-                    }, function(err, resp, respcode) {
+                    callback(null, res.body.id);
+                },
+                function(appId, callback) {
+                    utils.es.getCalendar(function(obj) {
                         var i, j;
-                        for (i = 0; i < resp._source.days.length; i++) {
-                            if (resp._source.days[i].date === '2015-02-28') {
-                                for (j = 0; resp._source.days[i].planned_appointments.length; j++) {
-                                    if (resp._source.days[i].planned_appointments[j].appid === appId) {
-                                        resp._source.days[i].planned_appointments[j].fullname.should.equal('iron man');
-                                        done();
+                        for (i = 0; i < obj.days.length; i++) {
+                            if (obj.days[i].date === '2015-02-28') {
+                                for (j = 0; obj.days[i].planned_appointments.length; j++) {
+                                    if (obj.days[i].planned_appointments[j].appid === appId) {
+                                        obj.days[i].planned_appointments[j].fullname.should.equal('iron man');
+                                        callback(null, null);
                                     }
                                 }
                             }
                         }
-                    })
-                });
+                    });
+                }
+            ], done);
         });
 
         it('should return CREATED and the id if the submitted data contains a valid customer id', function(done) {
-            postRequest('/customers/planned-appointments/2015-02-28')
-                .send({id: customer1Id})
-                .expect(201)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
+            utils.waterfall([
+                function(callback) {
+                    utils.request.post(cookies, '/customers/planned-appointments/2015-02-28')
+                        .send({id: customer1Id})
+                        .expect(201)
+                        .end(callback);
+                },
+                function(res, callback) {
                     res.body.should.have.property('id');
-                    var appId = res.body.id;
-
-                    client.get({
-                        index: mainIndex,
-                        type: 'customer',
-                        id: customer1Id
-                    }, function(err, resp, respcode) {
-                        for (var i = 0; i < resp._source.planned_appointments.length; i++) {
-                            if (resp._source.planned_appointments[i].date === '2015-02-28') {
-                                resp._source.planned_appointments[i].appid.should.equal(appId);
-                                done();
+                    callback(null, res.body.id);
+                },
+                function(appId, callback) {
+                    utils.es.getCustomer(customer1Id, function(obj) {
+                        for (var i = 0; i < obj.planned_appointments.length; i++) {
+                            if (obj.planned_appointments[i].date === '2015-02-28') {
+                                obj.planned_appointments[i].appid.should.equal(appId);
+                                callback(null, null);
                             }
                         }
                     });
-                });
+                }
+            ], done);
         });
     });
 
     describe('Delete planned appointment', function() {
-        function deleteRequest(url) {
-            return request
-                .delete(url)
-                .set('Cookie', cookies)
-                .set('Accept','application/json')
-                .set('x-requested-with', 'XmlHttpRequest');
-        }
 
         it('should return NOT FOUND if the date is invalid', function(done) {
-            deleteRequest('/customers/planned-appointments/2015-02-30/3jdsk2a')
+            utils.request.delete(cookies, '/customers/planned-appointments/2015-02-30/3jdsk2a')
                 .expect(404, done);
         });
 
         it('should return NOT FOUND if the appointment id does not exists', function(done) {
-            deleteRequest('/customers/planned-appointments/2015-02-26/3jdsk2a')
+            utils.request.delete(cookies, '/customers/planned-appointments/2015-02-26/3jdsk2a')
                 .expect(404, done);
         });
 
         it('should return OK if the appointment id is for an existing customer', function(done) {
-            deleteRequest('/customers/planned-appointments/2015-12-05/015f5d45-9e90-4523-8484-b006c3b9fc0c')
-                .expect(200)
-                .end(function(err, res) {
-                    client.get({
-                        index: mainIndex,
-                        type: 'customer',
-                        id: customer2Id
-                    }, function(err, resp, respcode) {
-                        resp._source.planned_appointments.should.be.an.Array().and.have.length(0);
-                        done();
+            utils.waterfall([
+                function(callback) {
+                    utils.request.delete(cookies, '/customers/planned-appointments/2015-12-05/015f5d45-9e90-4523-8484-b006c3b9fc0c')
+                        .expect(200)
+                        .end(callback);
+                },
+                function(res, callback) {
+                    utils.es.getCustomer(customer2Id, function(obj) {
+                        obj.planned_appointments.should.be.an.Array().and.have.length(0);
+                        callback(null, null);
                     });
-                })
+                }
+            ], done);
         });
 
         it('should return OK if the appointment id is for a new customer', function(done) {
-            deleteRequest('/customers/planned-appointments/2015-12-15/aa5173e1-8f4f-4c3a-8f92-1acab1f4848d')
-                .expect(200)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
-                    client.get({
-                        index: mainIndex,
-                        type: 'calendar',
-                        id: common.calendarDocId
-                    }, function(err, resp, respcode) {
-
-                        for (var i = 0; i < resp._source.days.length; i++) {
-                            if (resp._source.days[i].date === '2015-12-15') {
-                                resp._source.days[i].planned_appointments.should.be.an.Array().and.have.length(1);
-                                resp._source.days[i].planned_appointments[0].appid.should.equal('235442dc-90eb-44f0-b0ad-1afbdf366fcc');
-                                resp._source.days[i].planned_appointments[0].fullname.should.equal('new customer3');
-                                done();
+            utils.waterfall([
+                function(callback) {
+                    utils.request.delete(cookies, '/customers/planned-appointments/2015-12-15/aa5173e1-8f4f-4c3a-8f92-1acab1f4848d')
+                        .expect(200)
+                        .end(callback);
+                },
+                function(res, callback) {
+                    utils.es.getCalendar(function(obj) {
+                        for (var i = 0; i < obj.days.length; i++) {
+                            if (obj.days[i].date === '2015-12-15') {
+                                obj.days[i].planned_appointments.should.be.an.Array().and.have.length(1);
+                                obj.days[i].planned_appointments[0].appid.should.equal('235442dc-90eb-44f0-b0ad-1afbdf366fcc');
+                                obj.days[i].planned_appointments[0].fullname.should.equal('new customer3');
+                                callback(null, null);
                             }
                         }
-                    })
-                })
+
+                    });
+                }
+            ], done);
         });
     });
 
-    after(deleteCustomers);
+    after(utils.es.deleteCustomers);
 });

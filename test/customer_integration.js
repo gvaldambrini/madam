@@ -1,10 +1,8 @@
-var supertest = require('supertest');
 var should = require('should');
-var async = require('async');
+var utils = require('./utils');
+
 
 describe('API tests: customer integration tests', function() {
-    var port = '7891';  // defined in global.js
-    var request = supertest('http://localhost:' + port);
     var cookies;
     var common = require('../common');
     var client = common.createClient();
@@ -23,47 +21,18 @@ describe('API tests: customer integration tests', function() {
             {index: {_index: mainIndex, _type: 'workers', _id: common.workersDocId}},
             {workers: workers}
         ], refresh: true}, function(err, resp, respcode) {
-            request
-                .post('/login')
-                .set('Accept','application/json')
-                .send({'username': 'admin', 'password': 'pwdadmin'})
-                .expect(200)
-                .end(function(err, res) {
-                    if (err)
-                        throw err;
-
-                    res.body.user.should.equal('admin');
-                    var re = new RegExp('; path=/; httponly', 'gi');
-                    cookies = res
-                        .headers['set-cookie']
-                        .map(function(r) { return r.replace(re, '');}).join("; ");
-
-                    done();
-                });
+            utils.login(function(c) {
+                cookies = c;
+                done();
+            });
         });
     });
 
-    function postRequest(url) {
-        return request
-            .post(url)
-            .set('Cookie', cookies)
-            .set('Accept','application/json')
-            .set('x-requested-with', 'XmlHttpRequest');
-    }
-
-    function putRequest(url) {
-        return request
-            .put(url)
-            .set('Cookie', cookies)
-            .set('Accept','application/json')
-            .set('x-requested-with', 'XmlHttpRequest');
-    }
-
     it('should preserve the appointments after updating the customer', function(done) {
         var customerId;
-        async.waterfall([
+        utils.waterfall([
             function(callback) {
-                postRequest('/customers/')
+                utils.request.post(cookies, '/customers/')
                     .send({
                         name: 'someone',
                         surname: 'devnull',
@@ -76,10 +45,7 @@ describe('API tests: customer integration tests', function() {
                     });
             },
             function(res, callback) {
-                setTimeout(function() { callback(null, null);}, 50);
-            },
-            function(res, callback) {
-                postRequest('/customers/' + customerId + '/appointments')
+                utils.request.post(cookies, '/customers/' + customerId + '/appointments')
                     .send({services: [
                         {enabled: true, description: 'shampoo', worker: 'Daenerys'},
                         {enabled: true, description: 'haircut', worker: 'Daenerys'}
@@ -89,13 +55,13 @@ describe('API tests: customer integration tests', function() {
                     .end(callback);
             },
             function(res, callback) {
-                postRequest('/customers/planned-appointments/2016-01-05')
+                utils.request.post(cookies, '/customers/planned-appointments/2016-01-05')
                     .send({id: customerId})
                     .expect(201)
                     .end(callback);
             },
             function(res, callback) {
-                putRequest('/customers/' + customerId)
+                utils.request.put(cookies, '/customers/' + customerId)
                     .send({
                         name: 'othername',
                         surname: 'othersurname',
@@ -104,38 +70,28 @@ describe('API tests: customer integration tests', function() {
                     .end(callback);
             },
             function(res, callback) {
-                client.get({
-                    index: mainIndex,
-                    type: 'customer',
-                    id: customerId
-                }, callback);
-            },
-        ],
-        function(err, resp) {
-            if (err)
-                throw err;
-
-            var obj = resp._source;
-            obj.name.should.equal('othername');
-            obj.surname.should.equal('othersurname');
-            obj.email.should.equal('other@email.com');
-            obj.appointments.should.be.an.Array().and.have.length(1);
-            obj.appointments[0].date.should.equal('2015-12-26');
-            obj.appointments[0].services.should.be.an.Array().and.have.length(2);
-            obj.appointments[0].services[0].description.should.equal('shampoo');
-            obj.appointments[0].services[1].description.should.equal('haircut');
-            obj.planned_appointments.should.be.an.Array().and.have.length(1);
-            obj.planned_appointments[0].date.should.equal('2016-01-05');
-            done();
-        });
-
+                utils.es.getCustomer(customerId, function(obj) {
+                    obj.name.should.equal('othername');
+                    obj.surname.should.equal('othersurname');
+                    obj.email.should.equal('other@email.com');
+                    obj.appointments.should.be.an.Array().and.have.length(1);
+                    obj.appointments[0].date.should.equal('2015-12-26');
+                    obj.appointments[0].services.should.be.an.Array().and.have.length(2);
+                    obj.appointments[0].services[0].description.should.equal('shampoo');
+                    obj.appointments[0].services[1].description.should.equal('haircut');
+                    obj.planned_appointments.should.be.an.Array().and.have.length(1);
+                    obj.planned_appointments[0].date.should.equal('2016-01-05');
+                    callback(null, null);
+                });
+            }
+        ], done);
     });
 
     it('should remove a planned appointment when a normal one has been created with the same date', function(done) {
         var customerId;
-        async.waterfall([
+        utils.waterfall([
             function(callback) {
-                postRequest('/customers/')
+                utils.request.post(cookies, '/customers/')
                     .send({
                         name: 'othername',
                         surname: 'othersurname'
@@ -147,13 +103,13 @@ describe('API tests: customer integration tests', function() {
                     });
             },
             function(res, callback) {
-                postRequest('/customers/planned-appointments/2016-01-05')
+                utils.request.post(cookies, '/customers/planned-appointments/2016-01-05')
                     .send({id: customerId})
                     .expect(201)
                     .end(callback);
             },
             function(res, callback) {
-                postRequest('/customers/' + customerId + '/appointments')
+                utils.request.post(cookies, '/customers/' + customerId + '/appointments')
                     .send({services: [
                         {enabled: true, description: 'shampoo', worker: 'Arya'},
                         {enabled: true, description: 'haircut', worker: 'Daenerys'}
@@ -163,28 +119,25 @@ describe('API tests: customer integration tests', function() {
                     .end(callback);
             },
             function(res, callback) {
-                client.get({
-                    index: mainIndex,
-                    type: 'customer',
-                    id: customerId
-                }, callback);
-            },
-        ],
-        function(err, resp) {
-            if (err)
-                throw err;
+                utils.es.getCustomer(customerId, function(obj) {
+                    obj.name.should.equal('othername');
+                    obj.surname.should.equal('othersurname');
+                    obj.appointments.should.be.an.Array().and.have.length(1);
+                    obj.appointments[0].date.should.equal('2016-01-05');
+                    obj.appointments[0].services.should.be.an.Array().and.have.length(2);
+                    obj.appointments[0].services[0].description.should.equal('shampoo');
+                    obj.appointments[0].services[1].description.should.equal('haircut');
+                    obj.planned_appointments.should.be.an.Array().and.have.length(0);
+                    callback(null, null);
+                });
+            }
+        ], done);
+    });
 
-            var obj = resp._source;
-            obj.name.should.equal('othername');
-            obj.surname.should.equal('othersurname');
-            obj.appointments.should.be.an.Array().and.have.length(1);
-            obj.appointments[0].date.should.equal('2016-01-05');
-            obj.appointments[0].services.should.be.an.Array().and.have.length(2);
-            obj.appointments[0].services[0].description.should.equal('shampoo');
-            obj.appointments[0].services[1].description.should.equal('haircut');
-            obj.planned_appointments.should.be.an.Array().and.have.length(0);
-            done();
-        });
-
+    after(function(done) {
+        utils.waterfall([
+            utils.es.deleteCustomers,
+            utils.es.deleteWorkers
+        ], done);
     });
 });

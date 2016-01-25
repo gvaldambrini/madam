@@ -14,8 +14,10 @@ describe('API tests: login', function() {
                 .post('/login')
                 .set('x-requested-with', 'XmlHttpRequest')
                 .send({username: '', password: ''})
-                .expect(401)
+                .expect(400)
                 .end(function(err, res) {
+                    if (err)
+                        throw err;
                     res.body.errors[0].msg.should.equal('Missing username.');
                     done();
                 });
@@ -28,6 +30,8 @@ describe('API tests: login', function() {
                 .send({username: 'admina', password: 'pwdadmin'})
                 .expect(401)
                 .end(function(err, res) {
+                    if (err)
+                        throw err;
                     res.body.errors[0].msg.should.equal('Incorrect username.');
                     done();
                 });
@@ -38,8 +42,10 @@ describe('API tests: login', function() {
                 .post('/login')
                 .set('x-requested-with', 'XmlHttpRequest')
                 .send({username: 'admin', password: ''})
-                .expect(401)
+                .expect(400)
                 .end(function(err, res) {
+                    if (err)
+                        throw err;
                     res.body.errors[0].msg.should.equal('Missing password.');
                     done();
                 });
@@ -52,6 +58,8 @@ describe('API tests: login', function() {
                 .send({username: 'admin', password: 'pwdadmina'})
                 .expect(401)
                 .end(function(err, res) {
+                    if (err)
+                        throw err;
                     res.body.errors[0].msg.should.equal('Incorrect password.');
                     done();
                 });
@@ -64,6 +72,8 @@ describe('API tests: login', function() {
                 .send({username: 'admin', password: 'pwdadmin'})
                 .expect(200)
                 .end(function(err, res) {
+                    if (err)
+                        throw err;
                     res.body.user.should.equal('admin');
                     done();
                 });
