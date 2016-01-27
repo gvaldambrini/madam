@@ -108,6 +108,10 @@ class ProductHandler {
      * @param {function} next the next middleware function to invoke, if any.
      */
     static search(req, res, next) {
+        if (typeof req.query.text === 'undefined') {
+            res.sendStatus(400);
+            return;
+        }
         let queryBody;
         if (req.query.text.trim()) {
             queryBody = {
@@ -167,7 +171,7 @@ class ProductHandler {
 
         req.checkBody('name', req.i18n.__('The name is mandatory')).notEmpty();
 
-        if (req.body.first_see) {
+        if (req.body.sold_date) {
             req.checkBody('sold_date', req.i18n.__(
                 'The sold date does not seem a valid date')).isValidDate();
         }
@@ -195,6 +199,8 @@ class ProductHandler {
             }
         }
 
+        // we cannot use the elasticsearch copy_to as in that case the resulting
+        // field will contain a set of values. See also: http://goo.gl/TCNo47
         obj.complete_name = obj.name;
         if (obj.brand) {
             obj.complete_name += obj.brand;
@@ -237,9 +243,13 @@ class ProductHandler {
             index: req.config.mainIndex,
             type: 'product',
             id: req.params.id
-        }, (err, resp, respcode) =>
-            res.json(ProductHandler.toViewFormat(req, resp._source))
-        );
+        }, function(err, resp, respcode) {
+            if (!resp.found) {
+                res.sendStatus(404);
+                return;
+            }
+            res.json(ProductHandler.toViewFormat(req, resp._source));
+        });
     }
 
     /**
@@ -294,10 +304,13 @@ class ProductHandler {
             refresh: true
         };
 
-        client.update(args,
-            (err, resp, respcode) =>
-            common.saveCallback(req, res, err, resp, false)
-        );
+        client.update(args, function(err, resp, respcode) {
+            if (respcode === 404) {
+                res.sendStatus(404);
+                return;
+            }
+            common.saveCallback(req, res, err, resp, false);
+        });
     }
 
     /**
@@ -315,6 +328,11 @@ class ProductHandler {
             refresh: true,
             id: req.params.id
         }, function(err, resp, respcode) {
+            if (respcode === 404) {
+                res.sendStatus(404);
+                return;
+            }
+
             if (err) {
                 console.log(err);
                 res.status(400).end();

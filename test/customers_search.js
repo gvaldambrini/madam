@@ -48,10 +48,9 @@ describe('API tests: customers search', function() {
                     {index: {_index: mainIndex, _type: 'customer'}},
                     {name: 'Lory', surname: 'Taylor'}
 
-                ], refresh: true});
-                // A little delay is required to let the modification being propagated and
-                // available for further requests (even using the refresh param).
-                setTimeout(function() { done(); }, 50);
+                ], refresh: true}, function(err, resp, respcode) {
+                    done();
+                });
             });
 
             it('should return the customers that match with the name or surname', function(done) {
@@ -226,10 +225,9 @@ describe('API tests: customers search', function() {
                     {index: {_index: mainIndex, _type: 'customer'}},
                     {name: 'Lory', surname: 'Taylor', mobile_phone: '55566921'}
 
-                ], refresh: true});
-                // A little delay is required to let the modification being propagated and
-                // avaiable for further requests (even using the refresh param).
-                setTimeout(function() { done(); }, 50);
+                ], refresh: true}, function(err, resp, respcode) {
+                    done();
+                });
             });
 
             it('should return the customers that match with the name or surname', function(done) {

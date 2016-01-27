@@ -87,7 +87,36 @@ function deleteCustomers(cb) {
                 body: items,
                 refresh: true
             }, function(err, resp, respcode) {
-                setTimeout(function() { cb(); }, 50);
+                cb();
+            });
+
+        }
+        else
+            cb();
+    });
+}
+
+function deleteProducts(cb) {
+    client.search({
+        index: mainIndex,
+        type: 'product',
+        size: 100,
+        body: { query: { match_all: {}}}
+    }, function(err, resp, respcode) {
+        var items = [];
+        for (var i = 0; i < resp.hits.hits.length; i++)
+            items[items.length] = {
+                delete: {
+                    _index: mainIndex,
+                    _type: 'product',
+                    _id: resp.hits.hits[i]._id }
+            }
+        if (items) {
+            client.bulk({
+                body: items,
+                refresh: true
+            }, function(err, resp, respcode) {
+                cb();
             });
 
         }
@@ -121,6 +150,16 @@ function getCustomer(customerId, cb) {
         index: mainIndex,
         type: 'customer',
         id: customerId
+    }, function(err, resp, respcode) {
+        cb(resp._source);
+    });
+}
+
+function getProduct(productId, cb) {
+    client.get({
+        index: mainIndex,
+        type: 'product',
+        id: productId
     }, function(err, resp, respcode) {
         cb(resp._source);
     });
@@ -189,8 +228,10 @@ module.exports = {
         getCalendar: getCalendar,
         getWorkers: getWorkers,
         getServices: getServices,
+        getProduct: getProduct,
         deleteCustomers: deleteCustomers,
         deleteWorkers: deleteWorkers,
-        deleteServices: deleteServices
+        deleteServices: deleteServices,
+        deleteProducts: deleteProducts
     }
 };

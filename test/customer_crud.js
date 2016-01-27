@@ -218,7 +218,7 @@ describe('API tests: customer CRUD', function() {
                 .expect(404, done);
         });
 
-        describe('Update an existing user', function() {
+        describe('Update an existing customer', function() {
             var customerId;
             before(function(done) {
                 client.index({
