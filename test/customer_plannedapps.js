@@ -226,6 +226,62 @@ describe('API tests: customer planned appointments', function() {
                 .expect(400, done);
         });
 
+        it('should return an error if the planned appointment is for a date that has already a planned one', function(done) {
+            var plannedLen;
+            utils.waterfall([
+                function(callback) {
+                    utils.es.getCustomer(customer2Id, function(obj) {
+                        plannedLen = obj.planned_appointments.length;
+                        callback(null, null);
+                    });
+                },
+                function(res, callback) {
+                    utils.request.post(cookies, '/customers/planned-appointments/2015-12-05')
+                        .send({id: customer2Id})
+                        .expect(400)
+                        .end(callback);
+                },
+                function(res, callback) {
+                    res.body.errors.should.be.an.Array().and.have.length(1);
+                    res.body.errors[0].msg.should.equal(
+                        'Unable to plan the appointment: there is already a planned appointment for the same date.');
+
+                    utils.es.getCustomer(customer2Id, function(obj) {
+                        obj.planned_appointments.should.be.an.Array().and.have.length(plannedLen);
+                        callback(null, null);
+                    });
+                }
+            ], done);
+        });
+
+        it('should return an error if the planned appointment is for a date that has already an appointment', function(done) {
+            var plannedLen;
+            utils.waterfall([
+                function(callback) {
+                    utils.es.getCustomer(customer2Id, function(obj) {
+                        plannedLen = obj.planned_appointments.length;
+                        callback(null, null);
+                    });
+                },
+                function(res, callback) {
+                    utils.request.post(cookies, '/customers/planned-appointments/2015-06-11')
+                        .send({id: customer2Id})
+                        .expect(400)
+                        .end(callback);
+                },
+                function(res, callback) {
+                    res.body.errors.should.be.an.Array().and.have.length(1);
+                    res.body.errors[0].msg.should.equal(
+                        'Unable to plan the appointment: there is already an appointment for the same date.');
+
+                    utils.es.getCustomer(customer2Id, function(obj) {
+                        obj.planned_appointments.should.be.an.Array().and.have.length(plannedLen);
+                        callback(null, null);
+                    });
+                }
+            ], done);
+        });
+
         it('should return CREATED and the id if the submitted data contains the new customer fullname', function(done) {
             utils.waterfall([
                 function(callback) {

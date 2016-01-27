@@ -17,9 +17,22 @@ describe('API tests: customer integration tests', function() {
             {name: 'Margaery', color: '#0000ff'}
         ];
 
+        var calendar = {
+            days: [{
+                date: '2015-12-15',
+                planned_appointments: [
+                    {
+                        appid: '1187a4d2-4c2b-4e20-94ce-22e16871b53e',
+                        fullname: 'new customer1'
+                    }
+                ]}]
+        };
+
         client.bulk({body: [
             {index: {_index: mainIndex, _type: 'workers', _id: common.workersDocId}},
-            {workers: workers}
+            {workers: workers},
+            {index: {_index: mainIndex, _type: 'calendar', _id: common.calendarDocId}},
+            calendar
         ], refresh: true}, function(err, resp, respcode) {
             utils.login(function(c) {
                 cookies = c;
@@ -128,6 +141,42 @@ describe('API tests: customer integration tests', function() {
                     obj.appointments[0].services[0].description.should.equal('shampoo');
                     obj.appointments[0].services[1].description.should.equal('haircut');
                     obj.planned_appointments.should.be.an.Array().and.have.length(0);
+                    callback(null, null);
+                });
+            }
+        ], done);
+    });
+
+    it('should preserve the planned appointment when creating the customer starting from it', function(done) {
+        var customerId;
+        utils.waterfall([
+            function(callback) {
+                utils.request.post(cookies, '/customers/')
+                    .send({
+                        name: 'sandor',
+                        surname: 'clegane',
+                        __appid: '1187a4d2-4c2b-4e20-94ce-22e16871b53e',
+                    })
+                    .expect(201)
+                    .end(function(err, res) {
+                        customerId = res.body.id;
+                        callback(err, null);
+                    });
+            },
+            function(res, callback) {
+                utils.es.getCustomer(customerId, function(obj) {
+                    obj.name.should.equal('sandor');
+                    obj.surname.should.equal('clegane');
+                    obj.should.not.have.property('appointments');
+                    obj.planned_appointments.should.be.an.Array().and.have.length(1);
+                    obj.planned_appointments[0].date.should.equal('2015-12-15');
+                    callback(null, null);
+                });
+            },
+            function(res, callback) {
+                utils.es.getCalendar(function(obj) {
+                    obj.days[0].date.should.equal('2015-12-15');
+                    obj.days[0].planned_appointments.should.be.an.Array().and.have.length(0);
                     callback(null, null);
                 });
             }

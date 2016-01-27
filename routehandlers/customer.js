@@ -363,7 +363,7 @@ class CustomerHandler {
                     body: [
                         {index: {_index: req.config.mainIndex, _type: 'customer'}},
                         customerObj,
-                        {index: {_index: req.config.mainIndex, _type: 'calendar'}},
+                        {index: {_index: req.config.mainIndex, _type: 'calendar', _id: common.calendarDocId}},
                         calendarObj
                     ],
                     refresh: true
