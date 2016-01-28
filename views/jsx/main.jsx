@@ -11,6 +11,7 @@ import { ServicesForm, WorkersForm, SettingsRoot } from './settings';
 import { LoginForm } from './login';
 import { HomePage, Calendar, CalendarCustomer, CalendarAppointment, CalendarCustomerForm, CalendarAppointments } from './homepage';
 
+import '../stylesheets/style.scss';
 
 function csrfSafeMethod(method) {
   // these HTTP methods do not require CSRF protection

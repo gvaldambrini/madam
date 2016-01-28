@@ -1,20 +1,16 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var concat = require('gulp-concat');
-var minifycss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var nodemon = require('gulp-nodemon');
-var browserSync = require('browser-sync');
 var shell = require('gulp-shell');
 var jshint = require('gulp-jshint');
 var webpack = require("webpack");
 var webpackConfig = require("./webpack.config.js");
 var WebpackDevServer = require("webpack-dev-server");
-var reload = browserSync.reload;
 
 gulp.task('vendorscripts', function() {
     return gulp.src([
-        'node_modules/express-handlebars/node_modules/handlebars/dist/handlebars.runtime.min.js',
         'node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
         'node_modules/bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js',
         'vendor/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'])
@@ -58,27 +54,10 @@ gulp.task('webpack-build', function(cb) {
 if (process.env.NODE_ENV === 'production') {
     console.log('*** production ***');
 
-    gulp.task('sass', function () {
-        gulp.src('views/stylesheets/*.scss')
-            .pipe(sass())
-            .pipe(concat('main.css'))
-            .pipe(rename({ suffix: '.min' }))
-            .pipe(minifycss())
-            .pipe(gulp.dest('public/stylesheets'));
-    });
-
-    gulp.task('build', ['webpack-build', 'sass', 'vendorcss', 'vendorscripts', 'images']);
+    gulp.task('build', ['webpack-build', 'vendorcss', 'vendorscripts', 'images']);
 }
 else {
     console.log('*** development ***');
-
-    gulp.task('sass', function () {
-        gulp.src('views/stylesheets/*.scss')
-            .pipe(sass())
-            .pipe(concat('main.css'))
-            .pipe(gulp.dest('public/stylesheets'))
-            .pipe(reload({stream:true}));
-    });
 
     gulp.task('doc', shell.task([
       './node_modules/.bin/jsdoc -c jsdoc.json -r README.md']));
@@ -89,14 +68,7 @@ else {
         .pipe(jshint.reporter('default'));
     });
 
-    gulp.task('build', ['sass', 'vendorcss', 'vendorscripts', 'images', 'doc', 'lint']);
-
-    gulp.task('browser-sync', function() {
-      browserSync.init(null, {
-        proxy: "http://localhost:3000",
-        port: 4000
-      });
-    });
+    gulp.task('build', ['vendorcss', 'vendorscripts', 'images', 'doc', 'lint']);
 
     gulp.task('nodemon', function (cb) {
       var called = false;
@@ -134,11 +106,9 @@ else {
       });
     });
 
-    gulp.task('default', ['build', 'webpack-dev-server', 'nodemon', 'browser-sync'], function () {
+    gulp.task('default', ['build', 'webpack-dev-server', 'nodemon'], function () {
       gulp.watch(["*.js", "routes/*.js", "routehandlers/*.js"], ['lint']);
       gulp.watch(["*.js", "routes/*.js", "routehandlers/*.js", "README.md", "jsdoc.json"], ['doc']);
-      gulp.watch("views/stylesheets/*.scss", ['sass']);
-      gulp.watch(["views/*.handlebars"], reload);
     });
 }
 

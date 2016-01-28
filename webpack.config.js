@@ -20,11 +20,12 @@ module.exports = {
                 query: {
                     presets: ['react', 'es2015']
                 }
+            },
+            {
+              test: /\.scss$/,
+              loader: 'style!css!sass'
             }
         ]
-    },
-    resolve: {
-        extensions: ['', '.js', '.jsx']
     },
     plugins: [
         new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.js')
