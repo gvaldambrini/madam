@@ -1,36 +1,10 @@
 var gulp = require('gulp');
-var sass = require('gulp-sass');
-var concat = require('gulp-concat');
-var rename = require('gulp-rename');
 var nodemon = require('gulp-nodemon');
 var shell = require('gulp-shell');
 var jshint = require('gulp-jshint');
 var webpack = require("webpack");
 var webpackConfig = require("./webpack.config.js");
 var WebpackDevServer = require("webpack-dev-server");
-
-gulp.task('vendorscripts', function() {
-    return gulp.src([
-        'node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
-        'node_modules/bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js',
-        'vendor/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'])
-      .pipe(concat('vendor.min.js'))
-      .pipe(gulp.dest('public/javascripts'));
-});
-
-gulp.task('vendorcss', function() {
-    return gulp.src([
-        'node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css',
-        'vendor/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css'])
-      .pipe(concat('vendor.min.css'))
-      .pipe(gulp.dest('public/stylesheets'));
-});
-
-gulp.task('images', function() {
-    return gulp.src([
-        'vendor/bootstrap-colorpicker/dist/images/**'])
-      .pipe(gulp.dest('public/images'));
-});
 
 gulp.task('webpack-build', function(cb) {
   var config = Object.create(webpackConfig);
@@ -53,8 +27,7 @@ gulp.task('webpack-build', function(cb) {
 
 if (process.env.NODE_ENV === 'production') {
     console.log('*** production ***');
-
-    gulp.task('build', ['webpack-build', 'vendorcss', 'vendorscripts', 'images']);
+    gulp.task('build', ['webpack-build']);
 }
 else {
     console.log('*** development ***');
@@ -68,14 +41,14 @@ else {
         .pipe(jshint.reporter('default'));
     });
 
-    gulp.task('build', ['vendorcss', 'vendorscripts', 'images', 'doc', 'lint']);
+    gulp.task('build', ['doc', 'lint']);
 
     gulp.task('nodemon', function (cb) {
       var called = false;
       return nodemon({
         script: 'bin/www',
         ext: 'js',
-        ignore: ['public/*', 'views/*', 'test/*']
+        ignore: ['public/*', 'views/*', 'test/*', 'webpack.config.js']
       }).on('start', function () {
         if (!called) {
           called = true;
@@ -111,6 +84,3 @@ else {
       gulp.watch(["*.js", "routes/*.js", "routehandlers/*.js", "README.md", "jsdoc.json"], ['doc']);
     });
 }
-
-
-

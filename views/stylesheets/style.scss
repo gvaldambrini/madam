@@ -59,7 +59,7 @@ form {
 }
 
 .navbar-logo a {
-  background-image: url('/images/small_logo.png');
+  background-image: url('../../public/images/small_logo.png');
   background-position: 0 0;
   background-repeat: no-repeat;
   overflow: hidden;
@@ -85,7 +85,7 @@ form {
 
 @media (min-width: 768px) {
   .navbar-logo a {
-    background-image: url('/images/logo.png');
+    background-image: url('../../public/images/logo.png');
     width: 319px;
     height: 42px;
     margin-top: 4px;

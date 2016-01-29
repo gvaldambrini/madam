@@ -1,8 +1,22 @@
+import 'jquery/dist/jquery.min.js';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
+
+import 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'
+import 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css'
+
+import 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'
+import 'bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js'
+import 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route, Link, IndexRedirect, IndexLink, IndexRoute, History } from 'react-router';
 
 import Cookies from 'js-cookie';
+
+import '../javascripts/confirm-popover.js'
+import '../stylesheets/style.scss';
 
 import { Appointment, Appointments, AppointmentsRoot } from './appointments';
 import { CustomerForm, Customer, Customers, CustomersRoot } from './customers';
@@ -11,7 +25,6 @@ import { ServicesForm, WorkersForm, SettingsRoot } from './settings';
 import { LoginForm } from './login';
 import { HomePage, Calendar, CalendarCustomer, CalendarAppointment, CalendarCustomerForm, CalendarAppointments } from './homepage';
 
-import '../stylesheets/style.scss';
 
 function csrfSafeMethod(method) {
   // these HTTP methods do not require CSRF protection
