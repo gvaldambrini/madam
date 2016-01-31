@@ -45,7 +45,7 @@ const InputCustomer = React.createClass({
       method: 'get',
       data: {text: input, size: 10},
       success: data => callback(null, data.customers),
-      error: function(xhr, textStatus, errorThrown) {
+      error: function(xhr, textStatus, _errorThrown) {
         if (xhr.status === 401) {
           Cookies.remove('user');
           that.history.pushState(null, '/login');
@@ -54,13 +54,13 @@ const InputCustomer = React.createClass({
     });
   },
   renderSuggestion:
-    (suggestion, input) =>
-    typeof suggestion.surname != 'undefined'
+    (suggestion, _input) =>
+    typeof suggestion.surname !== 'undefined'
     ? `${suggestion.name} ${suggestion.surname}`
     : suggestion.name,
   getSuggestionValue:
     suggestion =>
-    typeof suggestion.surname != 'undefined'
+    typeof suggestion.surname !== 'undefined'
     ? `${suggestion.name} ${suggestion.surname}`
     : suggestion.name,
   onSuggestionSelected: function(suggestion, event) {
@@ -140,7 +140,7 @@ const DateAppointments = React.createClass({
   mixins: [History],
   render: function() {
     const that = this;
-    const appointmentRows = this.props.appointments.map((app, index) =>
+    const appointmentRows = this.props.appointments.map((app, _index) =>
       <tr key={app.appid} className={moment(this.props.date).isAfter(moment(), 'day') ? 'inactive' : ''} onClick={
           function(event) {
             event.preventDefault();
@@ -176,7 +176,7 @@ const DateAppointments = React.createClass({
             data-toggle="tooltip" data-placement="left"
             title={i18n.homepage.deleteText} ref={
               function(span) {
-                if (span != null) {
+                if (span !== null) {
                   var $span = $(span);
                   if ($span.data('tooltip-init'))
                     return;
@@ -216,7 +216,7 @@ const DateAppointments = React.createClass({
 
 var CalendarCustomerForm = React.createClass({
   mixins: [History],
-  doSubmit: function(self, data, targetName) {
+  doSubmit: function(self, data, _targetName) {
     const that = this;
     const editForm = typeof this.props.params.id !== 'undefined';
     const url = editForm ? '/customers/' + this.props.params.id : '/customers';
@@ -404,7 +404,7 @@ const CalendarCustomer = React.createClass({
 const CalendarAppointment = React.createClass({
   mixins: [History],
   doSubmit: function(self, data) {
-    const editForm = typeof this.props.params.appid != 'undefined';
+    const editForm = typeof this.props.params.appid !== 'undefined';
 
     let url;
     if (editForm) {

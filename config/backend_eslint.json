@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "./eslint.json"
+  ],
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "comma-dangle": 0,
+    "no-console": 0,
+    "global-require": 2,
+    "no-path-concat": 2
+  }
+}

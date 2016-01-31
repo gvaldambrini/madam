@@ -16,7 +16,6 @@ const session = require('cookie-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const bcrypt = require('bcrypt-nodejs');
-const elasticsearch = require('elasticsearch');
 const validator = require('express-validator');
 const csrf = require('csurf');
 const moment = require('moment');
@@ -37,8 +36,9 @@ const client = common.createClient();
  * @param {app} app the {@link http://expressjs.com/4x/api.html#app|express application}.
  */
 function setupConfig(app) {
+    /*eslint-disable global-require*/
     app.use(function(request, response, next) {
-        if (typeof process.env.NODE_CONFIG_FILE != 'undefined') {
+        if (typeof process.env.NODE_CONFIG_FILE !== 'undefined') {
             request.config = require(process.env.NODE_CONFIG_FILE);
         }
         else {
@@ -47,9 +47,10 @@ function setupConfig(app) {
         request.i18n.setLocale(request.config.language);
         // Let the configuration available also in templates.
         response.locals.config = request.config;
-        response.locals.isProduction = process.env.NODE_ENV == 'production';
+        response.locals.isProduction = process.env.NODE_ENV === 'production';
         next();
     });
+    /*eslint-enable global-require*/
 }
 
 /**
@@ -60,7 +61,7 @@ function setupConfig(app) {
  */
 function setupWebpack(app) {
     app.use(function(request, response, next) {
-        if (typeof process.env.WEBPACK_DEV_SERVER != 'undefined') {
+        if (typeof process.env.WEBPACK_DEV_SERVER !== 'undefined') {
             response.locals.webpackDevServer = process.env.WEBPACK_DEV_SERVER;
         }
         next();
@@ -116,7 +117,7 @@ function setupValidator(app) {
 function setupCookies(app) {
     let cookieKey;
     let cookieSecret;
-    if (process.env.NODE_ENV == 'production') {
+    if (process.env.NODE_ENV === 'production') {
         cookieKey = process.env.COOKIE_KEY;
         cookieSecret = process.env.COOKIE_SECRET;
     }
@@ -178,12 +179,12 @@ function setupAuthentication(app) {
             index: req.config.mainIndex,
             type: 'users',
             id: common.usersDocId
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (err) {
                 return done(err);
             }
 
-            if (typeof resp._source == 'undefined') {
+            if (typeof resp._source === 'undefined') {
                 console.log('Users document not found');
                 return done(req.i18n.__('Incorrect username.'), false);
             }
@@ -226,7 +227,7 @@ setupHandlebars(app);
 app.use(favicon(appDirname + '/public/images/favicon.ico'));
 
 app.use(logger('dev', {
-  skip: (req, res) => !req.config.logger
+  skip: (req, _res) => !req.config.logger
 }));
 
 setupValidator(app);

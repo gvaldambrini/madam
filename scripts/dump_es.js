@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 var async = require('async');
-var elasticsearch = require('elasticsearch');
 var common = require('../common');
 var client = common.createClient();
 var archiver = require('archiver');
@@ -35,7 +34,7 @@ async.waterfall([
         function(callback) {
             client.indices.getMapping({
                 index: mainIndex
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 if (err) {
                     callback(err, null);
                     return;
@@ -50,12 +49,12 @@ async.waterfall([
             client.search({
                 index: mainIndex,
                 size: 10000
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 if (err) {
                     console.log(err);
                     callback(err, null);
                 }
-                if (resp.hits.total != resp.hits.hits.length) {
+                if (resp.hits.total !== resp.hits.hits.length) {
                     callback('Error in fetching all the documents', resp.hits.total);
                 }
                 var documents = [];
@@ -101,7 +100,7 @@ async.waterfall([
                 }
                 var today = moment();
                 var fname = today.format('YYYY') + '/archive_' + today.format('YYYY-MM-DD') + '.tar.gz';
-                dboxClient.writeFile(fname, res.buffer, function(error, stat) {
+                dboxClient.writeFile(fname, res.buffer, function(error, _stat) {
                     if (error) {
                         callback(error, null);
                     }

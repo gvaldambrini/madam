@@ -219,7 +219,7 @@ const CustomersTable = React.createClass({
   render: function() {
     const that = this;
     const customerRows = this.props.data.customers.map(
-      (customer, index) =>
+      (customer, _index) =>
       <tr key={customer.id} onClick={
           function(event) {
             that.history.pushState(null, `/customers/edit/${customer.id}`);
@@ -235,7 +235,7 @@ const CustomersTable = React.createClass({
           <span onClick={function(event) {event.stopPropagation();}} className="table-btn pull-right glyphicon glyphicon-trash"
             data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
               function(span) {
-                if (span != null) {
+                if (span !== null) {
                   var $span = $(span);
                   if ($span.data('tooltip-init'))
                     return;

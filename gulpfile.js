@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var nodemon = require('gulp-nodemon');
 var shell = require('gulp-shell');
-var jshint = require('gulp-jshint');
+var eslint = require('gulp-eslint');
 var webpack = require("webpack");
 var webpackConfig = require("./webpack.config.js");
 var WebpackDevServer = require("webpack-dev-server");
@@ -35,12 +35,23 @@ else {
     gulp.task('doc', shell.task([
       './node_modules/.bin/jsdoc -c jsdoc.json -r README.md']));
 
-    gulp.task('lint', function() {
-      return gulp.src(["*.js", "routes/*.js", "routehandlers/*.js"])
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'));
+    gulp.task('backend_lint', function() {
+      return gulp.src(["app.js", "common.js", "routes/*.js", "routehandlers/*.js", "scripts/*.js"])
+        .pipe(eslint({
+          configFile: 'config/backend_eslint.json'
+        }))
+        .pipe(eslint.format());
     });
 
+    gulp.task('frontend_lint', function() {
+      return gulp.src(["views/jsx/*.jsx", "views/javascripts/*.js"])
+        .pipe(eslint({
+          configFile: 'config/frontend_eslint.json'
+        }))
+        .pipe(eslint.format());
+    });
+
+    gulp.task('lint', ['backend_lint', 'frontend_lint']);
     gulp.task('build', ['doc', 'lint']);
 
     gulp.task('nodemon', function (cb) {

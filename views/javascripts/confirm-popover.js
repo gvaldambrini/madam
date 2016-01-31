@@ -12,7 +12,7 @@
         var $mainContainer = $('#popovers-container');
 
         if ($mainContainer.length === 0) {
-            if (typeof options.$rootContainer == 'undefined') {
+            if (typeof options.$rootContainer === 'undefined') {
                 options.$rootContainer = $('body');
             }
             options.$rootContainer.append('<div id="popovers-container"></div>');

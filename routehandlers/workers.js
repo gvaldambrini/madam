@@ -17,14 +17,14 @@ class WorkersHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static fetch(req, res, next) {
+    static fetch(req, res, _next) {
         client.get({
             index: req.config.mainIndex,
             type: 'workers',
             id: common.workersDocId
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             let workers = [];
             if (resp.found && resp._source.workers.length > 0) {
                 workers = resp._source.workers;
@@ -41,9 +41,9 @@ class WorkersHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static save(req, res, next) {
+    static save(req, res, _next) {
         const workers = [];
         for (let i = 0; i < req.body.workers.length; i++) {
             if (req.body.workers[i].name.trim()) {
@@ -71,7 +71,7 @@ class WorkersHandler {
         };
 
         client.index(args,
-            (err, resp, respcode) =>
+            (err, resp, _respcode) =>
             common.saveCallback(req, res, err, resp, false, {workers: workers})
         );
     }

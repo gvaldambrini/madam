@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
+var async = require('async');
+var common = require('../common');
+var client = common.createClient();
+
+
 (function() {
-    var async = require('async');
-    var elasticsearch = require('elasticsearch');
-    var common = require('../common');
-    var client = common.createClient();
 
     var mainIndex = 'main';
 
@@ -12,7 +13,7 @@
         client.indices.delete({
             index: mainIndex,
             ignore: 404
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!err) {
                 console.log('Index main deleted');
             }
@@ -77,7 +78,7 @@
                     }
                 },
             }
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!err) {
                 console.log('Index main created');
             }
@@ -177,7 +178,7 @@
                     }
                 }
             }
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!err) {
                 console.log('Type customer created');
             }
@@ -226,7 +227,7 @@
                     }
                 }
             }
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!err) {
                 console.log('Type product created');
             }
@@ -253,7 +254,7 @@
                     }
                 }
             }
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!err) {
                 console.log('Type workers created');
             }
@@ -276,7 +277,7 @@
                     }
                 }
             }
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!err) {
                 console.log('Type services created');
             }
@@ -306,7 +307,7 @@
                     }
                 }
             }
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!err) {
                 console.log('Type users created');
             }
@@ -344,7 +345,7 @@
                     }
                 }
             }
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!err) {
                 console.log('Type calendar created');
             }

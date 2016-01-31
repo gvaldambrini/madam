@@ -6,7 +6,6 @@ var zlib = require('zlib');
 var tar = require('tar-stream');
 var promptly = require('promptly');
 var util = require('util');
-var elasticsearch = require('elasticsearch');
 var common = require('../common');
 var client = common.createClient();
 
@@ -55,7 +54,7 @@ async.waterfall([
             }
             var year = res.archiveFilename.match(/^archive_(\d{4})-\d{2}-\d{2}.tar.gz$/)[1];
             var fullname = year + '/' + res.archiveFilename;
-            dboxClient.stat(fullname, { buffer: true }, function(error, buf) {
+            dboxClient.stat(fullname, { buffer: true }, function(error, _buf) {
                 if (error) {
                     callback('File not found', null);
                 }
@@ -87,7 +86,7 @@ async.waterfall([
 
         extract.on('entry', function(header, stream, cb) {
             stream.on('data', function(chunk) {
-            if (header.name == 'documents.json')
+            if (header.name === 'documents.json')
                 data += chunk;
             });
 
@@ -109,11 +108,11 @@ async.waterfall([
     // ask the document id to restore
     function(res, callback) {
         var documentIdValidator = function(value) {
-            if (value == 'all')
+            if (value === 'all')
                 return value;
 
             for (var i = 0; i < res.documents.length; i++) {
-                if (res.documents[i]._id == value)
+                if (res.documents[i]._id === value)
                     return value;
             }
 
@@ -125,7 +124,7 @@ async.waterfall([
         promptly.prompt(msg, opt, function(err, value) {
             var documents = [];
             for (var i = 0; i < res.documents.length; i++) {
-                if (res.documents[i]._id == value || value == 'all') {
+                if (res.documents[i]._id === value || value === 'all') {
                     documents[documents.length] = res.documents[i];
                 }
             }
@@ -151,7 +150,7 @@ async.waterfall([
     function(res, callback) {
         function documentExists(doc) {
             for (var i = 0; i < res.existingDocuments.length; i++) {
-                if (res.existingDocuments[i]._id == doc._id) {
+                if (res.existingDocuments[i]._id === doc._id) {
                     return true;
                 }
             }
@@ -160,9 +159,9 @@ async.waterfall([
 
         var confirmMsg = 'The document "%s" already exists on the db. Overwrite? [y/n]';
         var yesNoValidator = function(value) {
-            if (value == 'y' | value == 'yes')
+            if (value === 'y' | value === 'yes')
                 return 'yes';
-            if (value == 'n' || value == 'no')
+            if (value === 'n' || value === 'no')
                 return 'no';
             throw new Error('Enter yes or no.');
         };
@@ -176,7 +175,7 @@ async.waterfall([
             var opt = {validator: yesNoValidator};
 
             promptly.prompt(msg, opt, function(err, value) {
-                filterCallback(value == 'yes');
+                filterCallback(value === 'yes');
             });
         }, function(results) {
             callback(null, {documents: results});
@@ -197,7 +196,7 @@ async.waterfall([
             body: body,
             index: mainIndex,
             refresh: true
-        }, function(err, resp) {
+        }, function(err, _resp) {
             callback(err, res.documents);
         });
     }

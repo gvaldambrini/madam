@@ -17,14 +17,14 @@ class ServicesHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static fetch(req, res, next) {
+    static fetch(req, res, _next) {
         client.get({
             index: req.config.mainIndex,
             type: 'services',
             id: common.servicesDocId
-        }, (err, resp, respcode) =>
+        }, (err, resp, _respcode) =>
             res.json({
                 services: resp.found && resp._source.names.length > 0 ? resp._source.names : []
             })
@@ -37,9 +37,9 @@ class ServicesHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static save(req, res, next) {
+    static save(req, res, _next) {
         const services = common.toArray(req.body.services).filter(e => e);
         if (services.length === 0) {
             const errors = [{msg: req.i18n.__('At least one service is mandatory')}];
@@ -58,7 +58,7 @@ class ServicesHandler {
         };
 
         client.index(args,
-            (err, resp, respcode) =>
+            (err, resp, _respcode) =>
             common.saveCallback(req, res, err, resp, false, {services: services})
         );
     }

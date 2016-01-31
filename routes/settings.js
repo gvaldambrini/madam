@@ -10,10 +10,7 @@ const router = express.Router();
 
 const settingsPath = '/settings';
 
-const elasticsearch = require('elasticsearch');
-const esErrors = elasticsearch.errors;
 const common = require('../common');
-const client = common.createClient();
 
 const WorkersHandler = require('../routehandlers/workers');
 const ServicesHandler = require('../routehandlers/services');

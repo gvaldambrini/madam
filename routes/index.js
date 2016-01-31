@@ -7,7 +7,6 @@
  */
 const express = require('express');
 const router = express.Router();
-const common = require('../common');
 
 const AuthenticationHandler = require('../routehandlers/authentication');
 

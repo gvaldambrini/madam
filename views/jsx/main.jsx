@@ -11,7 +11,7 @@ import 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, Link, IndexRedirect, IndexLink, IndexRoute, History } from 'react-router';
+import { Router, Route, Link, IndexRedirect, IndexRoute, History } from 'react-router';
 
 import Cookies from 'js-cookie';
 

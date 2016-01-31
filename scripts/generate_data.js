@@ -5,17 +5,16 @@
  * the application to make it easy testing the app with some content.
  */
 
-(function() {
-    var async = require('async');
-    var fs = require('fs');
-    var path = require('path');
-    var elasticsearch = require('elasticsearch');
-    var moment = require('moment');
-    var bcrypt = require('bcrypt-nodejs');
-    var uuid = require('node-uuid');
-    var common = require('../common');
-    var client = common.createClient();
+var fs = require('fs');
+var path = require('path');
+var moment = require('moment');
+var bcrypt = require('bcrypt-nodejs');
+var uuid = require('node-uuid');
+var common = require('../common');
+var client = common.createClient();
 
+
+(function() {
     var mainIndex = 'main';
     var workers = [];
 
@@ -93,18 +92,19 @@
         var lastnames = readFileAsArray(path.join(__dirname, 'data', 'lastnames.txt'));
         var firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
         var body = [];
+        var i, j, k;
 
-        for (var i = 0; i < numCustomers; i++) {
+        for (i = 0; i < numCustomers; i++) {
             body[body.length] = {index: {_index: mainIndex, _type: 'customer'}};
 
             var appointments = [];
             var offset = getRandomInt(0, 3);
             var initialOffset = offset;
-            for (var j = 0; j < getRandomInt(minApp, maxApp); j++) {
+            for (j = 0; j < getRandomInt(minApp, maxApp); j++) {
                 var appServices = [];
                 var serviceNames = services.slice();
 
-                for (var k = 0; k < getRandomInt(Math.floor(services.length / 2), services.length); k++) {
+                for (k = 0; k < getRandomInt(Math.floor(services.length / 2), services.length); k++) {
                     appServices[appServices.length] = {
                         description: popRandomElement(serviceNames),
                         worker: getRandomElement(workers).name
@@ -125,7 +125,7 @@
                 offset = 1;
             }
             var planned_appointments = [];
-            for (var k = 0; k < getRandomInt(minPlannedApp, maxPlannedApp); k++) {
+            for (k = 0; k < getRandomInt(minPlannedApp, maxPlannedApp); k++) {
                 planned_appointments[planned_appointments.length] = {
                     appid: uuid.v4(),
                     date: moment().add(offset, 'days').format('YYYY-MM-DD')

@@ -157,7 +157,7 @@ const SettingsRow = React.createClass({
           // that is not the "normal" usage from a real user but is required to have tests
           // working.
           function(input) {
-            if (input != null) {
+            if (input !== null) {
               $(input)
                 .unbind('change', that.textChanged)
                 .change(that.textChanged);
@@ -243,8 +243,8 @@ const ServicesForm = React.createClass({
     const items = this.state.items;
 
     for (let i = 0; i < items.length; i++) {
-      if (items[i].id == rowId) {
-        if (items[i].name == text) {
+      if (items[i].id === rowId) {
+        if (items[i].name === text) {
           return;
         }
         items[i].name = text;
@@ -326,7 +326,7 @@ const SettingsColorRow = React.createClass({
     return (
       <div className="input-group" data-row-id={this.props.rowId} ref={
         function(div) {
-          if (div != null) {
+          if (div !== null) {
             const $div = $(div);
             that.setColorPicker($div);
             // forward the native change event to the react event handler
@@ -346,7 +346,7 @@ const SettingsColorRow = React.createClass({
             // that is not the "normal" usage from a real user but is required to have tests
             // working.
               function(input) {
-                if (input != null) {
+                if (input !== null) {
                   $(input)
                     .unbind('change', that.textChanged)
                     .change(that.textChanged);
@@ -430,8 +430,8 @@ const WorkersForm = React.createClass({
     const items = this.state.items;
 
     for (let i = 0; i < items.length; i++) {
-      if (items[i].id == rowId) {
-        if (items[i].name == text && items[i].color == color) {
+      if (items[i].id === rowId) {
+        if (items[i].name === text && items[i].color === color) {
           return;
         }
         items[i].name = text;

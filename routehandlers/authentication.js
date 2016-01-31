@@ -26,8 +26,8 @@ class AuthenticationHandler {
                     // the returned error is null, the username false but the info is equal to the
                     // standard string 'Missing credentials', which is the one used here to provide
                     // a meaningful message to the frontend.
-                    err = req.i18n.__(req.body.username  ? 'Missing password.' : 'Missing username.');
-                    res.status(400).json({errors: [{msg: err}]});
+                    const msg = req.i18n.__(req.body.username  ? 'Missing password.' : 'Missing username.');
+                    res.status(400).json({errors: [{msg: msg}]});
                     return;
                 }
 
@@ -50,9 +50,9 @@ class AuthenticationHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static logout(req, res, next) {
+    static logout(req, res, _next) {
       req.logout();
       res.status(200).end();
     }

@@ -22,7 +22,7 @@ const Common = function() {};
  * @method
  */
 Common.prototype.createClient = function() {
-    if (process.env.NODE_ENV == 'production')
+    if (process.env.NODE_ENV === 'production')
         return new elasticsearch.Client({host: process.env.BONSAI_URL, apiVersion: '1.5'});
     return new elasticsearch.Client({apiVersion: '1.5'});
 };
@@ -72,9 +72,7 @@ Common.prototype.toLocalFormattedDate = function(req, ISODate) {
  * @param {array|string} container the container to converts.
  */
 Common.prototype.toArray = function(container) {
-    if (typeof container === 'string')
-        container = [container];
-    return container;
+    return (typeof container === 'string') ? [container] : container;
 };
 
 /**

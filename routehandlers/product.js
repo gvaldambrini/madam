@@ -105,9 +105,9 @@ class ProductHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static search(req, res, next) {
+    static search(req, res, _next) {
         if (typeof req.query.text === 'undefined') {
             res.sendStatus(400);
             return;
@@ -151,7 +151,7 @@ class ProductHandler {
             type: 'product',
             size: 50,
             body: queryBody
-        }, (err, resp, respcode) =>
+        }, (err, resp, _respcode) =>
             res.json({
                 products: ProductHandler.processElasticsearchResults(req, resp)
             })
@@ -192,7 +192,7 @@ class ProductHandler {
         for (let i = 0; i < productFields.length; i++) {
             let field = productFields[i];
             if (sourceObj[field]) {
-                if (field == 'sold_date')
+                if (field === 'sold_date')
                     obj[field] = common.toISODate(req, sourceObj[field]);
                 else
                     obj[field] = sourceObj[field];
@@ -221,7 +221,7 @@ class ProductHandler {
         for (let i = 0; i < productFields.length; i++) {
             let field = productFields[i];
             if (sourceObj[field]) {
-                if (field == 'sold_date')
+                if (field === 'sold_date')
                     obj[field] = common.toLocalFormattedDate(req, sourceObj[field]);
                 else
                     obj[field] = sourceObj[field];
@@ -236,14 +236,14 @@ class ProductHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static fetch(req, res, next) {
+    static fetch(req, res, _next) {
         client.get({
             index: req.config.mainIndex,
             type: 'product',
             id: req.params.id
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (!resp.found) {
                 res.sendStatus(404);
                 return;
@@ -258,9 +258,9 @@ class ProductHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static create(req, res, next) {
+    static create(req, res, _next) {
         const errors = ProductHandler.validateData(req);
         if (errors) {
             res.status(400).json({errors: errors});
@@ -276,7 +276,7 @@ class ProductHandler {
         args.body = ProductHandler.toElasticsearchFormat(req, req.body);
         args.body.created_at = moment().format('YYYY-MM-DD');
         client.index(args,
-            (err, resp, respcode) =>
+            (err, resp, _respcode) =>
             common.saveCallback(req, res, err, resp, true)
         );
     }
@@ -287,9 +287,9 @@ class ProductHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static update(req, res, next) {
+    static update(req, res, _next) {
         const errors = ProductHandler.validateData(req);
         if (errors) {
             res.status(400).json({errors: errors});
@@ -319,9 +319,9 @@ class ProductHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static delete(req, res, next) {
+    static delete(req, res, _next) {
         client.delete({
             index: req.config.mainIndex,
             type: 'product',

@@ -33,7 +33,7 @@ router.param('id', function(req, res, next, id) {
         index: req.config.mainIndex,
         type: 'customer',
         id: id
-    }, function(err, resp, respcode) {
+    }, function(err, resp, _respcode) {
         if (err) {
             res.sendStatus(404);
             return;

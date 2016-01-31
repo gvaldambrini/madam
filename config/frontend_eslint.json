@@ -1,0 +1,24 @@
+{
+  "extends": [
+    "./eslint.json"
+  ],
+  "ecmaFeatures": {
+    "jsx": true
+  },
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "react/jsx-uses-react": 1
+  },
+  "globals": {
+      "$": true,
+      "jQuery": true,
+      "config": true,
+      "i18n": true
+  }
+}

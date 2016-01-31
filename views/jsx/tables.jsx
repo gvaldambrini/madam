@@ -41,7 +41,7 @@ const InputSearch = React.createClass({
 const PopoverTemplate = React.createClass({
   propTypes: {
       confirm: React.PropTypes.string.isRequired,
-      cancel: React.PropTypes.string.isRequired,
+      cancel: React.PropTypes.string.isRequired
   },
   render: function() {
     return (
@@ -92,7 +92,7 @@ const BaseTableContainer = {
           data: data,
           loaded: true
         }),
-      error: function(xhr, textStatus, errorThrown) {
+      error: function(xhr, textStatus, _errorThrown) {
         if (xhr.status === 401) {
           Cookies.remove('user');
           that.history.pushState(null, '/login');
@@ -103,8 +103,7 @@ const BaseTableContainer = {
       ajaxArgs.data = {text: filterText};
     }
     $.ajax(ajaxArgs);
-  },
-
+  }
 };
 
 

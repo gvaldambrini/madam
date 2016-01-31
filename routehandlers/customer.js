@@ -27,9 +27,9 @@ class CustomerHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static simpleSearch(req, res, next) {
+    static simpleSearch(req, res, _next) {
         if (typeof req.query.text === 'undefined') {
             res.sendStatus(400);
             return;
@@ -64,7 +64,7 @@ class CustomerHandler {
             type: 'customer',
             size: req.query.size ? req.query.size : 50,
             body: queryBody
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             const customers = [];
             for (let i = 0; i < resp.hits.hits.length; i++) {
                 customers[customers.length] = {
@@ -88,9 +88,9 @@ class CustomerHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static search(req, res, next) {
+    static search(req, res, _next) {
         if (typeof req.query.text === 'undefined') {
             res.sendStatus(400);
             return;
@@ -136,7 +136,7 @@ class CustomerHandler {
             size: 50,
             body: queryBody
         },
-            (err, resp, respcode) =>
+            (err, resp, _respcode) =>
             res.json({
                 customers: CustomerHandler.processElasticsearchResults(req, resp.hits.hits)
             })
@@ -224,9 +224,9 @@ class CustomerHandler {
         for (let i = 0; i < customerFields.length; i++) {
             let field = customerFields[i];
             if (sourceObj[field]) {
-                if (field == 'first_seen')
+                if (field === 'first_seen')
                     obj[field] = common.toLocalFormattedDate(req, sourceObj[field]);
-                else if (field == 'discount')
+                else if (field === 'discount')
                     obj[field] = '' + sourceObj[field];
                 else
                     obj[field] = sourceObj[field];
@@ -241,9 +241,9 @@ class CustomerHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static fetch(req, res, next) {
+    static fetch(req, res, _next) {
         res.json(CustomerHandler.toViewFormat(req, req.customer));
     }
 
@@ -295,11 +295,11 @@ class CustomerHandler {
         for (let i = 0; i < customerFields.length; i++) {
             let field = customerFields[i];
             if (sourceObj[field]) {
-                if (field == 'first_seen')
+                if (field === 'first_seen')
                     obj[field] = common.toISODate(req, sourceObj[field]);
-                else if (field == 'allow_sms' || field == 'allow_email')
+                else if (field === 'allow_sms' || field === 'allow_email')
                     obj[field] = sourceObj[field] === "true";
-                else if (field == 'discount')
+                else if (field === 'discount')
                     obj[field] = parseInt(sourceObj[field], 10);
                 else
                     obj[field] = sourceObj[field];
@@ -314,9 +314,9 @@ class CustomerHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static create(req, res, next) {
+    static create(req, res, _next) {
         const errors = CustomerHandler.validateData(req);
         if (errors) {
             res.status(400).json({errors: errors});
@@ -346,7 +346,7 @@ class CustomerHandler {
                 index: req.config.mainIndex,
                 type: 'calendar',
                 id: common.calendarDocId
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 const indices = findAppointmentDate(resp, req.body.__appid);
                 if (typeof indices === 'undefined') {
                     res.sendStatus(404);
@@ -367,7 +367,7 @@ class CustomerHandler {
                         calendarObj
                     ],
                     refresh: true
-                }, (err, resp, respcode) =>
+                }, (err, resp, _respcode) =>
                    common.saveCallback(req, res, err, resp, true, {id: resp.items[0].create._id})
                 );
             });
@@ -381,7 +381,7 @@ class CustomerHandler {
             };
 
             client.index(args,
-                (err, resp, respcode) =>
+                (err, resp, _respcode) =>
                 common.saveCallback(req, res, err, resp, true)
             );
         }
@@ -393,9 +393,9 @@ class CustomerHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static update(req, res, next) {
+    static update(req, res, _next) {
         const errors = CustomerHandler.validateData(req);
         if (errors) {
             res.status(400).json({errors: errors});
@@ -414,7 +414,7 @@ class CustomerHandler {
         args.body.last_seen = req.customer.last_seen;
         args.body.planned_appointments = req.customer.planned_appointments;
         client.index(args,
-            (err, resp, respcode) =>
+            (err, resp, _respcode) =>
             common.saveCallback(req, res, err, resp, false)
         );
     }
@@ -425,15 +425,15 @@ class CustomerHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static delete(req, res, next) {
+    static delete(req, res, _next) {
         client.delete({
             index: req.config.mainIndex,
             type: 'customer',
             refresh: true,
             id: req.params.id
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (err) {
                 console.log(err);
                 res.status(400).end();

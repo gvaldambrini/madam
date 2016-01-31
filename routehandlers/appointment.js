@@ -21,9 +21,9 @@ class AppointmentHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static fetchByDate(req, res, next) {
+    static fetchByDate(req, res, _next) {
         function getApps(callback) {
             const queryBody = {
                 query: {
@@ -38,7 +38,7 @@ class AppointmentHandler {
                 type: 'customer',
                 size: req.query.size ? req.query.size : 50,
                 body: queryBody
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 const appointments = [];
                 for (let i = 0; i < resp.hits.hits.length; i++) {
                     let hit = resp.hits.hits[i];
@@ -75,7 +75,7 @@ class AppointmentHandler {
                 type: 'customer',
                 size: req.query.size ?  req.query.size : 50,
                 body: queryBody
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 const appointments = [];
                 for (let i = 0; i < resp.hits.hits.length; i++) {
                     let hit = resp.hits.hits[i];
@@ -101,7 +101,7 @@ class AppointmentHandler {
                 index: req.config.mainIndex,
                 type: 'calendar',
                 id: common.calendarDocId
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 const appointments = [];
 
                 if (resp.found && resp._source.days.length > 0) {
@@ -154,8 +154,8 @@ class AppointmentHandler {
             obj.last_seen = obj.appointments[0].date;
         }
         else {
-            const reduceFn = function(previousValue, currentValue, index, array) {
-                if (typeof previousValue == 'undefined' || currentValue.date > previousValue.date)
+            const reduceFn = function(previousValue, currentValue, index, _array) {
+                if (typeof previousValue === 'undefined' || currentValue.date > previousValue.date)
                     return currentValue;
                 return previousValue;
             };
@@ -170,16 +170,16 @@ class AppointmentHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static plan(req, res, next) {
+    static plan(req, res, _next) {
 
         function planOnCustomer(isodate, id) {
             client.get({
                 index: req.config.mainIndex,
                 type: 'customer',
                 id: id
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 if (!resp.found) {
                     res.sendStatus(400);
                     return;
@@ -219,7 +219,7 @@ class AppointmentHandler {
                     return;
                 }
 
-                if (typeof obj.planned_appointments == 'undefined')
+                if (typeof obj.planned_appointments === 'undefined')
                     obj.planned_appointments = [];
 
                 obj.planned_appointments.push({
@@ -234,7 +234,7 @@ class AppointmentHandler {
                     version: version,
                     refresh: true,
                     body: {doc: obj}
-                }, function(err, resp, respcode) {
+                }, function(err, resp, _respcode) {
                     common.saveCallback(req, res, err, resp, true, {id: appointmentId});
                 });
             });
@@ -245,7 +245,7 @@ class AppointmentHandler {
                 index: req.config.mainIndex,
                 type: 'calendar',
                 id: common.calendarDocId
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 let calDays = [];
                 if (resp.found && resp._source.days.length > 0) {
                     calDays = resp._source.days;
@@ -277,7 +277,7 @@ class AppointmentHandler {
                     id: common.calendarDocId,
                     refresh: true,
                     body: {days: calDays}
-                }, (err, resp, respcode) =>
+                }, (err, resp, _respcode) =>
                     common.saveCallback(req, res, err, resp, true, {id: appointmentId})
                 );
             });
@@ -301,9 +301,9 @@ class AppointmentHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static fetchPlanned(req, res, next) {
+    static fetchPlanned(req, res, _next) {
         // NOTE: not implemented for planned appointments part of a customer, since the
         // ui does not need that.
         const queryBody = {
@@ -321,8 +321,8 @@ class AppointmentHandler {
             index: req.config.mainIndex,
             size: 1,
             body: queryBody
-        }, function(err, resp, respcode) {
-            if (resp.hits.hits.length != 1) {
+        }, function(err, resp, _respcode) {
+            if (resp.hits.hits.length !== 1) {
                 res.sendStatus(404);
                 return;
             }
@@ -353,9 +353,9 @@ class AppointmentHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static deletePlanned(req, res, next) {
+    static deletePlanned(req, res, _next) {
         const queryBody = {
             query: {
                 bool: {
@@ -372,7 +372,7 @@ class AppointmentHandler {
             index: req.config.mainIndex,
             size: 1,
             body: queryBody
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (resp.hits.hits.length !== 1) {
                 res.sendStatus(404);
                 return;
@@ -429,7 +429,7 @@ class AppointmentHandler {
                 id: docId,
                 refresh: true,
                 body: obj
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 if (err) {
                     console.log(err);
                     res.status(400).end();
@@ -447,9 +447,9 @@ class AppointmentHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static fetchByCustomer(req, res, next) {
+    static fetchByCustomer(req, res, _next) {
 
         // sort by date (descending)
         function sortFn(a, b) {
@@ -503,14 +503,14 @@ class AppointmentHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static fetch(req, res, next) {
+    static fetch(req, res, _next) {
         client.get({
             index: req.config.mainIndex,
             type: 'workers',
             id: common.workersDocId
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             const obj = req.customer;
             let appointment;
 
@@ -553,9 +553,9 @@ class AppointmentHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static save(req, res, next) {
+    static save(req, res, _next) {
 
         const obj = req.customer;
 
@@ -573,7 +573,7 @@ class AppointmentHandler {
             newItem = true;
         }
 
-        if (typeof obj.appointments == 'undefined') {
+        if (typeof obj.appointments === 'undefined') {
             obj.appointments = [];
         }
 
@@ -680,7 +680,7 @@ class AppointmentHandler {
             refresh: true,
             body: {doc: obj}
         },
-            (err, resp, respcode) =>
+            (err, resp, _respcode) =>
             common.saveCallback(req, res, err, resp, newItem, {id: appointment.appid})
         );
     }
@@ -691,9 +691,9 @@ class AppointmentHandler {
      *
      * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
      * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} next the next middleware function to invoke, if any.
+     * @param {function} _next the next middleware function to invoke, if any.
      */
-    static delete(req, res, next) {
+    static delete(req, res, _next) {
         const obj = req.customer;
 
         if (typeof obj.appointments === 'undefined') {
@@ -726,7 +726,7 @@ class AppointmentHandler {
             body: {
                 doc: obj
             }
-        }, function(err, resp, respcode) {
+        }, function(err, resp, _respcode) {
             if (err) {
                 console.log(err);
                 res.status(400).end();

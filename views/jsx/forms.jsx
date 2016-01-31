@@ -187,7 +187,7 @@ const FormInputAndCheckbox = React.createClass({
   },
   handleChange: function(event) {
     const target = event.currentTarget;
-    const value = target.type == "checkbox" ? target.checked : target.value;
+    const value = target.type === "checkbox" ? target.checked : target.value;
     this.props.handleChange(target.name, value);
   },
   render: function() {
@@ -252,18 +252,18 @@ const FormTextArea = React.createClass({
 
 
 function fnRenderErrors(errors) {
-  if (errors.length > 0) {
-    const errorMessages = errors.map(err => <li key={err}>{err}</li>);
-
-    errors = (
-      <div className="alert alert-danger">
-        <ul>
-          {errorMessages}
-        </ul>
-      </div>
-    );
+  if (errors.length === 0) {
+    return errors;
   }
-  return errors;
+
+  const errorMessages = errors.map(err => <li key={err}>{err}</li>);
+  return (
+    <div className="alert alert-danger">
+      <ul>
+        {errorMessages}
+      </ul>
+    </div>
+  );
 }
 
 function fnSubmitForm(self, url, method, data, successCb) {
@@ -278,7 +278,7 @@ function fnSubmitForm(self, url, method, data, successCb) {
     contentType: 'application/json',
     data: JSON.stringify(data),
     success: successCb,
-    error: function(xhr, textStatus, errorThrown) {
+    error: function(xhr, textStatus, _errorThrown) {
       if (xhr.status === 401) {
         Cookies.remove('user');
         that.history.pushState(null, '/login');
@@ -299,7 +299,7 @@ function fnSubmitForm(self, url, method, data, successCb) {
 const BaseForm = {
   handleChange: function(name, value) {
     const data = this.state.data;
-    if (data[name] != value) {
+    if (data[name] !== value) {
       data[name] = value;
 
       this.setState({

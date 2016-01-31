@@ -7,7 +7,6 @@
  * which will be crypted using {@link https://www.npmjs.com/package/bcrypt-nodejs|bcrypt}.
  */
 
-var elasticsearch = require('elasticsearch');
 var common = require('../common');
 var client = common.createClient();
 var async = require('async');
@@ -21,7 +20,7 @@ async.waterfall([
                 index: 'main',
                 type: 'users',
                 id: common.usersDocId
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 var res;
                 if (err) {
                     res = {users: []};
@@ -73,7 +72,7 @@ async.waterfall([
         // Password
         function(res, callback) {
             var pwdValidator = function(value) {
-                if (value == res.username) {
+                if (value === res.username) {
                     throw new Error('The password must be different from the username');
                 }
                 if (value.length < 5) {
@@ -91,14 +90,14 @@ async.waterfall([
         // Password confirmation
         function(res, callback) {
             var confirmPwdValidator = function(value) {
-                if (value != res.password) {
+                if (value !== res.password) {
                     throw new Error('The password does not match the one previously entered');
                 }
 
                 return value;
             };
             var opt = {validator: confirmPwdValidator};
-            promptly.password('Confirm the password: ', opt, function(err, value) {
+            promptly.password('Confirm the password: ', opt, function(err, _value) {
                 callback(err, res);
             });
         },
@@ -116,7 +115,7 @@ async.waterfall([
                 body: {
                     users: res.users
                 }
-            }, function(err, resp, respcode) {
+            }, function(err, resp, _respcode) {
                 callback(err, res);
             });
         }

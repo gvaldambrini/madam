@@ -47,7 +47,7 @@ const AppointmentService = React.createClass({
     const $workers = $groupBtn.find('ul a');
     let newIndex = 0;
     for (var i = 0; i < $workers.length; i++) {
-        if ($($workers[i]).text() == $button.text()) {
+        if ($($workers[i]).text() === $button.text()) {
             newIndex = (i + 1) % $workers.length;
             break;
         }
@@ -115,7 +115,7 @@ const AppointmentService = React.createClass({
                 // that is not the "normal" usage from a real user but is required to have tests
                 // working.
                 function(input) {
-                  if (input != null) {
+                  if (input !== null) {
                     $(input)
                       .unbind('change', that.handleChange)
                       .change(that.handleChange);
@@ -246,10 +246,10 @@ const AppointmentFormContainer = React.createClass({
     this.setState({services: services});
   },
   handleChange: function(name, value) {
-    if (name == 'date' && this.state.date !== value) {
+    if (name === 'date' && this.state.date !== value) {
       this.setState({date: value});
     }
-    else if (name == 'notes' && this.state.notes !== value) {
+    else if (name === 'notes' && this.state.notes !== value) {
       this.setState({notes: value});
     }
   },
@@ -338,14 +338,14 @@ const AppointmentFormContainer = React.createClass({
     const newState = {};
     newState.workers = data.items;
 
-    if (typeof this._services != 'undefined') {
+    if (typeof this._services !== 'undefined') {
       newState.services = this.buildServiceMap(data.items, this._services);
       this._services = undefined;
     }
     this.setState(newState);
   },
   loadServices: function(data) {
-    if (typeof this.state.workers == 'undefined') {
+    if (typeof this.state.workers === 'undefined') {
       // a temporary variable which will be used later from the loadWorkers to
       // load the services map.
       this._services = data.items;
@@ -368,7 +368,7 @@ const AppointmentFormContainer = React.createClass({
     this.setState({services: services});
   },
   render: function() {
-    if (typeof this.state.workers == 'undefined' || typeof this.state.services == 'undefined') {
+    if (typeof this.state.workers === 'undefined' || typeof this.state.services === 'undefined') {
       return (<div></div>);
     }
 
@@ -415,7 +415,7 @@ const AppointmentFormContainer = React.createClass({
 var Appointment = React.createClass({
   mixins: [History],
   doSubmit: function(self, data) {
-    const editForm = typeof this.props.params.appid != 'undefined';
+    const editForm = typeof this.props.params.appid !== 'undefined';
     let url;
     if (editForm) {
       url = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`
@@ -498,7 +498,7 @@ const AppointmentsTable = React.createClass({
             <span onClick={function(event) {event.stopPropagation();}} className="table-btn pull-right glyphicon glyphicon-trash"
               data-toggle="tooltip" data-placement="left" title={i18n.appointments.deleteText} ref={
                 function(span) {
-                  if (span != null) {
+                  if (span !== null) {
                     const $span = $(span);
                     if ($span.data('tooltip-init'))
                       return;

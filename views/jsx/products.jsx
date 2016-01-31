@@ -53,7 +53,7 @@ const ProductForm = React.createClass({
 
     const url = this.state.editForm ? `/products/${this.props.params.id}` : '/products';
     const method = this.state.editForm ? 'put': 'post';
-    this.submitForm(url, method, data => this.history.pushState(null, '/products'));
+    this.submitForm(url, method, _data => this.history.pushState(null, '/products'));
   },
   renderHtml(element) {
     return {
@@ -136,7 +136,7 @@ const ProductsTable = React.createClass({
                 data-toggle="tooltip" data-placement="left"
                 title={i18n.products.deleteText} ref={
                   function(span) {
-                    if (span != null) {
+                    if (span !== null) {
                       const $span = $(span);
                       if ($span.data('tooltip-init'))
                         return;
