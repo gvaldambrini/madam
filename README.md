@@ -18,11 +18,12 @@ the (main and unique) database.
 The user interface is written in [React](https://github.com/facebook/react) and styled
 with [Bootstrap](http://getbootstrap.com/) version 3.
 [React Router](https://github.com/rackt/react-router) is used to perform the routing and
-[Webpack](https://webpack.github.io/) to bundle together js and jsx files.
+[Webpack](https://webpack.github.io/) to bundle javascripts, styles and images.
 [Sass](http://sass-lang.com/) is the selected css pre-processor while [Gulp](http://gulpjs.com/)
 is the task runner & build system.
 Finally, [Nightwatch.js](http://nightwatchjs.org/) is used to perform end-to-end
-tests and [JSDoc](https://github.com/jsdoc3/jsdoc) to generate the documentation.
+tests, [Mocha](https://mochajs.org/) the backend API tests and
+[JSDoc](https://github.com/jsdoc3/jsdoc) to generate the documentation.
 
 
 ## Setting up the application
@@ -41,7 +42,7 @@ node ./scripts/generate_indices.js
 ```
 node ./scripts/generate_data.js
 ```
-4. Launch the application with [browsersync](http://www.browsersync.io/) & the [webpack dev server](http://webpack.github.io/docs/webpack-dev-server.html) enabled:
+4. Launch the application with the [webpack dev server](http://webpack.github.io/docs/webpack-dev-server.html) enabled:
 ```
 gulp
 ```
