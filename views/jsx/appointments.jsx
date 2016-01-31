@@ -336,10 +336,10 @@ const AppointmentFormContainer = React.createClass({
   },
   loadWorkers: function(data) {
     const newState = {};
-    newState.workers = data.items;
+    newState.workers = data.workers;
 
     if (typeof this._services !== 'undefined') {
-      newState.services = this.buildServiceMap(data.items, this._services);
+      newState.services = this.buildServiceMap(data.workers, this._services);
       this._services = undefined;
     }
     this.setState(newState);
@@ -348,11 +348,11 @@ const AppointmentFormContainer = React.createClass({
     if (typeof this.state.workers === 'undefined') {
       // a temporary variable which will be used later from the loadWorkers to
       // load the services map.
-      this._services = data.items;
+      this._services = data.services;
       return;
     }
     this.setState({
-      services: this.buildServiceMap(this.state.workers, data.items)
+      services: this.buildServiceMap(this.state.workers, data.services)
     });
   },
   addService: function(event) {
