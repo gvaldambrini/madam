@@ -3,7 +3,7 @@ var nodemon = require('gulp-nodemon');
 var shell = require('gulp-shell');
 var eslint = require('gulp-eslint');
 var webpack = require("webpack");
-var webpackConfig = require("./webpack.config.js");
+var webpackConfig = require("./config/webpack.js");
 var WebpackDevServer = require("webpack-dev-server");
 
 gulp.task('webpack-build', function(cb) {
@@ -59,7 +59,7 @@ else {
       return nodemon({
         script: 'bin/www',
         ext: 'js',
-        ignore: ['public/*', 'views/*', 'test/*', 'webpack.config.js']
+        ignore: ['public/*', 'views/*', 'test/*', 'config/webpack.js']
       }).on('start', function () {
         if (!called) {
           called = true;

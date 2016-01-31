@@ -46,7 +46,7 @@ module.exports = {
         async.series([
             function(callback) {
               var webpack = require("webpack");
-              var webpackConfig = require("../webpack.config.js");
+              var webpackConfig = require("../config/webpack.js");
               var WebpackDevServer = require("webpack-dev-server");
 
               var config = Object.create(webpackConfig);

@@ -3,13 +3,13 @@ var path = require('path');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
-    context: __dirname + "/views",
+    context: path.join(__dirname, "..", "views"),
     entry: {
         app: ["./jsx/main.jsx"],
         vendor: ['bootstrap', 'jquery', 'react', 'react-dom', 'react-router', 'moment', 'js-cookie']
     },
     output: {
-        path: __dirname + "/public",
+        path: path.join(__dirname, ".." , "public"),
         publicPath: '/public/',
         filename: "bundle.js"
     },
