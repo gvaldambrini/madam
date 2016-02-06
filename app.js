@@ -13,6 +13,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('cookie-session');
+const compression = require('compression');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const bcrypt = require('bcrypt-nodejs');
@@ -224,6 +225,7 @@ setupWebpack(app);
 app.set('views', path.join(appDirname, 'views'));
 
 setupHandlebars(app);
+app.use(compression());
 app.use(favicon(appDirname + '/public/images/favicon.ico'));
 
 app.use(logger('dev', {
