@@ -171,7 +171,7 @@ function setupAuthentication(app) {
     passport.deserializeUser((username, done) => done(null, username));
 
     passport.use('login', new LocalStrategy({
-        passReqToCallback : true
+        passReqToCallback: true
     },
     // The verify callback, called only if both username and password are present.
     function(req, username, password, done) {

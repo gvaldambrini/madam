@@ -133,7 +133,7 @@ const SettingsRow = React.createClass({
   getInitialState: function() {
     return {
       value: ''
-    }
+    };
   },
   componentWillMount: function() {
     this.setState({value: this.props.value});
@@ -193,7 +193,7 @@ const ServicesForm = React.createClass({
   newEmptyObj: function() {
     return {
       name: ''
-    }
+    };
   },
   loadItems: function(data) {
     // We need an unique and stable id so that React can perform
@@ -201,7 +201,7 @@ const ServicesForm = React.createClass({
     // or added.
     const items = [];
     if (data.services.length === 0) {
-      const emptyItem = this.newEmptyObj()
+      const emptyItem = this.newEmptyObj();
       emptyItem.id = this.uuid4();
       items[0] = emptyItem;
     }
@@ -210,7 +210,7 @@ const ServicesForm = React.createClass({
         items[items.length] = {
           name: data.services[i],
           id: this.uuid4()
-        }
+        };
       }
     }
     this.setState({
@@ -276,7 +276,7 @@ const SettingsColorRow = React.createClass({
     return {
       name: '',
       color: '#000000'
-    }
+    };
   },
   componentWillMount: function() {
     this.setState({
@@ -398,7 +398,7 @@ const WorkersForm = React.createClass({
     return {
       name: '',
       color: config.defaultWorkerColor
-    }
+    };
   },
   loadItems: function(data) {
     // We need an unique and stable id so that React can perform
@@ -406,7 +406,7 @@ const WorkersForm = React.createClass({
     // or added.
     const items = [];
     if (data.workers.length === 0) {
-      const emptyItem = this.newEmptyObj()
+      const emptyItem = this.newEmptyObj();
       emptyItem.id = this.uuid4();
       items[0] = emptyItem;
     }
@@ -416,7 +416,7 @@ const WorkersForm = React.createClass({
           name: data.workers[i].name,
           color: data.workers[i].color,
           id: this.uuid4()
-        }
+        };
       }
     }
 

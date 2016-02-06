@@ -11,7 +11,7 @@ const CustomerFormContainer = React.createClass({
     return {
       data: {},
       errors: []
-    }
+    };
   },
   componentWillMount: function() {
     if (typeof this.props.customLoad !== 'undefined') {
@@ -40,7 +40,7 @@ const CustomerFormContainer = React.createClass({
   renderHtml: function(element) {
     return {
       __html: element
-    }
+    };
   },
   render: function() {
     let additionalButtons;
@@ -50,7 +50,7 @@ const CustomerFormContainer = React.createClass({
           onClick={this.handleSubmit}>
           {this.props.submitAndAdd}
         </button>
-      )
+      );
     }
 
     return (
@@ -236,7 +236,7 @@ const CustomersTable = React.createClass({
             data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
               function(span) {
                 if (span !== null) {
-                  var $span = $(span);
+                  const $span = $(span);
                   if ($span.data('tooltip-init'))
                     return;
                   $span.data('tooltip-init', true);
@@ -299,7 +299,7 @@ const Customers = React.createClass({
   },
   render: function() {
     if (!this.state.loaded) {
-      return <div></div>
+      return <div></div>;
     }
 
     let customers;

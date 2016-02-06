@@ -173,7 +173,6 @@ class AppointmentHandler {
      * @param {function} _next the next middleware function to invoke, if any.
      */
     static plan(req, res, _next) {
-
         function planOnCustomer(isodate, id) {
             client.get({
                 index: req.config.mainIndex,
@@ -450,7 +449,6 @@ class AppointmentHandler {
      * @param {function} _next the next middleware function to invoke, if any.
      */
     static fetchByCustomer(req, res, _next) {
-
         // sort by date (descending)
         function sortFn(a, b) {
             if (a._date < b._date)
@@ -556,7 +554,6 @@ class AppointmentHandler {
      * @param {function} _next the next middleware function to invoke, if any.
      */
     static save(req, res, _next) {
-
         const obj = req.customer;
 
         // Check & set the date

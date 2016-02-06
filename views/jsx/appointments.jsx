@@ -13,7 +13,7 @@ const AppointmentService = React.createClass({
       description: '',
       worker: {},
       checked: false
-    }
+    };
   },
   componentWillMount: function() {
     this.setState({
@@ -46,7 +46,7 @@ const AppointmentService = React.createClass({
     const $groupBtn = $button.closest('.input-group-btn');
     const $workers = $groupBtn.find('ul a');
     let newIndex = 0;
-    for (var i = 0; i < $workers.length; i++) {
+    for (let i = 0; i < $workers.length; i++) {
         if ($($workers[i]).text() === $button.text()) {
             newIndex = (i + 1) % $workers.length;
             break;
@@ -146,7 +146,7 @@ const AppointmentService = React.createClass({
 const AppointmentTextArea = React.createClass({
   mixins: [SimpleInput],
   getInitialState: function() {
-    return {value: ''}
+    return {value: ''};
   },
   componentWillMount: function() {
     this.setState({value: this.props.value});
@@ -230,7 +230,7 @@ const AppointmentFormContainer = React.createClass({
   getInitialState: function() {
     const date = typeof this.props.date !== 'undefined'
       ? moment(this.props.date).format(config.date_format)
-      : moment().format(config.date_format)
+      : moment().format(config.date_format);
 
     return {
       workers: undefined,
@@ -238,7 +238,7 @@ const AppointmentFormContainer = React.createClass({
       date: date,
       notes: '',
       errors: []
-    }
+    };
   },
   updateService: function(index, service) {
     const services = this.state.services;
@@ -282,7 +282,7 @@ const AppointmentFormContainer = React.createClass({
         description: this.state.services[i].description,
         enabled: this.state.services[i].checked,
         worker: this.state.services[i].worker.name
-      }
+      };
     }
     const data = {
       services: services,
@@ -300,12 +300,11 @@ const AppointmentFormContainer = React.createClass({
         description: services[i],
         worker: workers[0],
         checked: false
-      })
+      });
     }
     return map;
   },
   loadAppointment: function(data) {
-
     function getColor(worker, workers) {
       for (let i = 0; i < workers.length; i++) {
         if (workers[i].name === worker) {
@@ -324,7 +323,7 @@ const AppointmentFormContainer = React.createClass({
           color: getColor(data.services[i].worker, data.workers)
         },
         checked: true
-      }
+      };
     }
 
     this.setState({
@@ -332,7 +331,7 @@ const AppointmentFormContainer = React.createClass({
       services: services,
       date: data.date,
       notes: data.notes
-    })
+    });
   },
   loadWorkers: function(data) {
     const newState = {};
@@ -412,16 +411,16 @@ const AppointmentFormContainer = React.createClass({
 });
 
 
-var Appointment = React.createClass({
+const Appointment = React.createClass({
   mixins: [History],
   doSubmit: function(self, data) {
     const editForm = typeof this.props.params.appid !== 'undefined';
     let url;
     if (editForm) {
-      url = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`
+      url = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`;
     }
     else {
-      url = `/customers/${this.props.params.id}/appointments`
+      url = `/customers/${this.props.params.id}/appointments`;
     }
     const method = editForm ? 'put': 'post';
     fnSubmitForm(
@@ -467,7 +466,6 @@ var Appointment = React.createClass({
 const AppointmentsTable = React.createClass({
   mixins: [BaseTable],
   deleteItem: function(app) {
-
     let url;
     if (app.planned) {
       url = `/customers/planned-appointments/${moment(app.date, config.date_format).format('YYYY-MM-DD')}/${app.appid}`;
@@ -567,7 +565,7 @@ const CustomerAppointments = React.createClass({
 });
 
 
-var Appointments = React.createClass({
+const Appointments = React.createClass({
   mixins: [BaseTableContainer],
   getInitialState: function() {
     return {
@@ -629,4 +627,4 @@ module.exports = {
   Appointment: Appointment,
   Appointments: Appointments,
   AppointmentsRoot: AppointmentsRoot
-}
+};

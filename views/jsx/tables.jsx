@@ -23,7 +23,7 @@ const InputSearch = React.createClass({
         <span id="search-clear" className="glyphicon glyphicon-remove-circle"
           onClick={this.resetSearch}></span>
       </form>
-    )
+    );
   },
   search: function() {
     const text = this.searchInput().val();
@@ -76,14 +76,14 @@ const BaseTable = {
   renderHighlight: function(element) {
     return {
       __html: element
-    }
+    };
   }
 };
 
 
 const BaseTableContainer = {
   fetchData: function(url, filterText) {
-    var that = this;
+    const that = this;
     const ajaxArgs = {
       url: url,
       success:

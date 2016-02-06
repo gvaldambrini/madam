@@ -14,7 +14,7 @@ const ProductForm = React.createClass({
       data: {},
       editForm: false,
       errors: []
-    }
+    };
   },
   componentWillMount: function() {
     const that = this;
@@ -58,7 +58,7 @@ const ProductForm = React.createClass({
   renderHtml(element) {
     return {
       __html: element
-    }
+    };
   },
   render: function() {
     let submitText, formTitle;

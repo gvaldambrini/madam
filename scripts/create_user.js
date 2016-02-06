@@ -7,11 +7,11 @@
  * which will be crypted using {@link https://www.npmjs.com/package/bcrypt-nodejs|bcrypt}.
  */
 
-var common = require('../common');
-var client = common.createClient();
-var async = require('async');
-var promptly = require('promptly');
-var bcrypt = require('bcrypt-nodejs');
+const common = require('../common');
+const client = common.createClient();
+const async = require('async');
+const promptly = require('promptly');
+const bcrypt = require('bcrypt-nodejs');
 
 async.waterfall([
         // Fetch the existing users
@@ -21,7 +21,7 @@ async.waterfall([
                 type: 'users',
                 id: common.usersDocId
             }, function(err, resp, _respcode) {
-                var res;
+                let res;
                 if (err) {
                     res = {users: []};
                 }
@@ -33,14 +33,14 @@ async.waterfall([
         },
         // Username
         function(res, callback) {
-            var nameValidator = function(value) {
+            const nameValidator = function(value) {
                 if (value.length < 5) {
                     throw new Error('The username must have a minimum length of 5');
                 }
 
                 return value;
             };
-            var opt = {validator: nameValidator};
+            const opt = {validator: nameValidator};
             promptly.prompt('Username: ', opt, function(err, value) {
                 res.username = value;
                 callback(err, res);
@@ -51,7 +51,7 @@ async.waterfall([
             function filterFn(item) {
                 return item.username !== res.username;
             }
-            var filteredUsers = res.users.filter(filterFn);
+            const filteredUsers = res.users.filter(filterFn);
             if (filteredUsers.length !== res.users.length) {
                 promptly.confirm(
                     'You are going to overwrite an existing user. Are you sure?',
@@ -71,7 +71,7 @@ async.waterfall([
         },
         // Password
         function(res, callback) {
-            var pwdValidator = function(value) {
+            const pwdValidator = function(value) {
                 if (value === res.username) {
                     throw new Error('The password must be different from the username');
                 }
@@ -81,7 +81,7 @@ async.waterfall([
 
                 return value;
             };
-            var opt = {validator: pwdValidator};
+            const opt = {validator: pwdValidator};
             promptly.password('Type a password: ', opt, function(err, value) {
                 res.password = value;
                 callback(err, res);
@@ -89,14 +89,14 @@ async.waterfall([
         },
         // Password confirmation
         function(res, callback) {
-            var confirmPwdValidator = function(value) {
+            const confirmPwdValidator = function(value) {
                 if (value !== res.password) {
                     throw new Error('The password does not match the one previously entered');
                 }
 
                 return value;
             };
-            var opt = {validator: confirmPwdValidator};
+            const opt = {validator: confirmPwdValidator};
             promptly.password('Confirm the password: ', opt, function(err, _value) {
                 callback(err, res);
             });

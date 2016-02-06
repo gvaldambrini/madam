@@ -15,7 +15,7 @@ const LoginForm = React.createClass({
         password: ''
       },
       errors: []
-    }
+    };
   },
   handleSubmit: function(event) {
     event.preventDefault();

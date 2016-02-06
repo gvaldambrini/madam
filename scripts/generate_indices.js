@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-var async = require('async');
-var common = require('../common');
-var client = common.createClient();
+"use strict";
+
+const async = require('async');
+const common = require('../common');
+const client = common.createClient();
 
 
 (function() {
-
-    var mainIndex = 'main';
+    let mainIndex = 'main';
 
     function deleteIndex(callback) {
         client.indices.delete({

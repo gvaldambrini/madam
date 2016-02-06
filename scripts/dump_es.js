@@ -1,12 +1,15 @@
 #!/usr/bin/env node
-var async = require('async');
-var common = require('../common');
-var client = common.createClient();
-var archiver = require('archiver');
-var dropbox = require('dropbox');
-var moment = require('moment');
-var path = require('path');
-var util = require('util');
+
+"use strict";
+
+const async = require('async');
+const common = require('../common');
+const client = common.createClient();
+const archiver = require('archiver');
+const dropbox = require('dropbox');
+const moment = require('moment');
+const path = require('path');
+const util = require('util');
 
 /**
  * @overview Dumps the mapping and the documents on elasticsearch on dropbox.
@@ -19,9 +22,9 @@ var util = require('util');
  * more document from the generated archive.
  */
 
-var mainIndex = 'main';
+const mainIndex = 'main';
 
-var dboxClient = new dropbox.Client({
+const dboxClient = new dropbox.Client({
     key: process.env.DROPBOX_APP_KEY,
     secret: process.env.DROPBOX_APP_SECRET,
     token: process.env.DROPBOX_APP_TOKEN
@@ -40,7 +43,7 @@ async.waterfall([
                     return;
                 }
 
-                var res = {mappings: JSON.stringify(resp[mainIndex].mappings, null, 2)};
+                const res = {mappings: JSON.stringify(resp[mainIndex].mappings, null, 2)};
                 callback(null, res);
             });
         },
@@ -57,8 +60,8 @@ async.waterfall([
                 if (resp.hits.total !== resp.hits.hits.length) {
                     callback('Error in fetching all the documents', resp.hits.total);
                 }
-                var documents = [];
-                for (var i = 0; i < resp.hits.hits.length; i++) {
+                const documents = [];
+                for (let i = 0; i < resp.hits.hits.length; i++) {
                     documents[documents.length] = {
                         _index: resp.hits.hits[i]._index,
                         _type: resp.hits.hits[i]._type,
@@ -72,18 +75,18 @@ async.waterfall([
         },
         // create an archive from the json strings and create an unique buffer object
         function(res, callback) {
-            var archive = archiver('tar', {
+            const archive = archiver('tar', {
                 gzip: true,
                 gzipOptions: {level: 1}
             });
 
-            var bufs = [];
+            const bufs = [];
             archive.on('data', function(d) {
                 bufs.push(d);
             });
 
             archive.on('end', function() {
-                var buffer = Buffer.concat(bufs);
+                const buffer = Buffer.concat(bufs);
                 callback(null, {buffer: buffer});
             });
 
@@ -98,8 +101,8 @@ async.waterfall([
                 if (error) {
                     callback(error, null);
                 }
-                var today = moment();
-                var fname = today.format('YYYY') + '/archive_' + today.format('YYYY-MM-DD') + '.tar.gz';
+                const today = moment();
+                const fname = today.format('YYYY') + '/archive_' + today.format('YYYY-MM-DD') + '.tar.gz';
                 dboxClient.writeFile(fname, res.buffer, function(error, _stat) {
                     if (error) {
                         callback(error, null);

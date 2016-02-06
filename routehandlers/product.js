@@ -56,7 +56,6 @@ class ProductHandler {
      * @param {object} resp the elasticsearch response.
      */
     static processElasticsearchResults(req, resp) {
-
         function getField(hit, field, field_type) {
             if (hit.highlight && hit.highlight[field + '.' + field_type])
                 return hit.highlight[field + '.' + field_type][0];
@@ -129,8 +128,8 @@ class ProductHandler {
                 highlight: {
                     fields: {
                         '*': {
-                            'pre_tags': ['<b>'],
-                            'post_tags': ['</b>']
+                            pre_tags: ['<b>'],
+                            post_tags: ['</b>']
                         }
                     }
                 },

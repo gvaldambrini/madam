@@ -1,48 +1,51 @@
 #!/usr/bin/env node
 
+"use strict";
+
 /**
  * @overview Generates demo content for all the document types managed by
  * the application to make it easy testing the app with some content.
  */
 
-var fs = require('fs');
-var path = require('path');
-var moment = require('moment');
-var bcrypt = require('bcrypt-nodejs');
-var uuid = require('node-uuid');
-var common = require('../common');
-var client = common.createClient();
+const fs = require('fs');
+const path = require('path');
+const moment = require('moment');
+const bcrypt = require('bcrypt-nodejs');
+const uuid = require('node-uuid');
+const common = require('../common');
+const client = common.createClient();
 
 
 (function() {
-    var mainIndex = 'main';
-    var workers = [];
+    const mainIndex = 'main';
+    const workers = [];
 
     // The services that will be created
-    var services = ['shampoo', 'conditioning', 'haircut', 'color', 'highlights'];
+    const services = ['shampoo', 'conditioning', 'haircut', 'color', 'highlights'];
 
     // The number of workers generated
-    var numWorkers = 4;
+    const numWorkers = 4;
 
     // The minimum number of appointments generated for each customer
-    var minApp = 0;
-    var maxApp = 5;
+    const minApp = 0;
+    const maxApp = 5;
 
     // The minimum number of planned appointments generated for each customer
-    var minPlannedApp = 0;
-    var maxPlannedApp = 2;
+    const minPlannedApp = 0;
+    const maxPlannedApp = 2;
 
     // The number of customers generated
-    var numCustomers = 20;
+    const numCustomers = 20;
 
     // The number of products created
-    var numProducts = 30;
+    const numProducts = 30;
 
     // Username and password of the created user.
-    var username = "admin";
-    var password = "madam";
+    const username = "admin";
+    const password = "madam";
 
     function rainbow(numOfSteps, step) {
+        /*eslint-disable no-var*/
         // This function generates vibrant, "evenly spaced" colours (i.e. no clustering).
         // This is ideal for creating easily distinguishable vibrant markers in Google Maps
         // and other apps.
@@ -65,6 +68,7 @@ var client = common.createClient();
             ("00" + (~ ~(g * 255)).toString(16)).slice(-2) +
             ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
         return (c);
+        /*eslint-enable no-var*/
     }
 
     function getRandomElement(container) {
@@ -72,8 +76,8 @@ var client = common.createClient();
     }
 
     function popRandomElement(container) {
-        var element = getRandomElement(container);
-        var index = container.indexOf(element);
+        const element = getRandomElement(container);
+        const index = container.indexOf(element);
         container.splice(index, 1);
         return element;
     }
@@ -83,28 +87,27 @@ var client = common.createClient();
     }
 
     function readFileAsArray(filename) {
-        var data = fs.readFileSync(filename, 'UTF-8');
+        const data = fs.readFileSync(filename, 'UTF-8');
         return data.split('\n');
     }
 
     function populateCustomers() {
         console.log('Populate customers...');
-        var lastnames = readFileAsArray(path.join(__dirname, 'data', 'lastnames.txt'));
-        var firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
-        var body = [];
-        var i, j, k;
+        const lastnames = readFileAsArray(path.join(__dirname, 'data', 'lastnames.txt'));
+        const firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
+        const body = [];
 
-        for (i = 0; i < numCustomers; i++) {
+        for (let i = 0; i < numCustomers; i++) {
             body[body.length] = {index: {_index: mainIndex, _type: 'customer'}};
 
-            var appointments = [];
-            var offset = getRandomInt(0, 3);
-            var initialOffset = offset;
-            for (j = 0; j < getRandomInt(minApp, maxApp); j++) {
-                var appServices = [];
-                var serviceNames = services.slice();
+            const appointments = [];
+            let offset = getRandomInt(0, 3);
+            const initialOffset = offset;
+            for (let j = 0; j < getRandomInt(minApp, maxApp); j++) {
+                const appServices = [];
+                const serviceNames = services.slice();
 
-                for (k = 0; k < getRandomInt(Math.floor(services.length / 2), services.length); k++) {
+                for (let k = 0; k < getRandomInt(Math.floor(services.length / 2), services.length); k++) {
                     appServices[appServices.length] = {
                         description: popRandomElement(serviceNames),
                         worker: getRandomElement(workers).name
@@ -124,8 +127,8 @@ var client = common.createClient();
                 // we cannot have an appointment and a planned one on the same day.
                 offset = 1;
             }
-            var planned_appointments = [];
-            for (k = 0; k < getRandomInt(minPlannedApp, maxPlannedApp); k++) {
+            const planned_appointments = [];
+            for (let k = 0; k < getRandomInt(minPlannedApp, maxPlannedApp); k++) {
                 planned_appointments[planned_appointments.length] = {
                     appid: uuid.v4(),
                     date: moment().add(offset, 'days').format('YYYY-MM-DD')
@@ -133,7 +136,7 @@ var client = common.createClient();
                 offset += getRandomInt(4, 7);
             }
 
-            var customer = {
+            const customer = {
                 name: getRandomElement(firstnames),
                 surname: getRandomElement(lastnames),
                 appointments: appointments,
@@ -149,16 +152,16 @@ var client = common.createClient();
 
     function populateProducts() {
         console.log('Populate products...');
-        var products = ['shampoo', 'hairspray', 'argan oil', 'hair protection',
+        const products = ['shampoo', 'hairspray', 'argan oil', 'hair protection',
             'conditioner', 'color protect shampoo', 'gel', 'ultra defining gel',
             'volume mousse', 'silk therapy', 'scalp treatment', 'cure restorative masque',
             'hair booster'];
-        var brands = ['kenra', 'wella', 'matrix', 'redken', 'oreal', 'pureology'];
-        var body = [];
+        const brands = ['kenra', 'wella', 'matrix', 'redken', 'oreal', 'pureology'];
+        const body = [];
 
-        for (var i = 0; i < numProducts; i++) {
+        for (let i = 0; i < numProducts; i++) {
             body[body.length] = {index: {_index: mainIndex, _type: 'product'}};
-            var product = {
+            const product = {
                 name: getRandomElement(products),
                 brand: getRandomElement(brands),
                 sold_date: moment().subtract(getRandomInt(0, 30), 'days').format('YYYY-MM-DD'),
@@ -176,12 +179,12 @@ var client = common.createClient();
 
     function populateSettings() {
         console.log('Populate settings...');
-        var body = [];
+        const body = [];
 
         // Workers
-        var firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
+        const firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
         body[body.length] = {index: {_index: mainIndex, _type: 'workers', _id: common.workersDocId}};
-        for (var i = 0; i < numWorkers; i++) {
+        for (let i = 0; i < numWorkers; i++) {
             workers[workers.length] = {
                 name: getRandomElement(firstnames),
                 color: rainbow(numWorkers, i)
@@ -197,19 +200,19 @@ var client = common.createClient();
 
     function populateCalendar() {
         console.log('Populate calendar...');
-        var body = [];
-        var lastnames = readFileAsArray(path.join(__dirname, 'data', 'lastnames.txt'));
-        var firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
+        const body = [];
+        const lastnames = readFileAsArray(path.join(__dirname, 'data', 'lastnames.txt'));
+        const firstnames = readFileAsArray(path.join(__dirname, 'data', 'firstnames.txt'));
 
         body[body.length] = {index: {_index: mainIndex, _type: 'calendar', _id: common.calendarDocId}};
 
-        var calendarDays = [];
-        var numDays = 3;
-        var offset = getRandomInt(-3, 3);
+        const calendarDays = [];
+        const numDays = 3;
+        let offset = getRandomInt(-3, 3);
 
-        for (var i = 0; i < numDays; i++) {
-            var plannedApp = [];
-            for (var j = 0; j < getRandomInt(1, 3); j++) {
+        for (let i = 0; i < numDays; i++) {
+            const plannedApp = [];
+            for (let j = 0; j < getRandomInt(1, 3); j++) {
                 plannedApp[plannedApp.length] = {
                     appid: uuid.v4(),
                     fullname: getRandomElement(firstnames) + ' ' + getRandomElement(lastnames)
@@ -227,9 +230,9 @@ var client = common.createClient();
 
     function createUser() {
         console.log('Create user...');
-        var body = [];
+        const body = [];
 
-        var user = {
+        const user = {
             username: username,
             password: bcrypt.hashSync(password, bcrypt.genSaltSync(10))
         };

@@ -9,7 +9,7 @@
         }
 
         // Create the container for all the popovers if not exists.
-        var $mainContainer = $('#popovers-container');
+        let $mainContainer = $('#popovers-container');
 
         if ($mainContainer.length === 0) {
             if (typeof options.$rootContainer === 'undefined') {
@@ -20,10 +20,10 @@
         }
 
         this.each(function(index, item) {
-            var containerId = generateId();
-            var $item = $(item);
-            var itemId = $item.attr('id');
-            var $container;
+            const containerId = generateId();
+            const $item = $(item);
+            let itemId = $item.attr('id');
+            let $container;
 
             // If the item used to trigger the popover does not have an id, let's
             // generate a new one for it.
@@ -55,7 +55,7 @@
                 $mainContainer.find('.popover').map(function(index, item) {
                     // Clicking on every popover already opened we implement
                     // the 'singleton' functionality.
-                    var btnId = $(item).parent().data('source-element');
+                    const btnId = $(item).parent().data('source-element');
                     $('#' + btnId).click();
                 });
             });
@@ -77,5 +77,4 @@
 
         return this;
     };
-
 }(jQuery));

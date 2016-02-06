@@ -61,7 +61,7 @@ const FormInputDate = React.createClass({
 });
 
 
-var FormInput = React.createClass({
+const FormInput = React.createClass({
   mixins: [SimpleInput],
   propTypes: {
       handleChange: React.PropTypes.func.isRequired,
@@ -78,7 +78,7 @@ var FormInput = React.createClass({
     };
   },
   getInitialState: function() {
-    return {value: ''}
+    return {value: ''};
   },
   componentWillMount: function() {
     this.setState({value: this.props.value});
@@ -123,7 +123,7 @@ const FormInputRadio = React.createClass({
       })).isRequired
   },
   getInitialState: function() {
-    return {value: ''}
+    return {value: ''};
   },
   componentWillMount: function() {
     this.setState({value: this.props.value});
@@ -171,7 +171,7 @@ const FormInputAndCheckbox = React.createClass({
     return {
       value: '',
       cbvalue: false
-    }
+    };
   },
   componentWillMount: function() {
     this.setState({
@@ -227,7 +227,7 @@ const FormTextArea = React.createClass({
       value: React.PropTypes.string
   },
   getInitialState: function() {
-    return {value: ''}
+    return {value: ''};
   },
   componentWillMount: function() {
     this.setState({value: this.props.value});
@@ -327,9 +327,4 @@ module.exports = {
   fnRenderErrors: fnRenderErrors,
   fnSubmitForm: fnSubmitForm,
   BaseForm: BaseForm
-}
-
-
-
-
-
+};

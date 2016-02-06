@@ -115,8 +115,8 @@ class CustomerHandler {
                 highlight: {
                     fields: {
                         '*': {
-                            'pre_tags': ['<b>'],
-                            'post_tags': ['</b>']
+                            pre_tags: ['<b>'],
+                            post_tags: ['</b>']
                         }
                     }
                 }
@@ -152,7 +152,6 @@ class CustomerHandler {
      * @param {object} hits the hits from the elasticsearch response.
      */
     static processElasticsearchResults(req, hits) {
-
         function getField(hit, field, field_type) {
             if (hit.highlight && hit.highlight[field + '.' + field_type])
                 return hit.highlight[field + '.' + field_type][0];

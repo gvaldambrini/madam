@@ -86,14 +86,14 @@ const InputCustomer = React.createClass({
 });
 
 
-var PlanAppointmentForm = React.createClass({
+const PlanAppointmentForm = React.createClass({
   getInitialState: function() {
     return {
       customer: {
         fullname: '',
         id: undefined
       }
-    }
+    };
   },
   getCustomer: function() {
     return this.state.customer;
@@ -177,7 +177,7 @@ const DateAppointments = React.createClass({
             title={i18n.homepage.deleteText} ref={
               function(span) {
                 if (span !== null) {
-                  var $span = $(span);
+                  const $span = $(span);
                   if ($span.data('tooltip-init'))
                     return;
                   $span.data('tooltip-init', true);
@@ -214,7 +214,7 @@ const DateAppointments = React.createClass({
 });
 
 
-var CalendarCustomerForm = React.createClass({
+const CalendarCustomerForm = React.createClass({
   mixins: [History],
   doSubmit: function(self, data, _targetName) {
     const that = this;
@@ -408,10 +408,10 @@ const CalendarAppointment = React.createClass({
 
     let url;
     if (editForm) {
-      url = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`
+      url = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`;
     }
     else {
-      url = `/customers/${this.props.params.id}/appointments`
+      url = `/customers/${this.props.params.id}/appointments`;
     }
     const method = editForm ? 'put': 'post';
 
@@ -463,7 +463,7 @@ const Calendar = React.createClass({
       data: [],
       loaded: false,
       errors: []
-    }
+    };
   },
   componentWillMount: function() {
     this.updateTable();
@@ -500,7 +500,7 @@ const Calendar = React.createClass({
     };
     const url = `/customers/planned-appointments/${this.state.date}`;
     fnSubmitForm(this, url, 'post', data, function(response) {
-      var appointments = that.state.data.appointments;
+      const appointments = that.state.data.appointments;
       appointments.push({
         appid: response.id,
         fullname: data.fullname,
@@ -516,7 +516,7 @@ const Calendar = React.createClass({
   render: function() {
     const that = this;
     if (!this.state.loaded) {
-      return <div></div>
+      return <div></div>;
     }
 
     let appointments;

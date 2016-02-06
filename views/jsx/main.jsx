@@ -2,12 +2,12 @@ import 'jquery/dist/jquery.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 
-import 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'
-import 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css'
+import 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css';
+import 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css';
 
-import 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'
-import 'bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js'
-import 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'
+import 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js';
+import 'bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js';
+import 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -15,7 +15,7 @@ import { Router, Route, Link, IndexRedirect, IndexRoute, History } from 'react-r
 
 import Cookies from 'js-cookie';
 
-import '../javascripts/confirm-popover.js'
+import '../javascripts/confirm-popover.js';
 import '../stylesheets/style.scss';
 
 import { Appointment, Appointments, AppointmentsRoot } from './appointments';
@@ -96,7 +96,6 @@ const Navbar = React.createClass({
                     that.history.pushState(null, '/login');
                   }
                 });
-
               }
             }>{i18n.logout}</a>
           </div>
@@ -158,7 +157,7 @@ const App = React.createClass({
 
 function requireAuth(nextState, replaceState) {
     if (typeof Cookies.get('user') === 'undefined') {
-      replaceState({ nextPathname: nextState.location.pathname }, '/login')
+      replaceState({ nextPathname: nextState.location.pathname }, '/login');
     }
 }
 
@@ -218,7 +217,7 @@ const routes = function() {
       <Route path="/login" component={LoginForm}/>
     </Route>
   );
-}
+};
 
 const createBrowserHistory = require('history/lib/createBrowserHistory');
 const history = createBrowserHistory();
