@@ -1,5 +1,4 @@
 import React from 'react';
-import { History } from 'react-router';
 
 import Cookies from 'js-cookie';
 
@@ -7,7 +6,10 @@ import { BaseForm, FormInput } from './forms';
 
 
 const LoginForm = React.createClass({
-  mixins: [BaseForm, History],
+  mixins: [BaseForm],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   getInitialState: function() {
     return {
       data: {
@@ -23,7 +25,7 @@ const LoginForm = React.createClass({
 
     this.submitForm('/login', 'post', function(data) {
       Cookies.set('user', data.user);
-      this.history.pushState(null, '/');
+      this.context.router.push('/');
     }.bind(this));
   },
   render: function() {

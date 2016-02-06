@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, History } from 'react-router';
+import { Link } from 'react-router';
 
 import moment from 'moment';
 
@@ -8,7 +8,10 @@ import { PopoverTemplate, InputSearch, BaseTableContainer, BaseTable } from './t
 
 
 const ProductForm = React.createClass({
-  mixins: [BaseForm, History],
+  mixins: [BaseForm],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   getInitialState: function() {
     return {
       data: {},
@@ -53,7 +56,7 @@ const ProductForm = React.createClass({
 
     const url = this.state.editForm ? `/products/${this.props.params.id}` : '/products';
     const method = this.state.editForm ? 'put': 'post';
-    this.submitForm(url, method, _data => this.history.pushState(null, '/products'));
+    this.submitForm(url, method, _data => this.context.router.push('/products'));
   },
   renderHtml(element) {
     return {
@@ -113,7 +116,10 @@ const ProductForm = React.createClass({
 
 
 const ProductsTable = React.createClass({
-  mixins: [BaseTable, History],
+  mixins: [BaseTable],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   deleteItem: function(objId) {
     this.deleteRow('/products/' + objId);
   },
@@ -124,7 +130,7 @@ const ProductsTable = React.createClass({
         return (
           <tr key={object.id} onClick={
             function(event) {
-              that.history.pushState(null, '/products/edit/' + object.id);
+              that.context.router.push('/products/edit/' + object.id);
               event.preventDefault();
               event.stopPropagation();
             }
@@ -168,7 +174,7 @@ const ProductsTable = React.createClass({
               title={i18n.products.cloneText}
               onClick={
                 function(event) {
-                  that.history.pushState(null, '/products/clone/' + product.objects[0].id);
+                  that.context.router.push('/products/clone/' + product.objects[0].id);
                   event.preventDefault();
                   event.stopPropagation();
                 }
@@ -222,7 +228,7 @@ const ProductsTable = React.createClass({
 
 
 const Products = React.createClass({
-  mixins: [BaseTableContainer, History],
+  mixins: [BaseTableContainer],
   getInitialState: function() {
     return {
       data: [],

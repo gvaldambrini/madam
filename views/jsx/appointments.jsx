@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, History } from 'react-router';
+import { Link } from 'react-router';
 
 import moment from 'moment';
 
@@ -412,7 +412,9 @@ const AppointmentFormContainer = React.createClass({
 
 
 const Appointment = React.createClass({
-  mixins: [History],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   doSubmit: function(self, data) {
     const editForm = typeof this.props.params.appid !== 'undefined';
     let url;
@@ -428,7 +430,7 @@ const Appointment = React.createClass({
       url,
       method,
       data,
-      () => this.history.pushState(null, `/customers/edit/${this.props.params.id}/appointments`)
+      () => this.context.router.push(`/customers/edit/${this.props.params.id}/appointments`)
     );
   },
   render: function() {
@@ -538,19 +540,21 @@ const AppointmentsTable = React.createClass({
 
 
 const CustomerAppointments = React.createClass({
-  mixins: [History],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   handleRowClick(app) {
     const date = moment(app.date, config.date_format);
     if (app.planned) {
       if (date > moment()) {
         return;
       }
-      this.history.pushState(
-        null, `/customers/edit/${this.props.customer}/appointments/planned/${date.format('YYYY-MM-DD')}/${app.appid}`);
+      this.context.router.push(
+        `/customers/edit/${this.props.customer}/appointments/planned/${date.format('YYYY-MM-DD')}/${app.appid}`);
     }
     else {
-      this.history.pushState(
-        null, `/customers/edit/${this.props.customer}/appointments/edit/${app.appid}`);
+      this.context.router.push(
+      `/customers/edit/${this.props.customer}/appointments/edit/${app.appid}`);
     }
   },
   render: function() {

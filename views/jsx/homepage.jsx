@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { History, Link, IndexLink } from 'react-router';
+import { Link, IndexLink } from 'react-router';
 import Autosuggest from 'react-autosuggest';
 
 import Cookies from 'js-cookie';
@@ -13,7 +13,9 @@ import { CustomerFormContainer } from './customers';
 
 
 const InputCustomer = React.createClass({
-  mixins: [History],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   propTypes: {
     setCustomer: React.PropTypes.func.isRequired,
     getCustomer: React.PropTypes.func.isRequired
@@ -48,7 +50,7 @@ const InputCustomer = React.createClass({
       error: function(xhr, textStatus, _errorThrown) {
         if (xhr.status === 401) {
           Cookies.remove('user');
-          that.history.pushState(null, '/login');
+          that.context.router.push('/login');
         }
       }
     });
@@ -137,7 +139,9 @@ const PlanAppointmentForm = React.createClass({
 
 
 const DateAppointments = React.createClass({
-  mixins: [History],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   render: function() {
     const that = this;
     const appointmentRows = this.props.appointments.map((app, _index) =>
@@ -150,18 +154,18 @@ const DateAppointments = React.createClass({
               return;
             }
             if (typeof app.id === 'undefined') {
-              that.history.pushState(
-                null, `/calendar/${that.props.date}/appointments/planned/${app.appid}/newcustomer`);
+              that.context.router.push(
+                `/calendar/${that.props.date}/appointments/planned/${app.appid}/newcustomer`);
               return;
             }
             if (app.planned) {
-              that.history.pushState(
-                null, `/calendar/${that.props.date}/customers/${app.id}/appointments/planned/${app.appid}`);
+              that.context.router.push(
+                `/calendar/${that.props.date}/customers/${app.id}/appointments/planned/${app.appid}`);
               return;
             }
 
-            that.history.pushState(
-              null, `/calendar/${that.props.date}/customers/${app.id}/appointments/${app.appid}`);
+            that.context.router.push(
+              `/calendar/${that.props.date}/customers/${app.id}/appointments/${app.appid}`);
           }
         }>
 
@@ -215,7 +219,9 @@ const DateAppointments = React.createClass({
 
 
 const CalendarCustomerForm = React.createClass({
-  mixins: [History],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   doSubmit: function(self, data, _targetName) {
     const that = this;
     const editForm = typeof this.props.params.id !== 'undefined';
@@ -225,11 +231,11 @@ const CalendarCustomerForm = React.createClass({
 
     fnSubmitForm(self, url, method, data, function(obj) {
       if (editForm) {
-        that.history.pushState(null, `/calendar/${that.props.params.date}`);
+        that.context.router.push(`/calendar/${that.props.params.date}`);
       }
       else {
-        that.history.pushState(
-          null, `/calendar/${that.props.params.date}/customers/${obj.id}/appointments/planned/${that.props.params.appid}`);
+        that.context.router.push(
+          `/calendar/${that.props.params.date}/customers/${obj.id}/appointments/planned/${that.props.params.appid}`);
       }
     });
   },
@@ -278,20 +284,20 @@ const CalendarCustomerForm = React.createClass({
 
 
 const CalendarCustomerAppointments = React.createClass({
-  mixins: [History],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   handleRowClick(app) {
     const date = moment(app.date, config.date_format);
     if (app.planned) {
       if (date.isAfter(moment(), 'day')) {
         return;
       }
-      this.history.pushState(
-        null,
+      this.context.router.push(
         `/calendar/${date.format('YYYY-MM-DD')}/customers/${this.props.customer}/appointments/planned/${app.appid}}`);
     }
     else {
-      this.history.pushState(
-        null,
+      this.context.router.push(
         `/calendar/${date.format('YYYY-MM-DD')}/customers/${this.props.customer}/appointments/${app.appid}`);
     }
   },
@@ -402,7 +408,9 @@ const CalendarCustomer = React.createClass({
 
 
 const CalendarAppointment = React.createClass({
-  mixins: [History],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   doSubmit: function(self, data) {
     const editForm = typeof this.props.params.appid !== 'undefined';
 
@@ -416,7 +424,7 @@ const CalendarAppointment = React.createClass({
     const method = editForm ? 'put': 'post';
 
     fnSubmitForm(
-      self, url, method, data, () => this.history.pushState(null, `/calendar/${this.props.params.date}`));
+      self, url, method, data, () => this.context.router.push(`/calendar/${this.props.params.date}`));
   },
   render: function() {
     let submitText, formTitle, editForm, urlData, date;
@@ -452,7 +460,10 @@ const CalendarAppointment = React.createClass({
 
 
 const Calendar = React.createClass({
-  mixins: [BaseTableContainer, History],
+  mixins: [BaseTableContainer],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   getInitialState: function() {
     const date = typeof this.props.params.date !== 'undefined'
       ? this.props.params.date
@@ -511,7 +522,7 @@ const Calendar = React.createClass({
     });
   },
   setDate: function(date) {
-    this.history.pushState(null, `/calendar/${moment(date).format('YYYY-MM-DD')}`);
+    this.context.router.push(`/calendar/${moment(date).format('YYYY-MM-DD')}`);
   },
   render: function() {
     const that = this;

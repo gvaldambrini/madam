@@ -11,7 +11,7 @@ import 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, Link, IndexRedirect, IndexRoute, History } from 'react-router';
+import { Router, Route, Link, IndexRedirect, IndexRoute, browserHistory } from 'react-router';
 
 import Cookies from 'js-cookie';
 
@@ -73,7 +73,9 @@ const Sidebar = React.createClass({
 
 
 const Navbar = React.createClass({
-  mixins: [History],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   render: function() {
     const that = this;
     let logout;
@@ -93,7 +95,7 @@ const Navbar = React.createClass({
                   method: 'post',
                   success: function() {
                     Cookies.remove('user');
-                    that.history.pushState(null, '/login');
+                    that.context.router.push('/login');
                   }
                 });
               }
@@ -155,9 +157,12 @@ const App = React.createClass({
 });
 
 
-function requireAuth(nextState, replaceState) {
+function requireAuth(nextState, replace) {
     if (typeof Cookies.get('user') === 'undefined') {
-      replaceState({ nextPathname: nextState.location.pathname }, '/login');
+      replace({
+        pathname: '/login',
+        state: { nextPathname: nextState.location.pathname }
+      });
     }
 }
 
@@ -219,10 +224,7 @@ const routes = function() {
   );
 };
 
-const createBrowserHistory = require('history/lib/createBrowserHistory');
-const history = createBrowserHistory();
-
 ReactDOM.render(
-  <Router routes={routes()} history={history}/>,
+  <Router routes={routes()} history={browserHistory}/>,
   document.getElementById('main-container')
 );

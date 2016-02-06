@@ -1,4 +1,5 @@
 import React from 'react';
+import { browserHistory } from 'react-router';
 
 import Cookies from 'js-cookie';
 
@@ -95,7 +96,7 @@ const BaseTableContainer = {
       error: function(xhr, textStatus, _errorThrown) {
         if (xhr.status === 401) {
           Cookies.remove('user');
-          that.history.pushState(null, '/login');
+          browserHistory.push('/login');
         }
       }
     };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, IndexLink, History } from 'react-router';
+import { Link, IndexLink } from 'react-router';
 
 import { BaseForm, FormInputDate, FormInput, FormInputRadio, FormInputAndCheckbox, FormTextArea, fnSubmitForm } from './forms';
 import { PopoverTemplate, InputSearch, BaseTable, BaseTableContainer } from './tables';
@@ -118,7 +118,9 @@ const CustomerFormContainer = React.createClass({
 
 
 const CustomerForm = React.createClass({
-  mixins: [ History ],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   doSubmit: function(self, data, targetName) {
     const that = this;
     const editForm = typeof this.props.params.id !== 'undefined';
@@ -127,11 +129,11 @@ const CustomerForm = React.createClass({
 
     fnSubmitForm(self, url, method, data, function(obj) {
       if (targetName === 'submit-and-add') {
-        that.history.pushState(
-          null, `/customers/edit/${obj.id}/appointments/new`);
+        that.context.router.push(
+          `/customers/edit/${obj.id}/appointments/new`);
       }
       else {
-        that.history.pushState(null, '/customers/');
+        that.context.router.push('/customers/');
       }
     });
   },
@@ -212,7 +214,10 @@ const Customer = React.createClass({
 
 
 const CustomersTable = React.createClass({
-  mixins: [BaseTable, History],
+  mixins: [BaseTable],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   deleteItem: function(objId) {
     this.deleteRow('/customers/' + objId);
   },
@@ -222,7 +227,7 @@ const CustomersTable = React.createClass({
       (customer, _index) =>
       <tr key={customer.id} onClick={
           function(event) {
-            that.history.pushState(null, `/customers/edit/${customer.id}`);
+            that.context.router.push(`/customers/edit/${customer.id}`);
             event.preventDefault();
             event.stopPropagation();
           }
@@ -276,7 +281,7 @@ const CustomersTable = React.createClass({
 
 
 const Customers = React.createClass({
-  mixins: [BaseTableContainer, History],
+  mixins: [BaseTableContainer],
   getInitialState: function() {
     return {
       data: [],
