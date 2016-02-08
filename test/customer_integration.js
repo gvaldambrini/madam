@@ -147,6 +147,56 @@ describe('API tests: customer integration tests', function() {
         ], done);
     });
 
+    it('should remove a planned appointment when a normal one has been created starting from it', function(done) {
+        var customerId, appointmentId;
+        utils.waterfall([
+            function(callback) {
+                utils.request.post(cookies, '/customers/')
+                    .send({
+                        name: 'gregor',
+                        surname: 'clegane'
+                    })
+                    .expect(201)
+                    .end(function(err, res) {
+                        customerId = res.body.id;
+                        callback(err, null);
+                    });
+            },
+            function(res, callback) {
+                utils.request.post(cookies, '/customers/planned-appointments/2016-01-05')
+                    .send({id: customerId})
+                    .expect(201)
+                    .end(function(err, res) {
+                        appointmentId = res.body.id;
+                        callback(err, null);
+                    });
+            },
+            function(res, callback) {
+                utils.request.put(cookies, '/customers/' + customerId + '/appointments/' + appointmentId)
+                    .send({services: [
+                        {enabled: true, description: 'shampoo', worker: 'Arya'},
+                        {enabled: true, description: 'haircut', worker: 'Daenerys'}
+                    ],
+                    date: '04/01/2016'})
+                    .expect(200)
+                    .end(callback);
+            },
+            function(res, callback) {
+                utils.es.getCustomer(customerId, function(obj) {
+                    obj.name.should.equal('gregor');
+                    obj.surname.should.equal('clegane');
+                    obj.appointments.should.be.an.Array().and.have.length(1);
+                    obj.appointments[0].date.should.equal('2016-01-04');
+                    obj.appointments[0].services.should.be.an.Array().and.have.length(2);
+                    obj.appointments[0].services[0].description.should.equal('shampoo');
+                    obj.appointments[0].services[1].description.should.equal('haircut');
+                    obj.planned_appointments.should.be.an.Array().and.have.length(0);
+                    callback(null, null);
+                });
+            }
+        ], done);
+    });
+
     it('should preserve the planned appointment when creating the customer starting from it', function(done) {
         var customerId;
         utils.waterfall([

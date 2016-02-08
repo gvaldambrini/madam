@@ -574,8 +574,14 @@ class AppointmentHandler {
             obj.appointments = [];
         }
 
+        if (typeof obj.planned_appointments === 'undefined') {
+            obj.planned_appointments = [];
+        }
+
         let plannedIndex = -1;
-        if (typeof obj.planned_appointments !== 'undefined') {
+        let appIndex = -1;
+
+        if (newItem) {
             for (let i = 0; i < obj.planned_appointments.length; i++) {
                 if (moment(obj.planned_appointments[i].date).isSame(moment(isodate), 'day')) {
                     plannedIndex = i;
@@ -583,22 +589,26 @@ class AppointmentHandler {
                 }
             }
         }
-
-        let appIndex = -1;
-        if (!newItem) {
+        else {
+            for (let i = 0; i < obj.planned_appointments.length; i++) {
+                if (obj.planned_appointments[i].appid === req.params.appid) {
+                    plannedIndex = i;
+                    break;
+                }
+            }
             for (let i = 0; i < obj.appointments.length; i++) {
                 if (obj.appointments[i].appid === req.params.appid) {
                     appIndex = i;
                     break;
                 }
             }
-        }
 
-        if (!newItem && appIndex === -1 && plannedIndex === -1) {
-            // The passed app id is not in the customer appointments or in the
-            // planned ones, let's return NOT FOUND.
-            res.sendStatus(404);
-            return;
+            if (appIndex === -1 && plannedIndex === -1) {
+                // The passed app id is not in the customer appointments or in the
+                // planned ones, let's return NOT FOUND.
+                res.sendStatus(404);
+                return;
+            }
         }
 
         // Check & set the services
