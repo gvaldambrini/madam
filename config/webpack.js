@@ -5,7 +5,7 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
     context: path.join(__dirname, "..", "views"),
     entry: {
-        app: ["./jsx/main.jsx"],
+        app: ["./jsx/main.js"],
         vendor: ['bootstrap', 'jquery', 'react', 'react-dom', 'react-router', 'moment', 'js-cookie']
     },
     output: {
@@ -16,7 +16,7 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.jsx$/,
+                test: /\.(jsx|js)$/,
                 exclude: /node_modules/,
                 loader: "babel-loader",
                 query: {
