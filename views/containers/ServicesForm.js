@@ -11,7 +11,7 @@ import {
   addService,
   removeService,
   updateService
-} from '../redux/actions';
+} from '../redux/modules/services';
 
 import { ServicesFormUi } from "../components";
 
@@ -43,13 +43,6 @@ const ServicesForm = React.createClass({
     return (
       <ServicesFormUi
         {...this.props}
-        loaded={this.props.loaded}
-        errors={this.props.errors}
-        items={this.props.items}
-        disabled={!this.props.unlocked}
-        addNewInput={this.props.addNewInput}
-        removeInput={this.props.removeInput}
-        inputChange={this.props.inputChange}
         submit={this.submit} />
     );
   }

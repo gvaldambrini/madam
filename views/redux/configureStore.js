@@ -1,8 +1,15 @@
-import { createStore, applyMiddleware } from 'redux';
+import {
+  createStore,
+  combineReducers,
+  applyMiddleware
+} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import rootReducer from './reducers';
+import services from './modules/services';
 
+const rootReducer = combineReducers({
+  services
+});
 
 export default function configureStore(initialState) {
   const store = createStore(

@@ -48,7 +48,9 @@ else {
           "views/*.js",
           "views/components/*.js",
           "views/containers/*.js",
-          "views/javascripts/*.js"])
+          "views/javascripts/*.js",
+          "views/redux/*.js",
+          "views/redux/modules/*.js"])
         .pipe(eslint({
           configFile: 'config/frontend_eslint.json'
         }))

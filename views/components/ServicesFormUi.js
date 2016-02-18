@@ -14,7 +14,7 @@ export default React.createClass({
     items: ImmutablePropTypes.list.isRequired,
     addNewInput: React.PropTypes.func.isRequired,
     removeInput: React.PropTypes.func.isRequired,
-    disabled: React.PropTypes.bool.isRequired,
+    unlocked: React.PropTypes.bool.isRequired,
     inputChange: React.PropTypes.func.isRequired,
     submit: React.PropTypes.func.isRequired
   },
@@ -42,7 +42,7 @@ export default React.createClass({
           firstInput={index === 0 ? true : false}
           addNewInput={that.props.addNewInput}
           removeInput={that.props.removeInput}
-          disabled={that.props.disabled}
+          disabled={!that.props.unlocked}
           handleChange={that.props.inputChange}/>
       );
     });
@@ -62,7 +62,7 @@ export default React.createClass({
               <div className="col-sm-offset-2 col-sm-10">
                 <button type="button" className="btn btn-primary"
                   name="submit" onClick={this.handleSubmit}>
-                  {this.props.disabled ? this.props.route.i18n.unlock : this.props.route.i18n.save}
+                  {this.props.unlocked ? this.props.route.i18n.save : this.props.route.i18n.unlock}
                 </button>
               </div>
             </div>

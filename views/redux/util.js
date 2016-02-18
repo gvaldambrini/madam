@@ -1,6 +1,33 @@
 import { fromJS } from 'immutable';
 
 
+// Other utility functions
+
+export function uuid4() {
+  //// return uuid of form xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+  let uuid = '', ii;
+  for (ii = 0; ii < 32; ii += 1) {
+    switch (ii) {
+    case 8:
+    case 20:
+      uuid += '-';
+      uuid += (Math.random() * 16 | 0).toString(16);
+      break;
+    case 12:
+      uuid += '-';
+      uuid += '4';
+      break;
+    case 16:
+      uuid += '-';
+      uuid += (Math.random() * 4 | 8).toString(16);
+      break;
+    default:
+      uuid += (Math.random() * 16 | 0).toString(16);
+    }
+  }
+  return uuid;
+}
+
 // API functions, used to send data to the server and converts
 // Immutable data structures into plain js data structures.
 
@@ -40,33 +67,4 @@ export function parseServices(services) {
     }
   }
   return fromJS(items);
-}
-
-
-
-// Other utility functions
-
-export function uuid4() {
-  //// return uuid of form xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-  let uuid = '', ii;
-  for (ii = 0; ii < 32; ii += 1) {
-    switch (ii) {
-    case 8:
-    case 20:
-      uuid += '-';
-      uuid += (Math.random() * 16 | 0).toString(16);
-      break;
-    case 12:
-      uuid += '-';
-      uuid += '4';
-      break;
-    case 16:
-      uuid += '-';
-      uuid += (Math.random() * 4 | 8).toString(16);
-      break;
-    default:
-      uuid += (Math.random() * 16 | 0).toString(16);
-    }
-  }
-  return uuid;
 }
