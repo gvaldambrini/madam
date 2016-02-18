@@ -45,9 +45,9 @@ else {
 
     gulp.task('frontend_lint', function() {
       return gulp.src([
-          "views/jsx/*.js",
-          "views/jsx/components/*.js",
-          "views/jsx/containers/*.js",
+          "views/*.js",
+          "views/components/*.js",
+          "views/containers/*.js",
           "views/javascripts/*.js"])
         .pipe(eslint({
           configFile: 'config/frontend_eslint.json'

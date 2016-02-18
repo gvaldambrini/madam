@@ -24,8 +24,8 @@ import configureStore from './redux/configureStore';
 
 import Cookies from 'js-cookie';
 
-import '../javascripts/confirm-popover.js';
-import '../stylesheets/style.scss';
+import './javascripts/confirm-popover.js';
+import './stylesheets/style.scss';
 
 import {
   MainView,
