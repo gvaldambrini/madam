@@ -3,13 +3,15 @@ import React from 'react';
 import { fnRenderErrors } from './util';
 import SettingsInputUi from './SettingsInputUi';
 
+import ImmutablePropTypes from 'react-immutable-proptypes';
+
 
 // The services form presentational component.
 export default React.createClass({
   propTypes: {
     loaded: React.PropTypes.bool.isRequired,
-    errors: React.PropTypes.array.isRequired,
-    items: React.PropTypes.array.isRequired,
+    errors: ImmutablePropTypes.list.isRequired,
+    items: ImmutablePropTypes.list.isRequired,
     addNewInput: React.PropTypes.func.isRequired,
     removeInput: React.PropTypes.func.isRequired,
     disabled: React.PropTypes.bool.isRequired,
@@ -33,9 +35,9 @@ export default React.createClass({
     const settingsItems = this.props.items.map(function(item, index) {
       return (
         <SettingsInputUi
-          value={item.name}
-          key={item.id}
-          inputId={item.id}
+          value={item.get('name')}
+          key={item.get('id')}
+          inputId={item.get('id')}
           label={i18n.settings.services.name}
           firstInput={index === 0 ? true : false}
           addNewInput={that.props.addNewInput}
@@ -47,7 +49,7 @@ export default React.createClass({
 
     return (
       <div className="content-body">
-        {fnRenderErrors(this.props.errors)}
+        {fnRenderErrors(this.props.errors.toArray())}
         <div className="form-container" id="form-container">
           <form className="form-horizontal settings" method="post" action='' id="form">
             <div className="form-group">

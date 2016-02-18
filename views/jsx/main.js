@@ -19,6 +19,9 @@ import {
   browserHistory
 } from 'react-router';
 
+import { Provider } from 'react-redux';
+import configureStore from './redux/configureStore';
+
 import Cookies from 'js-cookie';
 
 import '../javascripts/confirm-popover.js';
@@ -80,6 +83,7 @@ function requireAuth(nextState, replace) {
     }
 }
 
+const store = configureStore();
 
 const routes = function() {
   return (
@@ -139,6 +143,8 @@ const routes = function() {
 };
 
 ReactDOM.render(
-  <Router routes={routes()} history={browserHistory}/>,
+  <Provider store={store}>
+    <Router routes={routes()} history={browserHistory}/>
+  </Provider>,
   document.getElementById('main-container')
 );
