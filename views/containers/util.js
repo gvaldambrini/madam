@@ -1,5 +1,4 @@
 import { browserHistory } from 'react-router';
-import Cookies from 'js-cookie';
 
 
 function fnSubmitForm(self, url, method, data, successCb) {
@@ -13,7 +12,6 @@ function fnSubmitForm(self, url, method, data, successCb) {
     success: successCb,
     error: function(xhr, textStatus, _errorThrown) {
       if (xhr.status === 401) {
-        Cookies.remove('user');
         browserHistory.push('/login');
       }
 
@@ -42,7 +40,6 @@ function fnFetchData(self, url, filterText) {
       }),
     error: function(xhr, textStatus, _errorThrown) {
       if (xhr.status === 401) {
-        Cookies.remove('user');
         browserHistory.push('/login');
       }
     }

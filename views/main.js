@@ -75,12 +75,12 @@ $.fn.datepicker.defaults.todayHighlight = true;
 
 
 function requireAuth(nextState, replace) {
-    if (typeof Cookies.get('user') === 'undefined') {
-      replace({
-        pathname: '/login',
-        state: { nextPathname: nextState.location.pathname }
-      });
-    }
+  if (typeof Cookies.get('user') === 'undefined') {
+    replace({
+      pathname: '/login',
+      state: { nextPathname: nextState.location.pathname }
+    });
+  }
 }
 
 const store = configureStore();
@@ -88,53 +88,60 @@ const store = configureStore();
 const routes = function() {
   return (
     <Route component={MainView}>
-      <Route path="/" component={MainContentUi} onEnter={requireAuth}>
+      <Route path="/" component={MainContentUi}>
         <IndexRedirect to="calendar" />
+        // Calendar section
         // this would be ideally just a main route with path equal to "/calendar(/:date)",
         // however with that configuration the related link in the sidebar is not active
         // when accessing the calendar page with a specific date.
         // This trick (having the main root simply as "calendar") solve the problem.
         <Route path="calendar" component={WrapperUi}>
-          <IndexRoute component={CalendarView}/>
-          <Route path=":date" component={CalendarView}/>
+          <IndexRoute component={CalendarView} onEnter={requireAuth}/>
+          <Route path=":date" component={CalendarView} onEnter={requireAuth}/>
           <Route path=":date/customers/:id" component={CalendarCustomerView}>
-            <IndexRoute component={CalendarCustomerForm}/>
+            <IndexRoute component={CalendarCustomerForm} onEnter={requireAuth}/>
             <Route path="appointments" component={WrapperUi}>
-              <IndexRoute component={CalendarAppointmentsView}/>
-              <Route path="new" component={CalendarAppointmentView}/>
-              <Route path=":appid" component={CalendarAppointmentView}/>
-              <Route path="planned/:appid" component={CalendarAppointmentView}/>
+              <IndexRoute component={CalendarAppointmentsView} onEnter={requireAuth}/>
+              <Route path="new" component={CalendarAppointmentView} onEnter={requireAuth}/>
+              <Route path=":appid" component={CalendarAppointmentView} onEnter={requireAuth}/>
+              <Route path="planned/:appid" component={CalendarAppointmentView} onEnter={requireAuth}/>
             </Route>
           </Route>
           <Route path=":date/appointments/planned/:appid/newcustomer" component={CalendarCustomerView}>
-            <IndexRoute component={CalendarCustomerForm}/>
+            <IndexRoute component={CalendarCustomerForm} onEnter={requireAuth}/>
           </Route>
         </Route>
+
+        // Customers section
         <Route path="customers" component={WrapperUi}>
-          <IndexRoute component={CustomersView}/>
+          <IndexRoute component={CustomersView} onEnter={requireAuth}/>
           <Route path="new" component={CustomerView}>
-            <IndexRoute component={CustomerForm}/>
+            <IndexRoute component={CustomerForm} onEnter={requireAuth}/>
           </Route>
           <Route path="edit/:id" component={CustomerView}>
-            <IndexRoute component={CustomerForm}/>
+            <IndexRoute component={CustomerForm} onEnter={requireAuth}/>
             <Route path="appointments" component={WrapperUi}>
-              <IndexRoute component={AppointmentsView}/>
-              <Route path="new" component={AppointmentView}/>
-              <Route path="edit/:appid" component={AppointmentView}/>
-              <Route path="planned/:date/:appid" component={AppointmentView}/>
+              <IndexRoute component={AppointmentsView} onEnter={requireAuth}/>
+              <Route path="new" component={AppointmentView} onEnter={requireAuth}/>
+              <Route path="edit/:appid" component={AppointmentView} onEnter={requireAuth}/>
+              <Route path="planned/:date/:appid" component={AppointmentView} onEnter={requireAuth}/>
             </Route>
           </Route>
         </Route>
+
+        // Products section
         <Route path="products" component={WrapperUi}>
-          <IndexRoute component={ProductsView}/>
-          <Route path="new" component={ProductForm}/>
-          <Route path="edit/:id" component={ProductForm}/>
-          <Route path="clone/:id" component={ProductForm}/>
+          <IndexRoute component={ProductsView} onEnter={requireAuth}/>
+          <Route path="new" component={ProductForm} onEnter={requireAuth}/>
+          <Route path="edit/:id" component={ProductForm} onEnter={requireAuth}/>
+          <Route path="clone/:id" component={ProductForm} onEnter={requireAuth}/>
         </Route>
+
+        // Settings section
         <Route path="settings" component={SettingsViewUi}>
           <IndexRedirect to="workers" />
-          <Route path="workers" i18n={i18n.settings.workers} component={WorkersForm}/>
-          <Route path="services" i18n={i18n.settings.services} component={ServicesForm}/>
+          <Route path="workers" i18n={i18n.settings.workers} component={WorkersForm} onEnter={requireAuth}/>
+          <Route path="services" i18n={i18n.settings.services} component={ServicesForm} onEnter={requireAuth}/>
         </Route>
       </Route>
       <Route path="/login" component={LoginForm}/>

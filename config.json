@@ -3,5 +3,6 @@
   "language": "it",
   "defaultWorkerColor": "#000000",
   "mainIndex": "main",
-  "logger": true
+  "logger": true,
+  "sessionMaxAge": 3600000
 }

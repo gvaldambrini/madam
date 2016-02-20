@@ -39,6 +39,7 @@ class AuthenticationHandler {
                 if (err) {
                     return next(err);
                 }
+                res.cookie('user', req.user, {maxAge: req.config.sessionMaxAge});
                 res.status(200).json({user: user});
             });
         })(req, res, next);
@@ -54,6 +55,7 @@ class AuthenticationHandler {
      */
     static logout(req, res, _next) {
       req.logout();
+      res.clearCookie('user');
       res.status(200).end();
     }
 }

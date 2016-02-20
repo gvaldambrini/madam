@@ -4,5 +4,6 @@
   "defaultWorkerColor": "#000000",
   "mainIndex": "main_test",
   "logger": false,
-  "disableCsrf": true
+  "disableCsrf": true,
+  "sessionMaxAge": 3600000
 }

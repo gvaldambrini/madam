@@ -37,21 +37,21 @@ const client = common.createClient();
  * @param {app} app the {@link http://expressjs.com/4x/api.html#app|express application}.
  */
 function setupConfig(app) {
-    /*eslint-disable global-require*/
-    app.use(function(request, response, next) {
-        if (typeof process.env.NODE_CONFIG_FILE !== 'undefined') {
-            request.config = require(process.env.NODE_CONFIG_FILE);
-        }
-        else {
-            request.config = require('./config.json');
-        }
-        request.i18n.setLocale(request.config.language);
-        // Let the configuration available also in templates.
-        response.locals.config = request.config;
-        response.locals.isProduction = process.env.NODE_ENV === 'production';
-        next();
-    });
-    /*eslint-enable global-require*/
+  /*eslint-disable global-require*/
+  app.use(function(request, response, next) {
+    if (typeof process.env.NODE_CONFIG_FILE !== 'undefined') {
+      request.config = require(process.env.NODE_CONFIG_FILE);
+    }
+    else {
+      request.config = require('./config.json');
+    }
+    request.i18n.setLocale(request.config.language);
+    // Let the configuration available also in templates.
+    response.locals.config = request.config;
+    response.locals.isProduction = process.env.NODE_ENV === 'production';
+    next();
+  });
+  /*eslint-enable global-require*/
 }
 
 /**
@@ -61,12 +61,12 @@ function setupConfig(app) {
  * @param {app} app the {@link http://expressjs.com/4x/api.html#app|express application}.
  */
 function setupWebpack(app) {
-    app.use(function(request, response, next) {
-        if (typeof process.env.WEBPACK_DEV_SERVER !== 'undefined') {
-            response.locals.webpackDevServer = process.env.WEBPACK_DEV_SERVER;
-        }
-        next();
-    });
+  app.use(function(request, response, next) {
+    if (typeof process.env.WEBPACK_DEV_SERVER !== 'undefined') {
+      response.locals.webpackDevServer = process.env.WEBPACK_DEV_SERVER;
+    }
+    next();
+  });
 }
 
 /**
@@ -95,18 +95,18 @@ function setupHandlebars(app) {
  * @param {app} app the {@link http://expressjs.com/4x/api.html#app|express application}.
  */
 function setupValidator(app) {
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
 
-    app.use(function(request, response, next) {
-      let validatorOptions = {
-        customValidators: {
-          isEmpty: value => /^\s+$/.test(value),
-          isValidDate: value => moment(value, request.config.date_format).isValid()
-        }
-      };
-      return validator(validatorOptions)(request, response, next);
-    });
+  app.use(function(request, response, next) {
+    let validatorOptions = {
+      customValidators: {
+        isEmpty: value => /^\s+$/.test(value),
+        isValidDate: value => moment(value, request.config.date_format).isValid()
+      }
+    };
+    return validator(validatorOptions)(request, response, next);
+  });
 }
 
 /**
@@ -116,48 +116,52 @@ function setupValidator(app) {
  * @param {app} app the {@link http://expressjs.com/4x/api.html#app|express application}.
  */
 function setupCookies(app) {
-    let cookieKey;
-    let cookieSecret;
-    if (process.env.NODE_ENV === 'production') {
-        cookieKey = process.env.COOKIE_KEY;
-        cookieSecret = process.env.COOKIE_SECRET;
+  let cookieKey;
+  let cookieSecret;
+  if (process.env.NODE_ENV === 'production') {
+    cookieKey = process.env.COOKIE_KEY;
+    cookieSecret = process.env.COOKIE_SECRET;
+  }
+  else {
+    cookieKey = 'sid';
+    cookieSecret = 'secret';
+  }
+
+  app.use(cookieParser(cookieSecret));
+  app.use(function(req, res, next) {
+    session({
+      key: cookieKey,
+      secret: cookieSecret,
+      maxAge: req.config.sessionMaxAge
+    })(req, res, next);
+  });
+
+  app.use(function(req, res, next) {
+    // The csrf protection is important for security, disable it only for
+    // testing!
+    if (req.config.disableCsrf) {
+      next();
+      return;
     }
-    else {
-        cookieKey = 'sid';
-        cookieSecret = 'secret';
+
+    csrf({ cookie: true })(req, res, next);
+  });
+
+  app.use(function(req, res, next) {
+    // To update the session expiration time we need to send the new
+    // expiration in the response cookie.
+    // To send again the response cookie to the client we need to
+    // update the session object.
+    req.session.fake = Date.now();
+
+    if (!req.config.disableCsrf) {
+      // Pass the csrf token to use to the frontend, setting its expiration
+      // to 1 day (greater than the session cookie) to let the frontend use
+      // the token to perform again the login in case of expired session.
+      res.cookie('csrf', req.csrfToken(), {maxAge: 24 * 60 * 60 * 1000});
     }
-
-    app.use(cookieParser(cookieSecret));
-    app.use(session({
-        key: cookieKey,
-        secret: cookieSecret,
-        maxAge: 1 * 60 * 60 * 1000 // 1 hour (rolling)
-    }));
-
-    app.use(function(req, res, next) {
-        // The csrf protection is important for security, disable it only for
-        // testing!
-        if (req.config.disableCsrf) {
-            next();
-            return;
-        }
-
-        csrf({ cookie: true })(req, res, next);
-    });
-
-    app.use(function(req, res, next) {
-        // To update the session expiration time we need to send the new
-        // expiration in the response cookie.
-        // To send again the response cookie to the client we need to
-        // update the session object.
-        req.session.fake = Date.now();
-
-        if (!req.config.disableCsrf) {
-            // Pass the csrf token to use to the frontend.
-            res.cookie('csrf', req.csrfToken());
-        }
-        next();
-    });
+    next();
+  });
 }
 
 /**
@@ -167,44 +171,55 @@ function setupCookies(app) {
  * @param {app} app the {@link http://expressjs.com/4x/api.html#app|express application}.
  */
 function setupAuthentication(app) {
-    // For now, there is no need of something more than the username.
-    passport.serializeUser((username, done) => done(null, username));
-    passport.deserializeUser((username, done) => done(null, username));
+  // For now, there is no need of something more than the username.
+  passport.serializeUser((username, done) => done(null, username));
+  passport.deserializeUser((username, done) => done(null, username));
 
-    passport.use('login', new LocalStrategy({
-        passReqToCallback: true
-    },
-    // The verify callback, called only if both username and password are present.
-    function(req, username, password, done) {
-        client.get({
-            index: req.config.mainIndex,
-            type: 'users',
-            id: common.usersDocId
-        }, function(err, resp, _respcode) {
-            if (err) {
-                return done(err);
-            }
+  passport.use('login', new LocalStrategy({
+    passReqToCallback: true
+  },
+  // The verify callback, called only if both username and password are present.
+  function(req, username, password, done) {
+    client.get({
+      index: req.config.mainIndex,
+      type: 'users',
+      id: common.usersDocId
+    }, function(err, resp, _respcode) {
+      if (err) {
+        return done(err);
+      }
 
-            if (typeof resp._source === 'undefined') {
-                console.log('Users document not found');
-                return done(req.i18n.__('Incorrect username.'), false);
-            }
-            let users = resp._source.users.filter(el => el.username === username);
-            if (users.length === 0) {
-                return done(req.i18n.__('Incorrect username.'), false);
-            }
+      if (typeof resp._source === 'undefined') {
+        console.log('Users document not found');
+        return done(req.i18n.__('Incorrect username.'), false);
+      }
+      let users = resp._source.users.filter(el => el.username === username);
+      if (users.length === 0) {
+        return done(req.i18n.__('Incorrect username.'), false);
+      }
 
-            let user = users[0];
-            if (!bcrypt.compareSync(password, user.password)) {
-                return done(req.i18n.__('Incorrect password.'), false);
-            }
+      let user = users[0];
+      if (!bcrypt.compareSync(password, user.password)) {
+        return done(req.i18n.__('Incorrect password.'), false);
+      }
 
-            return done(null, username);
-        });
-    }));
+      return done(null, username);
+    });
+  }));
 
-    app.use(passport.initialize());
-    app.use(passport.session());
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // This middleware must be invoked here, after the call of passport.session
+  app.use(function(req, res, next) {
+    if (req.isAuthenticated()) {
+      res.cookie('user', req.user, {maxAge: req.config.sessionMaxAge});
+    }
+    else {
+      res.clearCookie('user');
+    }
+    next();
+  });
 }
 
 /**

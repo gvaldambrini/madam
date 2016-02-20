@@ -15,7 +15,6 @@ export default React.createClass({
       url: '/logout',
       method: 'post',
       success: function() {
-        Cookies.remove('user');
         that.context.router.push('/login');
       }
     });

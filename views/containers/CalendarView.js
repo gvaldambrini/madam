@@ -1,6 +1,5 @@
 import React from 'react';
 import moment from 'moment';
-import Cookies from 'js-cookie';
 
 import {
   fnFetchData,
@@ -44,7 +43,6 @@ export default React.createClass({
       success: data => callback(null, data.customers),
       error: function(xhr, textStatus, _errorThrown) {
         if (xhr.status === 401) {
-          Cookies.remove('user');
           that.context.router.push('/login');
         }
       }

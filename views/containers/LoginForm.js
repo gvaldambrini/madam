@@ -1,5 +1,4 @@
 import React from 'react';
-import Cookies from 'js-cookie';
 
 import { fnSubmitForm } from './util';
 import { LoginFormUi } from "../components";
@@ -31,8 +30,7 @@ export default React.createClass({
   },
   handleSubmit: function() {
     const that = this;
-    fnSubmitForm(this, '/login', 'post', this.state.data, function(data) {
-      Cookies.set('user', data.user);
+    fnSubmitForm(this, '/login', 'post', this.state.data, function(_data) {
       that.context.router.push('/');
     });
   },
