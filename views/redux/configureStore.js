@@ -6,9 +6,11 @@ import {
 import thunkMiddleware from 'redux-thunk';
 
 import services from './modules/services';
+import products from './modules/products';
 
 const rootReducer = combineReducers({
-  services
+  services,
+  products
 });
 
 export default function configureStore(initialState) {

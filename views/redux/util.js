@@ -40,6 +40,13 @@ export function prepareServices(services) {
 }
 
 
+export function parseProducts(products) {
+  return fromJS(products);
+
+export function parseCustomers(customers) {
+  return fromJS(customers);
+}
+
 // API functions, used to receive data from the server and converts
 // js data structures to the Immutables ones.
 

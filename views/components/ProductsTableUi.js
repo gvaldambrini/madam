@@ -4,7 +4,7 @@ import React from 'react';
 // The products table presentational component.
 export default React.createClass({
   propTypes: {
-    data: React.PropTypes.object.isRequired,
+    products: React.PropTypes.array.isRequired,
     editProduct: React.PropTypes.func.isRequired,
     cloneProduct: React.PropTypes.func.isRequired,
     deleteProduct: React.PropTypes.func.isRequired
@@ -16,7 +16,7 @@ export default React.createClass({
   },
   render: function() {
     const that = this;
-    const productRows = this.props.data.products.map(function(product, index) {
+    const productRows = this.props.products.map(function(product, index) {
       const productDetails = product.objects.map(function(object) {
         return (
           <tr key={object.id} onClick={
@@ -84,16 +84,16 @@ export default React.createClass({
           <td colSpan={4} className="hidden-row">
             <div id={'expanded-row' + index} className="collapse">
               <table className='table table-hover'>
-                  <thead data-toggle="collapse" data-target={'#expanded-row' + index}>
-                    <tr>
-                      <th>{i18n.products.soldDate}</th>
-                      <th>{i18n.products.notes}</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {productDetails}
-                  </tbody>
+                <thead data-toggle="collapse" data-target={'#expanded-row' + index}>
+                  <tr>
+                    <th>{i18n.products.soldDate}</th>
+                    <th>{i18n.products.notes}</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productDetails}
+                </tbody>
               </table>
             </div>
           </td>

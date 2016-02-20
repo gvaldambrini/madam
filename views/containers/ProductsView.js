@@ -1,35 +1,33 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { fnFetchData } from './util';
-import { ProductsViewUi } from "../components";
+import {
+  fetchProductsIfNeeded,
+  deleteProduct,
+  resetProductsFilters
+} from '../redux/modules/products';
+
+import { ProductsViewUi } from '../components';
 
 
 // The products main container used in the products section.
-export default React.createClass({
+const ProductsView = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
-  getInitialState: function() {
-    return {
-      data: {},
-      loaded: false,
-      filterText: ''
-    };
+  propTypes: {
+    loaded: React.PropTypes.bool.isRequired,
+    filterText: React.PropTypes.string,
+    products: React.PropTypes.array.isRequired
   },
-  componentWillMount: function() {
-    this.updateTable();
+  componentDidMount: function() {
+    this.props.dispatch(fetchProductsIfNeeded(this.props.filterText));
   },
-  deleteProduct: function(objId) {
-    const that = this;
-    $.ajax({
-      url: '/products/' + objId,
-      method: 'delete',
-      complete: function(obj, status) {
-        if (status === 'success') {
-          that.updateTable();
-        }
-      }
-    });
+  componentWillReceiveProps: function(nextProps) {
+    this.props.dispatch(fetchProductsIfNeeded(nextProps.filterText));
+  },
+  componentWillUnmount: function() {
+    this.props.dispatch(resetProductsFilters());
   },
   editProduct: function(objId) {
     this.context.router.push(`/products/edit/${objId}`);
@@ -37,26 +35,35 @@ export default React.createClass({
   cloneProduct: function(objId) {
     this.context.router.push(`/products/clone/${objId}`);
   },
-  search: function(text) {
-    this.setState({
-      filterText: text
-    });
-
-    fnFetchData(this, '/products/search', text);
-  },
-  updateTable: function() {
-    this.search(this.state.filterText);
-  },
   render: function() {
     return (
       <ProductsViewUi
-        loaded={this.state.loaded}
-        data={this.state.data}
-        deleteProduct={this.deleteProduct}
+        {...this.props}
         editProduct={this.editProduct}
         cloneProduct={this.cloneProduct}
-        search={this.search}
         newProductPath='/products/new'/>
     );
   }
 });
+
+function mapStateToProps(state) {
+  const products = state.products;
+  return {
+    loaded: products.get('loaded'),
+    filterText: products.get('filterText'),
+    products: products.get('productList').toJS()
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch,
+    search: text => dispatch(fetchProductsIfNeeded(text)),
+    deleteProduct: productId => dispatch(deleteProduct(productId))
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ProductsView);

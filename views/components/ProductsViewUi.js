@@ -11,7 +11,7 @@ import ProductsTableUi from './ProductsTableUi';
 export default React.createClass({
   propTypes: {
     loaded: React.PropTypes.bool.isRequired,
-    data: React.PropTypes.object.isRequired,
+    products: React.PropTypes.array.isRequired,
     search: React.PropTypes.func.isRequired,
     editProduct: React.PropTypes.func.isRequired,
     cloneProduct: React.PropTypes.func.isRequired,
@@ -24,13 +24,9 @@ export default React.createClass({
       return <div></div>;
     }
 
-    if (this.props.data.products.length > 0) {
+    if (this.props.products.length > 0) {
       products = (
-        <ProductsTableUi
-          data={this.props.data}
-          editProduct={this.props.editProduct}
-          cloneProduct={this.props.cloneProduct}
-          deleteProduct={this.props.deleteProduct}/>
+        <ProductsTableUi {...this.props}/>
       );
     }
     else {

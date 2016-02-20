@@ -1,48 +1,69 @@
 import React from 'react';
 import moment from 'moment';
+import { connect } from 'react-redux';
 
-import { fnSubmitForm } from './util';
-import { ProductFormUi } from "../components";
+import { ProductFormUi } from '../components';
+
+import {
+  fetchProduct,
+  saveProduct
+} from '../redux/modules/products';
 
 
 // The product form container used in the products section.
-export default React.createClass({
+const ProductForm = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
+  propTypes: {
+    productObject: React.PropTypes.object
+  },
   getInitialState: function() {
+    // The form local state is initialized from the one stored in redux
+    // (if the related object already exists) and synced only on the save.
+    let data = {};
+    if (typeof this.props.params.id !== 'undefined') {
+      if (typeof this.props.productObject !== 'undefined') {
+        data = this.props.productObject;
+      }
+    }
+    else {
+      data = {
+        sold_date: moment().format(config.date_format)
+      };
+    }
+
     return {
-      data: {},
+      data: data,
       errors: []
     };
   },
-  componentWillMount: function() {
-    const that = this;
+  componentDidMount: function() {
+    if (typeof this.props.params.id !== 'undefined' &&
+        typeof this.props.productObject === 'undefined') {
+      this.props.dispatch(fetchProduct(this.props.params.id));
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    if (typeof this.props.params.id !== 'undefined') {
+      this.updateFormData(nextProps.productObject);
+    }
+  },
+  updateFormData: function(data) {
     const cloneForm = this.props.route.path.startsWith('clone');
-    if (this.props.params.id) {
-      $.ajax({
-        url: '/products/' + this.props.params.id,
-        method: 'get',
-        success: function(data) {
-          if (cloneForm) {
-            data.sold_date = moment().format(config.date_format);
-            data.notes = '';
-          }
-          that.setState({
-            data: data,
-            errors: []
-          });
-        }
-      });
+    if (cloneForm) {
+      data.sold_date = moment().format(config.date_format);
+      data.notes = '';
     }
     else {
-      that.setState({
-        data: {
-          sold_date: moment().format(config.date_format)
-        },
-        errors: []
-      });
+      // If the data in the state contains the id it means that we are
+      // editing an existing product.
+      data.id = this.props.params.id;
     }
+
+    this.setState({
+      data: data
+    });
   },
   handleChange: function(name, value) {
     const data = this.state.data;
@@ -55,10 +76,20 @@ export default React.createClass({
     }
   },
   submit: function() {
-    const editForm = this.props.route.path.startsWith('edit');
-    const url = editForm ? `/products/${this.props.params.id}` : '/products';
-    const method = editForm ? 'put': 'post';
-    fnSubmitForm(this, url, method, this.state.data, _data => this.context.router.push('/products'));
+    const that = this;
+    const onSuccess = function(_data) {
+      that.context.router.push('/products');
+    };
+
+    const onError = function(xhr, _textStatus, _errorThrown) {
+      that.setState({
+        errors: xhr.responseJSON.errors.map(item => item.msg)
+      });
+    };
+
+    this.props.dispatch(
+      saveProduct(this.state.data.id, this.state.data)
+    ).then(onSuccess, onError);
   },
   render: function() {
     const editForm = this.props.route.path.startsWith('edit');
@@ -83,3 +114,18 @@ export default React.createClass({
     );
   }
 });
+
+
+function mapStateToProps(state, ownProps) {
+  const objects = state.products.get('productObjects');
+  let obj;
+  if (objects.has(ownProps.params.id)) {
+    obj = objects.get(ownProps.params.id).toJS();
+  }
+
+  return {
+    productObject: obj
+  };
+}
+
+export default connect(mapStateToProps)(ProductForm);
