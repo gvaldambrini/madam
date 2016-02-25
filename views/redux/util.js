@@ -39,10 +39,6 @@ export function prepareServices(services) {
   return items;
 }
 
-
-export function parseProducts(products) {
-  return fromJS(products);
-
 export function parseCustomers(customers) {
   return fromJS(customers);
 }

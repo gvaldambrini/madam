@@ -1,25 +1,44 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { fnSubmitForm } from './util';
-import { WorkersFormUi } from "../components";
+import {
+  fetchWorkersIfNeeded,
+  saveWorkers
+} from '../redux/modules/workers';
+
+import { WorkersFormUi } from '../components';
 
 
 // The workers form container.
-export default React.createClass({
+const WorkersForm = React.createClass({
+  propTypes: {
+    workerList: React.PropTypes.array.isRequired,
+    loaded: React.PropTypes.bool.isRequired
+  },
   getInitialState: function() {
+    // The form local state is initialized from the one stored in redux
+    // (if the related object already exists) and synced only on the save.
+    let items = [];
+    if (this.props.loaded) {
+      items = this.prepareItems(this.props.workerList);
+    }
+
     return {
-      items: [],
+      items: items,
       errors: [],
-      disabled: true,
-      submitText: this.props.route.i18n.save,
-      loaded: false
+      disabled: true
     };
   },
-  componentWillMount: function() {
-    $.ajax({
-      url: '/settings/workers',
-      method: 'get',
-      success: this.loadItems
+  componentDidMount: function() {
+    if (!this.props.loaded) {
+      this.props.dispatch(fetchWorkersIfNeeded());
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    const items = this.prepareItems(nextProps.workerList);
+    this.setState({
+      items: items,
+      disabled: true
     });
   },
   uuid4: function () {
@@ -57,11 +76,11 @@ export default React.createClass({
       items: items
     });
   },
-  removeInput: function(rowId) {
+  removeInput: function(workerId) {
     const items = this.state.items.slice();
     let index;
     for (let i = 0; i < items.length; i++) {
-      if (items[i].id === rowId) {
+      if (items[i].id === workerId) {
         index = i;
         break;
       }
@@ -77,33 +96,24 @@ export default React.createClass({
       color: config.defaultWorkerColor
     };
   },
-  loadItems: function(data) {
+  prepareItems: function(workers) {
+    const that = this;
     // We need an unique and stable id so that React can perform
     // the reconciliation to understand who is the child removed
     // or added.
-    const items = [];
-    if (data.workers.length === 0) {
+    let items = [];
+    if (workers.length === 0) {
       const emptyItem = this.newEmptyObj();
       emptyItem.id = this.uuid4();
       items[0] = emptyItem;
     }
     else {
-      for (let i = 0; i < data.workers.length; i++) {
-        items[items.length] = {
-          name: data.workers[i].name,
-          color: data.workers[i].color,
-          id: this.uuid4()
-        };
-      }
+      items = workers.map(function(item) { item.id = that.uuid4(); return item; });
     }
-
-    this.setState({
-      items: items,
-      loaded: true,
-      disabled: true
-    });
+    return items;
   },
   submit: function() {
+    const that = this;
     if (this.state.disabled) {
       this.setState({
         disabled: false
@@ -111,11 +121,18 @@ export default React.createClass({
       return;
     }
 
-    const data = {workers: this.state.items};
-    fnSubmitForm(this, '/settings/workers', 'put', data, this.loadItems);
+    const onError = function(xhr, _textStatus, _errorThrown) {
+      that.setState({
+        errors: xhr.responseJSON.errors.map(item => item.msg)
+      });
+    };
+
+    this.props.dispatch(
+      saveWorkers(this.state.items)
+    ).then(undefined, onError);
   },
   inputChange: function(inputId, text, color) {
-    const items = this.state.items;
+    const items = this.state.items.slice();
 
     for (let i = 0; i < items.length; i++) {
       if (items[i].id === inputId) {
@@ -135,7 +152,7 @@ export default React.createClass({
     return (
       <WorkersFormUi
         {...this.props}
-        loaded={this.state.loaded}
+        loaded={this.props.loaded}
         errors={this.state.errors}
         items={this.state.items}
         addNewInput={this.addNewInput}
@@ -147,3 +164,13 @@ export default React.createClass({
   }
 });
 
+
+function mapStateToProps(state) {
+  const workers = state.workers;
+  return {
+    workerList: workers.get('workerList').toJS(),
+    loaded: workers.get('loaded')
+  };
+}
+
+export default connect(mapStateToProps)(WorkersForm);
