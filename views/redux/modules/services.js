@@ -1,89 +1,26 @@
-const REQUEST_FETCH = 'services/REQUEST_FETCH';
 const RESPONSE_FETCH = 'services/RESPONSE_FETCH';
-const REQUEST_SAVE = 'services/REQUEST_SAVE';
-const RESPONSE_SAVE = 'services/RESPONSE_SAVE';
-
-const UNLOCK_FORM = 'services/UNLOCK_FORM';
-const RESET_FORM = 'services/RESET_FORM';
-
-const ADD_SERVICE = 'services/ADD_SERVICE';
-const REMOVE_SERVICE = 'services/REMOVE_SERVICE';
-const UPDATE_SERVICE = 'services/UPDATE_SERVICE';
 
 import {
   List,
-  Map
+  Map,
+  fromJS
 } from 'immutable';
 
-import {
-  prepareServices,
-  parseErrors,
-  parseServices,
-  uuid4
-} from '../util';
-
-
-function findServiceIndex(services, serviceId) {
-    let index;
-    for (let i = 0; i < services.size; i++) {
-      if (services.getIn([i, 'id']) === serviceId) {
-        index = i;
-        break;
-      }
-    }
-    return index;
-}
 
 export default function reducer(state = Map({
   loaded: false,
-  items: List(),
-  savedItems: List(),
-  errors: List(),
-  unlocked: false
+  serviceList: List()
 }), action) {
   switch (action.type) {
-    case ADD_SERVICE:
-      return state.updateIn(['items'], list => list.push(Map({name: '', id: uuid4()})));
-    case REMOVE_SERVICE:
-    {
-      const index = findServiceIndex(state.get('items'), action.payload.serviceId);
-      return state.updateIn(['items'], list => list.remove(index, 1));
-    }
-    case UPDATE_SERVICE:
-    {
-      const index = findServiceIndex(state.get('items'), action.payload.serviceId);
-      return state.updateIn(['items', index, 'name'], _text => action.payload.text);
-    }
-    case UNLOCK_FORM:
-      return state.set('unlocked', true);
-    case RESET_FORM:
-      return state.merge(
-        Map({
-          unlocked: false,
-          items: List(state.get('savedItems')),
-          errors: List()}));
-    case RESPONSE_SAVE:
     case RESPONSE_FETCH:
-      if (action.error) {
-        return state.set('errors', parseErrors(action.payload));
-      }
-      const items = parseServices(action.payload);
       return state.merge(
         Map({
           loaded: true,
-          items: items,
-          savedItems: List(items),
-          errors: List(),
-          unlocked: false}));
+          serviceList: fromJS(action.payload.map(el => Map({name: el})))
+        }));
     default:
       return state;
   }
-}
-
-function requestFetchServices() {
-  return {
-    type: REQUEST_FETCH
-  };
 }
 
 function responseFetchServices(services) {
@@ -96,7 +33,6 @@ function responseFetchServices(services) {
 
 function fetchServices() {
   return dispatch => {
-    dispatch(requestFetchServices());
     $.ajax({
       url: '/settings/services',
       method: 'get',
@@ -123,79 +59,19 @@ export function fetchServicesIfNeeded() {
   };
 }
 
-export function unlockServicesForm() {
-  return {
-    type: UNLOCK_FORM
-  };
-}
-
-export function resetServicesForm() {
-  return {
-    type: RESET_FORM
-  };
-}
-
-function requestSaveServices() {
-  return {
-    type: REQUEST_SAVE
-  };
-}
-
-function responseSaveServices(services) {
-  return {
-    type: RESPONSE_SAVE,
-    payload: services,
-    error: false
-  };
-}
-
-function responseSaveServicesError(errors) {
-  return {
-    type: RESPONSE_SAVE,
-    payload: errors,
-    error: true
-  };
-}
-
 export function saveServices(services) {
   return dispatch => {
-    dispatch(requestSaveServices());
-    $.ajax({
+    const ajaxPromise = $.ajax({
       url: '/settings/services',
       method: 'put',
       contentType: 'application/json',
-      data: JSON.stringify({services: prepareServices(services)}),
-      success: function(data) {
-        dispatch(responseSaveServices(data.services));
-      },
-      error: function(xhr, _textStatus, _errorThrown) {
-        dispatch(responseSaveServicesError(xhr.responseJSON.errors));
-      }
+      data: JSON.stringify({services: services.map(item => item.name)})
     });
-  };
-}
+    const onSuccess = function(data) {
+      dispatch(responseFetchServices(fromJS(data.services)));
+    };
 
-export function addService() {
-  return {
-    type: ADD_SERVICE
-  };
-}
-
-export function removeService(serviceId) {
-  return {
-    type: REMOVE_SERVICE,
-    payload: {
-      serviceId
-    }
-  };
-}
-
-export function updateService(serviceId, text) {
-  return {
-    type: UPDATE_SERVICE,
-    payload: {
-      serviceId,
-      text
-    }
+    ajaxPromise.then(onSuccess);
+    return ajaxPromise;
   };
 }

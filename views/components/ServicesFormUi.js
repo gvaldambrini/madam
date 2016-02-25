@@ -3,18 +3,16 @@ import React from 'react';
 import { fnRenderErrors } from './util';
 import SettingsInputUi from './SettingsInputUi';
 
-import ImmutablePropTypes from 'react-immutable-proptypes';
-
 
 // The services form presentational component.
 export default React.createClass({
   propTypes: {
     loaded: React.PropTypes.bool.isRequired,
-    errors: ImmutablePropTypes.list.isRequired,
-    items: ImmutablePropTypes.list.isRequired,
+    errors: React.PropTypes.array.isRequired,
+    items: React.PropTypes.array.isRequired,
     addNewInput: React.PropTypes.func.isRequired,
     removeInput: React.PropTypes.func.isRequired,
-    unlocked: React.PropTypes.bool.isRequired,
+    disabled: React.PropTypes.bool.isRequired,
     inputChange: React.PropTypes.func.isRequired,
     submit: React.PropTypes.func.isRequired
   },
@@ -35,21 +33,21 @@ export default React.createClass({
     const settingsItems = this.props.items.map(function(item, index) {
       return (
         <SettingsInputUi
-          value={item.get('name')}
-          key={item.get('id')}
-          inputId={item.get('id')}
+          value={item.name}
+          key={item.id}
+          inputId={item.id}
           label={i18n.settings.services.name}
           firstInput={index === 0 ? true : false}
           addNewInput={that.props.addNewInput}
           removeInput={that.props.removeInput}
-          disabled={!that.props.unlocked}
+          disabled={that.props.disabled}
           handleChange={that.props.inputChange}/>
       );
     });
 
     return (
       <div className="content-body">
-        {fnRenderErrors(this.props.errors.toArray())}
+        {fnRenderErrors(this.props.errors)}
         <div className="form-container" id="form-container">
           <form className="form-horizontal settings" method="post" action='' id="form">
             <div className="form-group">
@@ -62,7 +60,7 @@ export default React.createClass({
               <div className="col-sm-offset-2 col-sm-10">
                 <button type="button" className="btn btn-primary"
                   name="submit" onClick={this.handleSubmit}>
-                  {this.props.unlocked ? this.props.route.i18n.save : this.props.route.i18n.unlock}
+                  {this.props.disabled ? this.props.route.i18n.unlock : this.props.route.i18n.save }
                 </button>
               </div>
             </div>
