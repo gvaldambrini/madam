@@ -24,7 +24,6 @@ export default React.createClass({
   handleSubmit: function(event) {
     event.preventDefault();
     event.stopPropagation();
-
     this.props.submit();
   },
   addService: function(event) {

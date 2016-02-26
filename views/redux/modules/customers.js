@@ -67,7 +67,7 @@ function responseFetchCustomers(customers) {
   };
 }
 
-function fetchCustomers(filterText) {
+export function fetchCustomers(filterText) {
   return dispatch => {
     dispatch(requestFetchCustomers(filterText));
     $.ajax({
@@ -175,10 +175,10 @@ export function saveCustomer(customerId, data) {
       contentType: 'application/json',
       data: JSON.stringify(data)
     });
-    const onSuccess = function(data) {
+    const onSuccess = function(obj) {
       // update the item on the objects list
-      dispatch(responseFetchCustomer(data.id, data));
-      // let's refresh the list of products
+      dispatch(responseFetchCustomer(obj.id, data));
+      // let's refresh the customer list
       dispatch(fetchCustomers(''));
     };
 

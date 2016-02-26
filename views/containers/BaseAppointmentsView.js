@@ -1,27 +1,30 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
 
-import { fnFetchData } from './util';
+import {
+  fetchAppointmentsIfNeeded,
+  deleteAppointment
+} from '../redux/modules/appointments';
+
 import { AppointmentsViewUi } from '../components';
 
 
 // The base appointments container that contains the related appointments table for
 // a given customer.
-export default React.createClass({
+const BaseAppointmentsView = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
-  getInitialState: function() {
-    return {
-      data: {},
-      loaded: false
-    };
+  propTypes: {
+    loaded: React.PropTypes.bool.isRequired,
+    appointments: React.PropTypes.array.isRequired
   },
-  componentWillMount: function() {
-    this.updateTable();
+  componentDidMount: function() {
+    this.props.dispatch(fetchAppointmentsIfNeeded(this.props.params.id));
   },
-  updateTable: function() {
-    fnFetchData(this, `/customers/${this.props.params.id}/appointments`);
+  componentWillReceiveProps: function(_nextProps) {
+    this.props.dispatch(fetchAppointmentsIfNeeded(this.props.params.id));
   },
   editAppointment: function(app) {
     const date = moment(app.date, config.date_format);
@@ -31,27 +34,36 @@ export default React.createClass({
     this.context.router.push(this.props.editAppointmentPath(app));
   },
   deleteAppointment: function(app) {
-    let url;
-    if (app.planned) {
-      url = `/customers/planned-appointments/${moment(app.date, config.date_format).format('YYYY-MM-DD')}/${app.appid}`;
-    }
-    else {
-      url = `/customers/${this.props.params.id}/appointments/${app.appid}`;
-    }
-    $.ajax({
-      url: url,
-      method: 'delete',
-      complete: this.updateTable
-    });
+    this.props.dispatch(deleteAppointment(this.props.params.id, app));
   },
   render: function() {
     return (
       <AppointmentsViewUi
-        data={this.state.data}
-        loaded={this.state.loaded}
-        newAppointmentPath={this.props.newAppointmentPath}
+        {...this.props}
         editAppointment={this.editAppointment}
-        deleteAppointment={this.deleteAppointment}/>
+        deleteAppointment={this.deleteAppointment} />
     );
   }
 });
+
+
+function mapStateToProps(state, ownProps) {
+  const loaded = state.appointments.hasIn(['customers', ownProps.params.id]);
+  let appointments = [];
+  let name, surname;
+  if (loaded) {
+    appointments = state.appointments.getIn(
+      ['customers', ownProps.params.id, 'appointmentList']).toJS();
+    name = state.appointments.getIn(['customers', ownProps.params.id, 'name']);
+    surname = state.appointments.getIn(['customers', ownProps.params.id, 'surname']);
+  }
+
+  return {
+    name,
+    surname,
+    loaded,
+    appointments
+  };
+}
+
+export default connect(mapStateToProps)(BaseAppointmentsView);

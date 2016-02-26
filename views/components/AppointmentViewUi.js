@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 import AppointmentFormUi from './AppointmentFormUi';
 
@@ -12,6 +13,7 @@ export default React.createClass({
     inputChange: React.PropTypes.func.isRequired,
     services: React.PropTypes.array,
     workers: React.PropTypes.array,
+    loaded: React.PropTypes.bool.isRequired,
     updateService: React.PropTypes.func.isRequired,
     addService: React.PropTypes.func.isRequired,
     submit: React.PropTypes.func.isRequired,
@@ -19,7 +21,7 @@ export default React.createClass({
     formTitle: React.PropTypes.string.isRequired
   },
   render: function() {
-    if (typeof this.props.workers === 'undefined' || typeof this.props.services === 'undefined') {
+    if (!this.props.loaded) {
       return (<div></div>);
     }
 

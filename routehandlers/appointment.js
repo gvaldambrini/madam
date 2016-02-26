@@ -504,43 +504,30 @@ class AppointmentHandler {
      * @param {function} _next the next middleware function to invoke, if any.
      */
     static fetch(req, res, _next) {
-        client.get({
-            index: req.config.mainIndex,
-            type: 'workers',
-            id: common.workersDocId
-        }, function(err, resp, _respcode) {
-            const obj = req.customer;
-            let appointment;
+        const obj = req.customer;
+        let appointment;
 
-            if (typeof obj.appointments === 'undefined') {
-                res.sendStatus(404);
-                return;
+        if (typeof obj.appointments === 'undefined') {
+            res.sendStatus(404);
+            return;
+        }
+
+        for (let j = 0; j < obj.appointments.length; j++) {
+            if (obj.appointments[j].appid === req.params.appid) {
+                appointment = obj.appointments[j];
+                break;
             }
+        }
 
-            for (let j = 0; j < obj.appointments.length; j++) {
-                if (obj.appointments[j].appid === req.params.appid) {
-                    appointment = obj.appointments[j];
-                    break;
-                }
-            }
+        if (typeof appointment === 'undefined') {
+            res.sendStatus(404);
+            return;
+        }
 
-            if (typeof appointment === 'undefined') {
-                res.sendStatus(404);
-                return;
-            }
-
-            const workers = resp._source.workers;
-            const services = [];
-
-            for (let i = 0; i < appointment.services.length; i++)
-                services[i] = appointment.services[i];
-
-            res.json({
-                workers: workers,
-                date: common.toLocalFormattedDate(req, appointment.date),
-                services: services,
-                notes: appointment.notes
-            });
+        res.json({
+            date: common.toLocalFormattedDate(req, appointment.date),
+            services: appointment.services,
+            notes: appointment.notes
         });
     }
 

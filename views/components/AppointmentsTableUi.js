@@ -5,13 +5,13 @@ import moment from 'moment';
 // The appointments table presentational component.
 export default React.createClass({
   propTypes: {
-    data: React.PropTypes.object.isRequired,
+    appointments: React.PropTypes.array.isRequired,
     editAppointment: React.PropTypes.func.isRequired,
     deleteAppointment: React.PropTypes.func.isRequired
   },
   render: function() {
     const that = this;
-    const appointmentRows = this.props.data.appointments.map(function(app) {
+    const appointmentRows = this.props.appointments.map(function(app) {
       const appClass = app.planned ? 'planned-appointment' : '';
       const date = moment(app.date, config.date_format);
       return (

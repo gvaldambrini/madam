@@ -150,16 +150,6 @@ describe('API tests: customer appointments', function() {
                         .end(callback);
                 },
                 function(res, callback) {
-                    res.body.workers.should.be.an.Array().and.have.length(workers.length);
-
-                    function compareObj(obj1, obj2) {
-                        obj1.should.containEql(obj2);
-                        obj2.should.containEql(obj1);
-                    }
-
-                    compareObj(res.body.workers[0], workers[0]);
-                    compareObj(res.body.workers[1], workers[1]);
-                    compareObj(res.body.workers[2], workers[2]);
                     res.body.date.should.equal('20/08/2015');
                     res.body.notes.should.equal('not the best work ever')
                     res.body.services.should.be.an.Array().and.have.length(3);

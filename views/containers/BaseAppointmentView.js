@@ -1,91 +1,116 @@
 import React from 'react';
 import moment from 'moment';
+import { connect } from 'react-redux';
 
-import { fnSubmitForm } from './util';
-import { AppointmentViewUi } from "../components";
+import { fetchServicesIfNeeded } from '../redux/modules/services';
+import { fetchWorkersIfNeeded } from '../redux/modules/workers';
+import {
+  fetchAppointmentIfNeeded,
+  saveAppointment
+} from '../redux/modules/appointments';
+
+import { AppointmentViewUi } from '../components';
 
 
 // The base appointment container that contains the related form.
-export default React.createClass({
+const BaseAppointmentView = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
   propTypes: {
-    destPath: React.PropTypes.string.isRequired
+    destPath: React.PropTypes.string.isRequired,
+    workerList: React.PropTypes.array.isRequired,
+    workersLoaded: React.PropTypes.bool.isRequired,
+    serviceList: React.PropTypes.array.isRequired,
+    servicesLoaded: React.PropTypes.bool.isRequired
   },
   getInitialState: function() {
+    let data = {
+      date: '',
+      services: undefined,
+      notes: ''
+    };
+
+    if (!this.isEditForm()) {
+      if (this.props.workersLoaded && this.props.servicesLoaded) {
+        data = this.prepareNewAppointment(
+          this.props.serviceList, this.props.workerList);
+      }
+    }
+    else {
+      if (this.props.workersLoaded && typeof this.props.appObject !== 'undefined') {
+        data = this.prepareExistingAppointment(
+          this.props.appObject, this.props.workerList);
+      }
+    }
+
+    return {
+      data: data,
+      errors: []
+    };
+  },
+  componentDidMount: function() {
+    if (!this.props.workersLoaded) {
+      this.props.dispatch(fetchWorkersIfNeeded());
+    }
+
+    if (this.isEditForm()) {
+      this.props.dispatch(
+        fetchAppointmentIfNeeded(this.props.params.id, this.props.params.appid));
+    }
+    else {
+      if (!this.props.servicesLoaded) {
+        this.props.dispatch(fetchServicesIfNeeded());
+      }
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    let data;
+    if (!this.isEditForm()) {
+      if (nextProps.workersLoaded && nextProps.servicesLoaded) {
+        data = this.prepareNewAppointment(
+          nextProps.serviceList, nextProps.workerList);
+      }
+    }
+    else {
+      if (nextProps.workersLoaded && typeof nextProps.appObject !== 'undefined') {
+        data = this.prepareExistingAppointment(
+          nextProps.appObject, nextProps.workerList);
+      }
+    }
+    if (typeof data !== 'undefined') {
+      this.setState({data: data});
+    }
+  },
+  isEditForm: function() {
+    if (this.props.location.pathname.indexOf('planned') === -1 &&
+        typeof this.props.params.appid !== 'undefined') {
+      return true;
+    }
+    return false;
+  },
+  prepareNewAppointment: function(services, workers) {
     const date = (typeof this.props.params.date !== 'undefined')
       ? moment(this.props.params.date)
       : moment();
 
-    let submitText, formTitle, editForm, urlData;
-    if (this.props.location.pathname.indexOf('planned') !== -1) {
-      submitText = i18n.appointments.confirmAppointment;
-      formTitle = i18n.appointments.titleConfirmAppointment;
-      editForm = false;
-    }
-    else if (typeof this.props.params.appid !== 'undefined') {
-      submitText = i18n.appointments.submitEdit;
-      formTitle = i18n.appointments.titleEdit;
-      editForm = true;
-      urlData = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`;
-    }
-    else {
-      submitText = i18n.appointments.submitAdd;
-      formTitle = i18n.appointments.titleNew;
-      editForm = false;
-    }
-
-    return {
-      workers: undefined,
-      services: undefined,
+    const data = {
       date: date.format(config.date_format),
-      notes: '',
-      errors: [],
-      staticData: {
-        submitText: submitText,
-        formTitle: formTitle,
-        editForm: editForm,
-        urlData: urlData
-      }
+      services: undefined,
+      notes: ''
     };
-  },
-  componentWillMount: function() {
-    if (this.state.staticData.editForm) {
-      $.ajax({
-        url: this.state.staticData.urlData,
-        method: 'get',
-        success: this.loadAppointment
-      });
-    }
-    else {
-      $.ajax({
-        url: '/settings/workers',
-        method: 'get',
-        success: this.loadWorkers
-      });
 
-      $.ajax({
-        url: '/settings/services',
-        method: 'get',
-        success: this.loadServices
-      });
-    }
-  },
-  buildServiceMap: function(workers, services) {
-    const map = [];
-    // new appointment
-    for (let i = 0; i < services.length; i++) {
-      map.push({
-        description: services[i],
+    data.services = services.map(function(item) {
+      return {
+        description: item.name,
         worker: workers[0],
         checked: false
-      });
-    }
-    return map;
+      };
+    });
+    return data;
   },
-  loadAppointment: function(data) {
-    function getColor(worker, workers) {
+  prepareExistingAppointment: function(appObject, workers) {
+    function getColor(worker) {
       for (let i = 0; i < workers.length; i++) {
         if (workers[i].name === worker) {
           return workers[i].color;
@@ -94,112 +119,118 @@ export default React.createClass({
       return config.defaultWorkerColor;
     }
 
-    let services = [];
-    for (let i = 0; i < data.services.length; i++) {
-      services[i] = {
-        description: data.services[i].description,
+    const data = {
+      date: appObject.date,
+      services: undefined,
+      notes: appObject.notes
+    };
+
+    data.services = appObject.services.map(function(item) {
+      return {
+        description: item.description,
         worker: {
-          name: data.services[i].worker,
-          color: getColor(data.services[i].worker, data.workers)
+          name: item.worker,
+          color: getColor(item.worker)
         },
         checked: true
       };
-    }
-
-    this.setState({
-      workers: data.workers,
-      services: services,
-      date: data.date,
-      notes: data.notes
     });
-  },
-  loadWorkers: function(data) {
-    const newState = {};
-    newState.workers = data.workers;
-
-    if (typeof this._services !== 'undefined') {
-      newState.services = this.buildServiceMap(data.workers, this._services);
-      this._services = undefined;
-    }
-    this.setState(newState);
-  },
-  loadServices: function(data) {
-    if (typeof this.state.workers === 'undefined') {
-      // a temporary variable which will be used later from the loadWorkers to
-      // load the services map.
-      this._services = data.services;
-      return;
-    }
-    this.setState({
-      services: this.buildServiceMap(this.state.workers, data.services)
-    });
+    return data;
   },
   updateService: function(index, service) {
-    const services = this.state.services;
+    const data = this.state.data;
+    const services = data.services.slice();
     services[index] = service;
-    this.setState({services: services});
+    data.services = services;
+    this.setState({
+      data: data
+    });
   },
-  addService: function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    const services = this.state.services.slice();
+  addService: function() {
+    const data = this.state.data;
+    const services = data.services.slice();
     services.push({
       checked: true,
       description: '',
-      worker: this.state.workers[0]
+      worker: this.props.workerList[0]
     });
-
-    this.setState({services: services});
+    data.services = services;
+    this.setState({
+      data: data
+    });
   },
   inputChange: function(name, value) {
-    if (name === 'date' && this.state.date !== value) {
-      this.setState({date: value});
+    const data = this.state.data;
+    if (name === 'date' && data.date !== value) {
+      data.date = value;
+      this.setState({
+        data: data
+      });
     }
-    else if (name === 'notes' && this.state.notes !== value) {
-      this.setState({notes: value});
+    else if (name === 'notes' && data.notes !== value) {
+      data.notes = value;
+      this.setState({
+        data: data
+      });
     }
   },
   submit: function() {
-    const services = [];
-    for (let i = 0; i < this.state.services.length; i++) {
-      services[services.length] = {
-        description: this.state.services[i].description,
-        enabled: this.state.services[i].checked,
-        worker: this.state.services[i].worker.name
+    const services = this.state.data.services.map(function(item) {
+      return {
+        description: item.description,
+        enabled: item.checked,
+        worker: item.worker.name
       };
-    }
+    });
     const data = {
       services: services,
-      date: this.state.date,
-      notes: this.state.notes
+      date: this.state.data.date,
+      notes: this.state.data.notes
     };
 
-    let url;
-    if (typeof this.props.params.appid !== 'undefined') {
-      url = `/customers/${this.props.params.id}/appointments/${this.props.params.appid}`;
-    }
-    else {
-      url = `/customers/${this.props.params.id}/appointments`;
-    }
+    const that = this;
+    const onSuccess = function(_data) {
+      that.context.router.push(that.props.destPath);
+    };
 
-    fnSubmitForm(
-      this,
-      url,
-      (typeof this.props.params.appid !== 'undefined') ? 'put': 'post',
-      data,
-      () => this.context.router.push(this.props.destPath)
-    );
+    const onError = function(xhr, _textStatus, _errorThrown) {
+      that.setState({
+        errors: xhr.responseJSON.errors.map(item => item.msg)
+      });
+    };
+
+    this.props.dispatch(
+      saveAppointment(this.props.params.id, this.props.params.appid, data)
+    ).then(onSuccess, onError);
   },
   render: function() {
+    let submitText, formTitle;
+    if (this.props.location.pathname.indexOf('planned') !== -1) {
+      submitText = i18n.appointments.confirmAppointment;
+      formTitle = i18n.appointments.titleConfirmAppointment;
+    }
+    else if (typeof this.props.params.appid !== 'undefined') {
+      submitText = i18n.appointments.submitEdit;
+      formTitle = i18n.appointments.titleEdit;
+    }
+    else {
+      submitText = i18n.appointments.submitAdd;
+      formTitle = i18n.appointments.titleNew;
+    }
+    const loaded = (
+      this.props.workersLoaded &&
+      typeof this.state.data.services !== 'undefined');
+
     return (
       <AppointmentViewUi
-        services={this.state.services}
-        workers={this.state.workers}
-        date={this.state.date}
-        notes={this.state.notes}
+        services={this.state.data.services}
+        workers={this.props.workerList}
+        loaded={loaded}
+        date={this.state.data.date}
+        notes={this.state.data.notes}
         errors={this.state.errors}
-        submitText={this.state.staticData.submitText}
-        formTitle={this.state.staticData.formTitle}
+        submitText={submitText}
+        formTitle={formTitle}
         addService={this.addService}
         inputChange={this.inputChange}
         updateService={this.updateService}
@@ -207,3 +238,23 @@ export default React.createClass({
     );
   }
 });
+
+
+function mapStateToProps(state, ownProps) {
+  let obj = state.appointments.getIn(
+    ['customers', ownProps.params.id, 'appointmentObjects', ownProps.params.appid]);
+
+  if (typeof obj !== 'undefined') {
+    obj = obj.toJS();
+  }
+
+  return {
+    serviceList: state.services.get('serviceList').toJS(),
+    servicesLoaded: state.services.get('loaded'),
+    workerList: state.workers.get('workerList').toJS(),
+    workersLoaded: state.workers.get('loaded'),
+    appObject: obj
+  };
+}
+
+export default connect(mapStateToProps)(BaseAppointmentView);

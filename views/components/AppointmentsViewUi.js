@@ -8,8 +8,10 @@ import AppointmentsTableUi from './AppointmentsTableUi';
 // The main appointments presentational component, which includes the related table.
 export default React.createClass({
   propTypes: {
+    name: React.PropTypes.string,
+    surname: React.PropTypes.string,
     loaded: React.PropTypes.bool.isRequired,
-    data: React.PropTypes.object.isRequired,
+    appointments: React.PropTypes.array.isRequired,
     editAppointment: React.PropTypes.func.isRequired,
     deleteAppointment: React.PropTypes.func.isRequired,
     newAppointmentPath: React.PropTypes.string.isRequired
@@ -20,12 +22,9 @@ export default React.createClass({
     }
 
     let table;
-    if (typeof this.props.data.appointments !== 'undefined' && this.props.data.appointments.length > 0) {
+    if (this.props.appointments.length > 0) {
       table = (
-        <AppointmentsTableUi
-          data={this.props.data}
-          editAppointment={this.props.editAppointment}
-          deleteAppointment={this.props.deleteAppointment}/>
+        <AppointmentsTableUi {...this.props} />
       );
     }
 
@@ -35,7 +34,7 @@ export default React.createClass({
           {i18n.appointments.createNew}
         </Link>
         <p className="hidden-xs pull-right">
-            {this.props.data.name} {this.props.data.surname}
+            {this.props.name} {this.props.surname}
         </p>
         {table}
         <div id="popover-template">
