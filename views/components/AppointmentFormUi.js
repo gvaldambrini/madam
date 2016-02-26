@@ -40,7 +40,7 @@ export default React.createClass({
         workers={this.props.workers} key={index} />
     );
     return (
-      <div className="content-body">
+      <div>
         {fnRenderErrors(this.props.errors)}
         <div className="form-container">
           <form id="form" className="form-horizontal customer" method="post">

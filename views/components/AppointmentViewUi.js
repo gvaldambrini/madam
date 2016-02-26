@@ -24,30 +24,31 @@ export default React.createClass({
     if (!this.props.loaded) {
       return (<div></div>);
     }
+    let content;
 
     if (this.props.workers.length === 0) {
-      return (
-        <div id="appointment-view">
-          <div className="alert alert-danger" role="alert">
-            <Link to="/settings/workers">{i18n.appointments.setWorkersMsg}</Link>
-          </div>
+      content = (
+        <div className="alert alert-danger" role="alert">
+          <Link to="/settings/workers">{i18n.appointments.setWorkersMsg}</Link>
         </div>
       );
     }
-
-    if (this.props.services.length === 0) {
-      return (
-        <div id="appointment-view">
-          <div className="alert alert-danger" role="alert">
-            <Link to="/settings/services">{i18n.appointments.setServicesMsg}</Link>
-          </div>
+    else if (this.props.services.length === 0) {
+      content = (
+        <div className="alert alert-danger" role="alert">
+          <Link to="/settings/services">{i18n.appointments.setServicesMsg}</Link>
         </div>
+      );
+    }
+    else {
+      content = (
+        <AppointmentFormUi {...this.props}/>
       );
     }
 
     return (
-      <div id="appointment-view">
-        <AppointmentFormUi {...this.props}/>
+      <div id="appointment-view" className="content-body">
+        {content}
       </div>
     );
   }
