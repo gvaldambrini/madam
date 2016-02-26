@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+"use strict";
+
 /**
  * @overview Create an user on elasticsearch.
  *
