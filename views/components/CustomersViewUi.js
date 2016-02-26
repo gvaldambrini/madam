@@ -11,7 +11,7 @@ import CustomersTableUi from './CustomersTableUi';
 export default React.createClass({
   propTypes: {
     loaded: React.PropTypes.bool.isRequired,
-    data: React.PropTypes.object.isRequired,
+    customers: React.PropTypes.array.isRequired,
     search: React.PropTypes.func.isRequired,
     editCustomer: React.PropTypes.func.isRequired,
     deleteCustomer: React.PropTypes.func.isRequired,
@@ -23,12 +23,9 @@ export default React.createClass({
     }
 
     let customers;
-    if (this.props.data.customers.length > 0) {
+    if (this.props.customers.length > 0) {
       customers = (
-        <CustomersTableUi
-          data={this.props.data}
-          editCustomer={this.props.editCustomer}
-          deleteCustomer={this.props.deleteCustomer} />
+        <CustomersTableUi {...this.props} />
       );
     }
     else {

@@ -1,31 +1,44 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { fnSubmitForm } from './util';
-import { CustomerFormUi } from "../components";
+import { CustomerFormUi } from '../components';
+
+import {
+  fetchCustomer,
+  saveCustomer
+} from '../redux/modules/customers';
 
 
 // The customer form container used in the customers section.
-export default React.createClass({
+const CustomerForm = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
+  propTypes: {
+    customerObject: React.PropTypes.object
+  },
   getInitialState: function() {
+    // The form local state is initialized from the one stored in redux
+    // (if the related object already exists) and synced only on the save.
+    const data = typeof this.props.customerObject !== 'undefined'
+      ? this.props.customerObject
+      : {};
+
     return {
-      data: {},
+      data: data,
       errors: []
     };
   },
-  componentWillMount: function() {
+  componentDidMount: function() {
+    if (typeof this.props.params.id !== 'undefined' &&
+        typeof this.props.customerObject === 'undefined') {
+      this.props.dispatch(fetchCustomer(this.props.params.id));
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
     if (typeof this.props.params.id !== 'undefined') {
-      $.ajax({
-        url: `/customers/${this.props.params.id}`,
-        method: 'get',
-        success:
-          data =>
-          this.setState({
-            data: data,
-            errors: []
-          })
+      this.setState({
+        data: nextProps.customerObject
       });
     }
   },
@@ -41,11 +54,7 @@ export default React.createClass({
   },
   submit: function(submitAndAdd) {
     const that = this;
-    const editForm = typeof this.props.params.id !== 'undefined';
-    const url = editForm ? `/customers/${this.props.params.id}` : '/customers';
-    const method = editForm ? 'put': 'post';
-
-    fnSubmitForm(this, url, method, this.state.data, function(obj) {
+    const onSuccess = function(obj) {
       if (submitAndAdd) {
         that.context.router.push(
           `/customers/edit/${obj.id}/appointments/new`);
@@ -53,7 +62,17 @@ export default React.createClass({
       else {
         that.context.router.push('/customers/');
       }
-    });
+    };
+
+    const onError = function(xhr, _textStatus, _errorThrown) {
+      that.setState({
+        errors: xhr.responseJSON.errors.map(item => item.msg)
+      });
+    };
+
+    this.props.dispatch(
+      saveCustomer(this.props.params.id, this.state.data)
+    ).then(onSuccess, onError);
   },
   render: function() {
     const editForm = typeof this.props.params.id !== 'undefined';
@@ -81,3 +100,18 @@ export default React.createClass({
     );
   }
 });
+
+
+function mapStateToProps(state, ownProps) {
+  const objects = state.customers.get('customerObjects');
+  let obj;
+  if (objects.has(ownProps.params.id)) {
+    obj = objects.get(ownProps.params.id).toJS();
+  }
+
+  return {
+    customerObject: obj
+  };
+}
+
+export default connect(mapStateToProps)(CustomerForm);

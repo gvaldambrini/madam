@@ -4,7 +4,7 @@ import React from 'react';
 // The customers table presentational component.
 export default React.createClass({
   propTypes: {
-    data: React.PropTypes.object.isRequired,
+    customers: React.PropTypes.array.isRequired,
     editCustomer: React.PropTypes.func.isRequired,
     deleteCustomer: React.PropTypes.func.isRequired
   },
@@ -15,7 +15,7 @@ export default React.createClass({
   },
   render: function() {
     const that = this;
-    const customerRows = this.props.data.customers.map(
+    const customerRows = this.props.customers.map(
       (customer, _index) =>
       <tr key={customer.id} onClick={
           function(event) {

@@ -1,58 +1,66 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { fnFetchData } from './util';
-import { CustomersViewUi } from "../components";
+import {
+  fetchCustomersIfNeeded,
+  deleteCustomer,
+  resetCustomersFilters
+} from '../redux/modules/customers';
+
+import { CustomersViewUi } from '../components';
 
 
 // The customers main container used in the customers section.
-export default React.createClass({
+const CustomersView = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
-  getInitialState: function() {
-    return {
-      data: {},
-      loaded: false,
-      filterText: ''
-    };
+  propTypes: {
+    loaded: React.PropTypes.bool.isRequired,
+    filterText: React.PropTypes.string,
+    customers: React.PropTypes.array.isRequired
   },
-  componentWillMount: function() {
-    this.updateTable();
+  componentDidMount: function() {
+    this.props.dispatch(fetchCustomersIfNeeded(this.props.filterText));
   },
-  deleteCustomer: function(objId) {
-    const that = this;
-    $.ajax({
-      url: '/customers/' + objId,
-      method: 'delete',
-      complete: function(obj, status) {
-        if (status === 'success') {
-          that.updateTable();
-        }
-      }
-    });
+  componentWillReceiveProps: function(nextProps) {
+    this.props.dispatch(fetchCustomersIfNeeded(nextProps.filterText));
+  },
+  componentWillUnmount: function() {
+    this.props.dispatch(resetCustomersFilters());
   },
   editCustomer: function(objId) {
     this.context.router.push(`/customers/edit/${objId}`);
   },
-  search: function(text) {
-    this.setState({
-      filterText: text
-    });
-
-    fnFetchData(this, '/customers/search', text);
-  },
-  updateTable: function() {
-    this.search(this.state.filterText);
-  },
   render: function() {
     return (
       <CustomersViewUi
-        loaded={this.state.loaded}
-        data={this.state.data}
-        deleteCustomer={this.deleteCustomer}
+        {...this.props}
         editCustomer={this.editCustomer}
-        search={this.search}
         newCustomerPath='/customers/new'/>
     );
   }
 });
+
+function mapStateToProps(state) {
+  const customers = state.customers;
+
+  return {
+    loaded: customers.get('loaded'),
+    filterText: customers.get('filterText'),
+    customers: customers.get('customerList').toJS()
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch,
+    search: text => dispatch(fetchCustomersIfNeeded(text)),
+    deleteCustomer: customerId => dispatch(deleteCustomer(customerId))
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CustomersView);
