@@ -21,10 +21,17 @@ export default React.createClass({
       return <div></div>;
     }
 
-    let table;
+    let appointments;
     if (this.props.appointments.length > 0) {
-      table = (
+      appointments = (
         <AppointmentsTableUi {...this.props} />
+      );
+    }
+    else {
+      appointments = (
+        <div className="alert alert-info" role="alert">
+          {i18n.appointments.emptyTableMsg}
+        </div>
       );
     }
 
@@ -36,7 +43,9 @@ export default React.createClass({
         <p className="hidden-xs pull-right">
             {this.props.name} {this.props.surname}
         </p>
-        {table}
+        <div className="appointment-table-container">
+        {appointments}
+        </div>
         <div id="popover-template">
           <PopoverTemplateUi
             confirm={i18n.appointments.btnConfirm}

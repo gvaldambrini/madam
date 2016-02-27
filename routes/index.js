@@ -59,6 +59,7 @@ router.get('*', function(req, res, next) {
             },
             appointments: {
                 date: req.i18n.__('Date'),
+                emptyTableMsg: req.i18n.__('No appointments to display.'),
                 details: req.i18n.__('Details'),
                 planned: req.i18n.__('Planned'),
                 createNew: req.i18n.__('Create new appointment'),

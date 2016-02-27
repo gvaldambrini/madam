@@ -87,5 +87,6 @@
 	"Unable to save the appointment: there is already an appointment for the same date.": "Impossibile salvare l'appuntamento: esiste già un appuntamento con la stessa data.",
 	"Unable to plan the appointment: there is already a planned appointment for the same date.": "Impossibile pianificare l'appuntamento: esiste già un appuntamento pianificato con la stessa data.",
 	"Unable to plan the appointment: there is already an appointment for the same date.": "Impossibile pianificare l'appuntamento: esiste già un appuntamento con la stessa data.",
-	"The sold date does not seem a valid date": "Data di vendita non sembra essere una data valida"
+	"The sold date does not seem a valid date": "La data di vendita non sembra essere valida",
+	"No appointments to display.": "Nessun appuntamento da mostrare."
 }
