@@ -13,7 +13,7 @@ export default React.createClass({
     date: React.PropTypes.string.isRequired,
     setDate: React.PropTypes.func.isRequired,
     loaded: React.PropTypes.bool.isRequired,
-    data: React.PropTypes.object.isRequired,
+    appointments: React.PropTypes.array.isRequired,
     errors: React.PropTypes.array.isRequired,
     fetchCustomerSuggestions: React.PropTypes.func.isRequired,
     deleteAppointment: React.PropTypes.func.isRequired,
@@ -27,10 +27,10 @@ export default React.createClass({
     }
 
     let appointments;
-    if (this.props.data.appointments.length > 0) {
+    if (this.props.appointments.length > 0) {
       appointments = (
         <AppointmentsTableDateUi
-          appointments={this.props.data.appointments}
+          appointments={this.props.appointments}
           date={this.props.date}
           deleteAppointment={this.props.deleteAppointment}
           editAppointment={this.props.editAppointment}/>

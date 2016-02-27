@@ -1,51 +1,50 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { fnSubmitForm } from './util';
-import { CustomerFormUi } from "../components";
+import {
+  fetchCustomer,
+  saveCustomer
+} from '../redux/modules/customers';
+
+import { fetchAppointmentsByDateIfNeeded } from '../redux/modules/appointments';
+import { CustomerFormUi } from '../components';
 
 
 // The customer form container used in the calendar / homepage section.
-export default React.createClass({
+const CalendarCustomerForm = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
+  propTypes: {
+    customerObject: React.PropTypes.object
+  },
   getInitialState: function() {
+    // The form local state is initialized from the one stored in redux
+    // (if the related object already exists) and synced only on the save.
+    const data = typeof this.props.customerObject !== 'undefined'
+      ? this.props.customerObject
+      : {};
+
     return {
-      data: {},
+      data: data,
       errors: []
     };
   },
-  componentWillMount: function() {
-    const that = this;
-    const editForm = typeof this.props.params.id !== 'undefined';
-
-    if (editForm) {
-      $.ajax({
-        url: `/customers/${this.props.params.id}`,
-        method: 'get',
-        success:
-          data =>
-          this.setState({
-            data: data,
-            errors: []
-          })
-      });
+  componentDidMount: function() {
+    if (typeof this.props.customerObject !== 'undefined') {
+      return;
     }
-    else {
-      $.ajax({
-        url: `/customers/planned-appointments/${that.props.params.date}/${that.props.params.appid}`,
-        method: 'get',
-        success: function(data) {
-          const name = data.fullname.split(' ', 1)[0];
-          const surname = data.fullname.substr(name.length + 1);
-          that.setState({
-            data: {
-              name: name,
-              surname: surname
-            },
-            errors: []
-          });
-        }
+    if (typeof this.props.params.id !== 'undefined') {
+      this.props.dispatch(fetchCustomer(this.props.params.id));
+    }
+    else if (typeof this.props.params.date !== 'undefined') {
+      this.props.dispatch(fetchAppointmentsByDateIfNeeded(this.props.params.date));
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    if (typeof nextProps.customerObject !== 'undefined') {
+      this.setState({
+        data: nextProps.customerObject
       });
     }
   },
@@ -61,13 +60,11 @@ export default React.createClass({
   },
   submit: function(_submitAndAdd) {
     const that = this;
-    const editForm = typeof this.props.params.id !== 'undefined';
-    const url = editForm ? '/customers/' + this.props.params.id : '/customers';
-    const method = editForm ? 'put': 'post';
     const data = this.state.data;
     data.__appid = this.props.params.appid;
 
-    fnSubmitForm(this, url, method, data, function(obj) {
+    const onSuccess = function(obj) {
+      const editForm = typeof that.props.params.id !== 'undefined';
       if (editForm) {
         that.context.router.push(`/calendar/${that.props.params.date}`);
       }
@@ -75,7 +72,17 @@ export default React.createClass({
         that.context.router.push(
           `/calendar/${that.props.params.date}/customers/${obj.id}/appointments/planned/${that.props.params.appid}`);
       }
-    });
+    };
+
+    const onError = function(xhr, _textStatus, _errorThrown) {
+      that.setState({
+        errors: xhr.responseJSON.errors.map(item => item.msg)
+      });
+    };
+
+    this.props.dispatch(
+      saveCustomer(this.props.params.id, data)
+    ).then(onSuccess, onError);
   },
   render: function() {
     const editForm = typeof this.props.params.id !== 'undefined';
@@ -101,3 +108,30 @@ export default React.createClass({
     );
   }
 });
+
+
+function mapStateToProps(state, ownProps) {
+  let obj;
+  if (typeof ownProps.params.id !== 'undefined') {
+    if (state.customers.get('customerObjects').has(ownProps.params.id)) {
+      obj = state.customers.get('customerObjects').get(ownProps.params.id).toJS();
+    }
+  }
+  else if (typeof ownProps.params.date !== 'undefined') {
+    const apps = state.appointments.getIn(['dates', ownProps.params.date, 'appointmentList']);
+    if (typeof apps !== 'undefined') {
+      const objData = apps.filter(item => item.get('appid') === ownProps.params.appid).get(0).toJS();
+      const name = objData.fullname.split(' ', 1)[0];
+      obj = {
+        name: name,
+        surname: objData.fullname.substr(name.length + 1)
+      };
+    }
+  }
+
+  return {
+    customerObject: obj
+  };
+}
+
+export default connect(mapStateToProps)(CalendarCustomerForm);

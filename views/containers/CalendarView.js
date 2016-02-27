@@ -1,15 +1,19 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
 
+import { searchCustomers } from '../redux/modules/customers';
 import {
-  fnFetchData,
-  fnSubmitForm
-} from './util';
+  fetchAppointmentsByDateIfNeeded,
+  planAppointment,
+  deleteAppointment
+} from '../redux/modules/appointments';
+
 import { CalendarViewUi } from '../components';
 
 
 // The main container used in the calendar / homepage section.
-export default React.createClass({
+const CalendarView = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
@@ -20,84 +24,62 @@ export default React.createClass({
 
     return {
       date: date,
-      data: {},
-      loaded: false,
       errors: []
     };
   },
-  componentWillMount: function() {
-    this.updateTable();
+  componentDidMount: function() {
+    this.props.dispatch(fetchAppointmentsByDateIfNeeded(this.state.date));
   },
   componentWillReceiveProps: function(nextProps) {
-    if (nextProps.params.date !== this.state.date) {
-      this.updateTable(nextProps.params.date);
+    if (typeof nextProps.params.date !== 'undefined' &&
+        nextProps.params.date !== this.state.date) {
+      this.props.dispatch(fetchAppointmentsByDateIfNeeded(nextProps.params.date));
       this.setState({date: moment(nextProps.params.date).format('YYYY-MM-DD')});
     }
   },
   fetchCustomerSuggestions: function(input, callback) {
-    const that = this;
-    $.ajax({
-      url: '/customers/simple-search',
-      method: 'get',
-      data: {text: input, size: 10},
-      success: data => callback(null, data.customers),
-      error: function(xhr, textStatus, _errorThrown) {
-        if (xhr.status === 401) {
-          that.context.router.push('/login');
-        }
-      }
-    });
-  },
-  updateTable: function(date) {
-    fnFetchData(this, '/customers/appointments/' + (typeof date === 'undefined' ? this.state.date : date));
+    searchCustomers(input).then(data => callback(null, data.customers));
   },
   addAppointment: function(customer) {
-    const that = this;
     const data = {
       fullname: customer.fullname,
       id: customer.id
     };
-    const url = `/customers/planned-appointments/${this.state.date}`;
-    fnSubmitForm(this, url, 'post', data, function(response) {
-      const appointments = that.state.data.appointments;
-      appointments.push({
-        appid: response.id,
-        fullname: data.fullname,
-        id: data.id,
-        planned: true
+
+    const that = this;
+    const onError = function(xhr, _textStatus, _errorThrown) {
+      that.setState({
+        errors: xhr.responseJSON.errors.map(item => item.msg)
       });
-      that.setState({data: {appointments: appointments}});
-    });
+    };
+    const onSuccess = function(_obj) {
+      that.setState({errors: []});
+    };
+
+    this.props.dispatch(
+      planAppointment(this.state.date, data)
+    ).then(onSuccess, onError);
   },
   editAppointment: function(app) {
-    if (typeof app.id === 'undefined') {
-      this.context.router.push(
-        `/calendar/${this.state.date}/appointments/planned/${app.appid}/newcustomer`);
-      return;
-    }
-    if (app.planned) {
-      this.context.router.push(
-        `/calendar/${this.state.date}/customers/${app.id}/appointments/planned/${app.appid}`);
-      return;
-    }
-
-    this.context.router.push(
-      `/calendar/${this.state.date}/customers/${app.id}/appointments/${app.appid}`);
-  },
-  deleteAppointment: function(app) {
     let url;
-    if (app.planned) {
-      url = `/customers/planned-appointments/${this.state.date}/${app.appid}`;
+    if (typeof app.id === 'undefined') {
+      url = `/calendar/${this.state.date}/appointments/planned/${app.appid}/newcustomer`;
+    }
+    else if (app.planned) {
+      url = `/calendar/${this.state.date}/customers/${app.id}/appointments/planned/${app.appid}`;
     }
     else {
-      url = `/customers/${app.id}/appointments/${app.appid}`;
+      url = `/calendar/${this.state.date}/customers/${app.id}/appointments/${app.appid}`;
     }
 
-    $.ajax({
-      url: url,
-      method: 'delete',
-      complete: () => this.updateTable()
-    });
+    this.context.router.push(url);
+  },
+  deleteAppointment: function(app) {
+    if (app.planned) {
+      // Bad hack required as redux expects a local formatted date.
+      app.date = moment(this.state.date).format(config.date_format);
+    }
+    this.props.dispatch(deleteAppointment(app.id, app));
   },
   setDate: function(date) {
     this.context.router.push(`/calendar/${moment(date).format('YYYY-MM-DD')}`);
@@ -107,8 +89,8 @@ export default React.createClass({
       <CalendarViewUi
         date={this.state.date}
         setDate={this.setDate}
-        loaded={this.state.loaded}
-        data={this.state.data}
+        loaded={this.props.loaded}
+        appointments={this.props.appointments}
         errors={this.state.errors}
         fetchCustomerSuggestions={this.fetchCustomerSuggestions}
         deleteAppointment={this.deleteAppointment}
@@ -117,3 +99,23 @@ export default React.createClass({
     );
   }
 });
+
+
+function mapStateToProps(state, ownProps) {
+  const date = typeof ownProps.params.date !== 'undefined'
+    ? ownProps.params.date
+    : moment().format('YYYY-MM-DD');
+
+  const loaded = state.appointments.hasIn(['dates', date]);
+  let appointments = [];
+  if (loaded) {
+    appointments = state.appointments.getIn(
+      ['dates', date, 'appointmentList']).toJS();
+  }
+  return {
+    loaded,
+    appointments
+  };
+}
+
+export default connect(mapStateToProps)(CalendarView);

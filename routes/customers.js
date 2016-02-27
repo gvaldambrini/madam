@@ -62,7 +62,6 @@ router.param('date', function(req, res, next, date) {
 router.get('/appointments/:date', handlers.appointment.fetchByDate);
 
 router.post('/planned-appointments/:date', handlers.appointment.plan);
-router.get('/planned-appointments/:date/:appid', handlers.appointment.fetchPlanned);
 router.delete('/planned-appointments/:date/:appid', handlers.appointment.deletePlanned);
 
 router.get('/:id/appointments', handlers.appointment.fetchByCustomer);

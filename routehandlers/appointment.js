@@ -295,58 +295,6 @@ class AppointmentHandler {
     }
 
     /**
-     * The handler that returns the planned appointment with the given date / appid.
-     * @method
-     *
-     * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
-     * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
-     * @param {function} _next the next middleware function to invoke, if any.
-     */
-    static fetchPlanned(req, res, _next) {
-        // NOTE: not implemented for planned appointments part of a customer, since the
-        // ui does not need that.
-        const queryBody = {
-            query: {
-                bool: {
-                    should: [
-                        { term: { "calendar.days.planned_appointments.appid": req.params.appid }}
-                    ],
-                    minimum_should_match: 1
-                }
-            }
-        };
-
-        client.search({
-            index: req.config.mainIndex,
-            size: 1,
-            body: queryBody
-        }, function(err, resp, _respcode) {
-            if (resp.hits.hits.length !== 1) {
-                res.sendStatus(404);
-                return;
-            }
-
-            const obj = resp.hits.hits[0]._source;
-            const docType = resp.hits.hits[0]._type;
-
-            if (docType === 'calendar') {
-                for (let i = 0; i < obj.days.length; i++) {
-                    for (let j = 0; j < obj.days[i].planned_appointments.length; j++) {
-                        if (obj.days[i].planned_appointments[j].appid === req.params.appid) {
-                            res.json({
-                                fullname: obj.days[i].planned_appointments[j].fullname
-                            });
-                            return;
-                        }
-                    }
-                }
-                res.sendStatus(404);
-                return;
-            }
-        });
-    }
-
-    /**
      * The handler that deletes the planned appointment with the given appid.
      * @method
      *

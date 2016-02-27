@@ -2,6 +2,8 @@ const RESPONSE_FETCH = 'appointments/RESPONSE_FETCH';
 const APPOINTMENT_DELETED = 'appointments/APPOINTMENT_DELETED';
 const RESPONSE_APPOINTMENT_FETCH = 'appointments/RESPONSE_APPOINTMENT_FETCH';
 
+const RESPONSE_FETCH_BY_DATE = 'appointments/RESPONSE_FETCH_BY_DATE';
+
 import moment from 'moment';
 import {
   List,
@@ -15,7 +17,7 @@ import { fetchCustomers } from './customers';
 function reducerPerCustomer(state = Map({
   name: '',
   surname: '',
-  appointmentList: List(),
+  appointmentList: undefined,
   appointmentObjects: Map()
 }), action) {
   switch (action.type) {
@@ -53,16 +55,48 @@ function reducerPerCustomer(state = Map({
   }
 }
 
-export default function reducer(state = Map({
-  customers: Map()
+function reducerPerDate(state = Map({
+  appointmentList: List()
 }), action) {
   switch (action.type) {
-    case RESPONSE_FETCH:
+    case RESPONSE_FETCH_BY_DATE:
+      return state.set('appointmentList', fromJS(action.payload.data.appointments));
     case APPOINTMENT_DELETED:
+    {
+      const appointmentList = state
+        .get('appointmentList')
+        .filterNot(app => app.get('appid') === action.payload.appId);
+      return state.set('appointmentList', appointmentList);
+    }
+    default:
+      return state;
+  }
+}
+
+export default function reducer(state = Map({
+  customers: Map(),
+  dates: Map()
+}), action) {
+  if (action.type === APPOINTMENT_DELETED) {
+      return state
+        .setIn(
+          ['customers', action.payload.customerId],
+          reducerPerCustomer(state.getIn(['customers', action.payload.customerId]), action))
+        .setIn(
+        ['dates', action.payload.date],
+        reducerPerDate(state.getIn(['dates', action.payload.date]), action));
+  }
+
+  switch (action.type) {
+    case RESPONSE_FETCH:
     case RESPONSE_APPOINTMENT_FETCH:
       return state.setIn(
         ['customers', action.payload.customerId],
         reducerPerCustomer(state.getIn(['customers', action.payload.customerId]), action));
+    case RESPONSE_FETCH_BY_DATE:
+      return state.setIn(
+        ['dates', action.payload.date],
+        reducerPerDate(state.getIn(['dates', action.payload.date]), action));
     default:
       return state;
   }
@@ -91,8 +125,8 @@ function fetchAppointments(customerId) {
 }
 
 function shouldFetchAppointments(state, customerId) {
-  const appointments = state.appointments;
-  if (!appointments.hasIn(['customers', customerId])) {
+  const apps = state.appointments;
+  if (typeof apps.getIn(['customers', customerId, 'appointmentList']) === 'undefined') {
     return true;
   }
   return false;
@@ -106,20 +140,60 @@ export function fetchAppointmentsIfNeeded(customerId) {
   };
 }
 
-function appointmentDeleted(customerId, appId) {
+function responseFetchAppointmentsByDate(date, data) {
+  return {
+    type: RESPONSE_FETCH_BY_DATE,
+    payload: {
+      date: date,
+      data: data
+    }
+  };
+}
+
+function fetchAppointmentsByDate(date) {
+  return dispatch => {
+    $.ajax({
+      url: `/customers/appointments/${date}`,
+      method: 'get',
+      success: function(data) {
+        dispatch(responseFetchAppointmentsByDate(date, data));
+      }
+    });
+  };
+}
+
+function shouldFetchAppointmentsByDate(state, date) {
+  const appointments = state.appointments;
+  if (!appointments.hasIn(['dates', date])) {
+    return true;
+  }
+  return false;
+}
+
+export function fetchAppointmentsByDateIfNeeded(date) {
+  return (dispatch, getState) => {
+    if (shouldFetchAppointmentsByDate(getState(), date)) {
+      return dispatch(fetchAppointmentsByDate(date));
+    }
+  };
+}
+
+function appointmentDeleted(customerId, appId, date) {
   return {
     type: APPOINTMENT_DELETED,
     payload: {
       customerId,
-      appId
+      appId,
+      date
     }
   };
 }
 
 export function deleteAppointment(customerId, app) {
+  const appDate = moment(app.date, config.date_format).format('YYYY-MM-DD');
   let url;
   if (app.planned) {
-    url = `/customers/planned-appointments/${moment(app.date, config.date_format).format('YYYY-MM-DD')}/${app.appid}`;
+    url = `/customers/planned-appointments/${appDate}/${app.appid}`;
   }
   else {
     url = `/customers/${customerId}/appointments/${app.appid}`;
@@ -129,7 +203,7 @@ export function deleteAppointment(customerId, app) {
       url,
       method: 'delete',
       success: function() {
-        dispatch(appointmentDeleted(customerId, app.appid));
+        dispatch(appointmentDeleted(customerId, app.appid, appDate));
       }
     });
   };
@@ -200,8 +274,31 @@ export function saveAppointment(customerId, appId, data) {
       // saving an appointment.
       dispatch(fetchAppointments(customerId));
       dispatch(fetchCustomers(''));
+
+      const appDate = moment(data.date, config.date_format).format('YYYY-MM-DD');
+      dispatch(fetchAppointmentsByDate(appDate));
     };
 
+    ajaxPromise.then(onSuccess);
+    return ajaxPromise;
+  };
+}
+
+export function planAppointment(date, data) {
+  return dispatch => {
+    const ajaxPromise = $.ajax({
+      url: `/customers/planned-appointments/${date}`,
+      method: 'post',
+      contentType: 'application/json',
+      data: JSON.stringify(data)
+    });
+
+    const onSuccess = function(_obj) {
+      dispatch(fetchAppointmentsByDate(date));
+      if (typeof data.id !== 'undefined') {
+        dispatch(fetchAppointments(data.id));
+      }
+    };
     ajaxPromise.then(onSuccess);
     return ajaxPromise;
   };

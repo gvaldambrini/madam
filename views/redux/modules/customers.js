@@ -100,6 +100,17 @@ export function fetchCustomersIfNeeded(filterText) {
   };
 }
 
+export function searchCustomers(text) {
+  // This function does not produce any modification in the
+  // global state tree. However is here as it is related to
+  // the customers and performs an AJAX call.
+  return $.ajax({
+    url: '/customers/simple-search',
+    method: 'get',
+    data: {text: text, size: 10}
+  });
+}
+
 function customerDeleted(customerId) {
   return {
     type: CUSTOMER_DELETED,

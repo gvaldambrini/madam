@@ -181,33 +181,6 @@ describe('API tests: customer planned appointments', function() {
         });
     });
 
-    describe('Read planned appointment', function() {
-        it('should return NOT FOUND if the date is invalid', function(done) {
-            utils.request.get(cookies, '/customers/planned-appointments/2015-41-15/m3e39od2a')
-                .expect(404, done);
-        });
-
-        it('should return NOT FOUND if the requested appointment does not exists', function(done) {
-            utils.request.get(cookies, '/customers/planned-appointments/2015-12-05/m3e39od2a')
-                .expect(404, done);
-        });
-
-        it('should return the planned info if the requested appointment exists', function(done) {
-            utils.waterfall([
-                function(callback) {
-                    utils.request.get(cookies, '/customers/planned-appointments/2015-12-15/aa5173e1-8f4f-4c3a-8f92-1acab1f4848d')
-                        .expect(200)
-                        .end(callback);
-                },
-                function(res, callback) {
-                    res.body.fullname.should.equal('new customer2');
-                    callback(null, null);
-                }
-            ], done);
-        });
-
-    });
-
     describe('Create planned appointment', function() {
 
         it('should return NOT FOUND if the date is invalid', function(done) {

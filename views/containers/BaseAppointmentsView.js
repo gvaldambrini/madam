@@ -23,9 +23,6 @@ const BaseAppointmentsView = React.createClass({
   componentDidMount: function() {
     this.props.dispatch(fetchAppointmentsIfNeeded(this.props.params.id));
   },
-  componentWillReceiveProps: function(_nextProps) {
-    this.props.dispatch(fetchAppointmentsIfNeeded(this.props.params.id));
-  },
   editAppointment: function(app) {
     const date = moment(app.date, config.date_format);
     if (app.planned && date.isAfter(moment(), 'day')) {
@@ -48,14 +45,22 @@ const BaseAppointmentsView = React.createClass({
 
 
 function mapStateToProps(state, ownProps) {
-  const loaded = state.appointments.hasIn(['customers', ownProps.params.id]);
-  let appointments = [];
+  const customerData = state.appointments.getIn(['customers', ownProps.params.id]);
+  let appointments;
+  if (typeof customerData !== 'undefined')  {
+    appointments = customerData.get('appointmentList');
+  }
+
   let name, surname;
-  if (loaded) {
-    appointments = state.appointments.getIn(
-      ['customers', ownProps.params.id, 'appointmentList']).toJS();
-    name = state.appointments.getIn(['customers', ownProps.params.id, 'name']);
-    surname = state.appointments.getIn(['customers', ownProps.params.id, 'surname']);
+  let loaded = false;
+  if (typeof appointments !== 'undefined') {
+    appointments = appointments.toJS();
+    name = customerData.get('name');
+    surname = customerData.get('surname');
+    loaded = true;
+  }
+  else {
+    appointments = [];
   }
 
   return {

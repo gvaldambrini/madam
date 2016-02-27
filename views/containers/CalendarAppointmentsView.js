@@ -9,9 +9,9 @@ export default React.createClass({
   editAppointmentPath: function(app) {
     const date = moment(app.date, config.date_format);
     if (app.planned) {
-      return `/calendar/${date.format('YYYY-MM-DD')}/customers/${this.props.customer}/appointments/planned/${app.appid}}`;
+      return `/calendar/${date.format('YYYY-MM-DD')}/customers/${this.props.params.id}/appointments/planned/${app.appid}}`;
     }
-    return `/calendar/${date.format('YYYY-MM-DD')}/customers/${this.props.customer}/appointments/${app.appid}`;
+    return `/calendar/${date.format('YYYY-MM-DD')}/customers/${this.props.params.id}/appointments/${app.appid}`;
   },
   render: function() {
     const isotoday = moment().format('YYYY-MM-DD');
