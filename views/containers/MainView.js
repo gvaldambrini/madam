@@ -1,23 +1,17 @@
 import React from 'react';
 import Cookies from 'js-cookie';
 
+import { logout } from '../redux/modules/auth';
 import { MainViewUi } from '../components';
 
 
 // The main view container (the whole page).
-export default React.createClass({
+const MainView = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
   logout: function() {
-    const that = this;
-    $.ajax({
-      url: '/logout',
-      method: 'post',
-      success: function() {
-        that.context.router.push('/login');
-      }
-    });
+    logout().then(() => this.context.router.push('/login'));
   },
   render: function() {
     return (
@@ -30,3 +24,6 @@ export default React.createClass({
     );
   }
 });
+
+
+export default MainView;

@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { fnSubmitForm } from './util';
-import { LoginFormUi } from "../components";
+import { login } from '../redux/modules/auth';
+import { LoginFormUi } from '../components';
 
 
 // The login form container.
-export default React.createClass({
+const LoginForm = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
@@ -28,11 +28,19 @@ export default React.createClass({
       });
     }
   },
-  handleSubmit: function() {
+  submit: function() {
     const that = this;
-    fnSubmitForm(this, '/login', 'post', this.state.data, function(_data) {
+    const onSuccess = function(_obj) {
       that.context.router.push('/');
-    });
+    };
+
+    const onError = function(xhr, _textStatus, _errorThrown) {
+      that.setState({
+        errors: xhr.responseJSON.errors.map(item => item.msg)
+      });
+    };
+
+    login(this.state.data.username, this.state.data.password).then(onSuccess, onError);
   },
   render: function() {
     return (
@@ -40,8 +48,11 @@ export default React.createClass({
         errors={this.state.errors}
         data={this.state.data}
         inputChange={this.handleChange}
-        submit={this.handleSubmit}
+        submit={this.submit}
         />
     );
   }
 });
+
+
+export default LoginForm;
