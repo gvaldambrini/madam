@@ -13,49 +13,67 @@ export default React.createClass({
   },
   render: function() {
     const that = this;
-    const appointmentRows = this.props.appointments.map((app, _index) =>
-      <tr key={app.appid} className={moment(this.props.date).isAfter(moment(), 'day') ? 'inactive' : ''} onClick={
-          function(event) {
-            event.preventDefault();
-            event.stopPropagation();
+    const appointmentRows = this.props.appointments.map(function(app, _index) {
+      return (
+        <tr key={app.appid} className={moment(that.props.date).isAfter(moment(), 'day') ? 'inactive' : ''} onClick={
+            function(event) {
+              event.preventDefault();
+              event.stopPropagation();
 
-            if (moment(that.props.date).isAfter(moment(), 'day')) {
-              return;
-            }
-            that.props.editAppointment(app);
-          }
-        }>
-
-        <td className={app.planned ? 'planned-appointment' : ''}>
-          {app.fullname}
-        </td>
-        <td className={app.planned ? 'planned-appointment' : ''}>
-          {app.planned ? i18n.homepage.planned : app.services}
-        </td>
-        <td className="no-padding">
-          <span onClick={function(event) {event.stopPropagation();}} className="pull-right glyphicon glyphicon-trash"
-            data-toggle="tooltip" data-placement="left"
-            title={i18n.homepage.deleteText} ref={
-              function(span) {
-                if (span !== null) {
-                  const $span = $(span);
-                  if ($span.data('tooltip-init'))
-                    return;
-                  $span.data('tooltip-init', true);
-                  $span.tooltip();
-                  $span.confirmPopover({
-                    template: '#popover-template',
-                    title: i18n.homepage.deleteTitle,
-                    content: i18n.homepage.deleteMsg,
-                    $rootContainer: $('#calendar-table-container'),
-                    onConfirm: () => that.props.deleteAppointment(app)
-                  });
-                }
+              if (moment(that.props.date).isAfter(moment(), 'day')) {
+                return;
               }
-            }></span>
-        </td>
-      </tr>
-    );
+              that.props.editAppointment(app);
+            }
+          }>
+
+          <td className={app.planned ? 'planned-appointment' : ''}>
+            {app.fullname}
+          </td>
+          <td className={app.planned ? 'planned-appointment' : ''}>
+            {app.planned ? i18n.homepage.planned : app.services}
+          </td>
+          <td className="no-padding">
+            <span className="table-btn-container">
+              <span
+                onClick={function(event) {event.stopPropagation();}}
+                className={
+                typeof app.id === 'undefined'
+                ? "glyphicon glyphicon-print table-btn disabled" :
+                "glyphicon glyphicon-print table-btn"}
+                data-toggle="tooltip" data-placement="left"
+                title={i18n.homepage.printCustomerSheet} ref={
+                    function(span) {
+                      if (span !== null && typeof app.id !== 'undefined') {
+                        $(span).tooltip();
+                      }
+                    }
+                  }></span>
+              <span onClick={function(event) {event.stopPropagation();}} className="glyphicon glyphicon-trash table-btn"
+                data-toggle="tooltip" data-placement="left"
+                title={i18n.homepage.deleteText} ref={
+                  function(span) {
+                    if (span !== null) {
+                      const $span = $(span);
+                      if ($span.data('tooltip-init'))
+                        return;
+                      $span.data('tooltip-init', true);
+                      $span.tooltip();
+                      $span.confirmPopover({
+                        template: '#popover-template',
+                        title: i18n.homepage.deleteTitle,
+                        content: i18n.homepage.deleteMsg,
+                        $rootContainer: $('#calendar-table-container'),
+                        onConfirm: () => that.props.deleteAppointment(app)
+                      });
+                    }
+                  }
+                }></span>
+            </span>
+          </td>
+        </tr>
+      );
+    });
 
     return (
       <table className='table table-hover'>

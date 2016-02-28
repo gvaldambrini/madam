@@ -29,28 +29,30 @@ export default React.createClass({
             <td>{object.date}</td>
             <td>{object.notes}</td>
             <td className="no-padding">
-              <span
-                onClick={function(event) {event.stopPropagation();}}
-                className="table-btn pull-right glyphicon glyphicon-trash"
-                data-toggle="tooltip" data-placement="left"
-                title={i18n.products.deleteText} ref={
-                  function(span) {
-                    if (span !== null) {
-                      const $span = $(span);
-                      if ($span.data('tooltip-init'))
-                        return;
-                      $span.data('tooltip-init', true);
-                      $span.tooltip();
-                      $span.confirmPopover({
-                        template: '#popover-template',
-                        title: i18n.products.deleteTitle,
-                        content: i18n.products.deleteMsg,
-                        $rootContainer: $('#products-table-container'),
-                        onConfirm: () => that.props.deleteProduct(object.id)
-                      });
+              <span className="table-btn-container">
+                <span
+                  onClick={function(event) {event.stopPropagation();}}
+                  className="table-btn glyphicon glyphicon-trash"
+                  data-toggle="tooltip" data-placement="left"
+                  title={i18n.products.deleteText} ref={
+                    function(span) {
+                      if (span !== null) {
+                        const $span = $(span);
+                        if ($span.data('tooltip-init'))
+                          return;
+                        $span.data('tooltip-init', true);
+                        $span.tooltip();
+                        $span.confirmPopover({
+                          template: '#popover-template',
+                          title: i18n.products.deleteTitle,
+                          content: i18n.products.deleteMsg,
+                          $rootContainer: $('#products-table-container'),
+                          onConfirm: () => that.props.deleteProduct(object.id)
+                        });
+                      }
                     }
-                  }
-                }></span>
+                  }></span>
+                </span>
             </td>
           </tr>
         );
@@ -62,22 +64,24 @@ export default React.createClass({
           <td dangerouslySetInnerHTML={that.renderHighlight(product.brand)} />
           <td>{product.count}</td>
           <td className="no-padding">
-            <span className="pull-right glyphicon glyphicon-plus"
-              data-toggle="tooltip" data-placement="left"
-              title={i18n.products.cloneText}
-              onClick={
-                function(event) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  that.props.cloneProduct(product.objects[0].id);
-                }
-              } ref={
-                function(span) {
-                  if (span !== null) {
-                    $(span).tooltip();
+            <span className="table-btn-container">
+              <span className="table-btn glyphicon glyphicon-plus"
+                data-toggle="tooltip" data-placement="left"
+                title={i18n.products.cloneText}
+                onClick={
+                  function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    that.props.cloneProduct(product.objects[0].id);
                   }
-                }
-              }></span>
+                } ref={
+                  function(span) {
+                    if (span !== null) {
+                      $(span).tooltip();
+                    }
+                  }
+                }></span>
+              </span>
           </td>
         </tr>,
         <tr>

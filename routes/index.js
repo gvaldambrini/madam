@@ -139,7 +139,9 @@ router.get('*', function(req, res, next) {
                 editCustomer: req.i18n.__('Edit customer'),
                 createNewCustomer: req.i18n.__('Create new customer and confirm appointment'),
                 fullname: req.i18n.__('Name'),
-                appDetails: req.i18n.__('Details')
+                appDetails: req.i18n.__('Details'),
+                printCustomerSheets: req.i18n.__('Print customer sheets'),
+                printCustomerSheet: req.i18n.__('Print customer sheet'),
             }
         }
     });

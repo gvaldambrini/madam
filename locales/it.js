@@ -88,5 +88,7 @@
 	"Unable to plan the appointment: there is already a planned appointment for the same date.": "Impossibile pianificare l'appuntamento: esiste già un appuntamento pianificato con la stessa data.",
 	"Unable to plan the appointment: there is already an appointment for the same date.": "Impossibile pianificare l'appuntamento: esiste già un appuntamento con la stessa data.",
 	"The sold date does not seem a valid date": "La data di vendita non sembra essere valida",
-	"No appointments to display.": "Nessun appuntamento da mostrare."
+	"No appointments to display.": "Nessun appuntamento da mostrare.",
+	"Print customer sheets": "Stampa schede clienti",
+	"Print customer sheet": "Stampa scheda cliente"
 }

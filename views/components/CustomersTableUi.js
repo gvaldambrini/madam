@@ -29,27 +29,29 @@ export default React.createClass({
         <td className="hidden-xs" dangerouslySetInnerHTML={this.renderHighlight(customer.phone)} />
         <td className="hidden-xs">{customer.last_seen}</td>
         <td className="no-padding">
-          <span
-            onClick={function(event) {event.stopPropagation();}}
-            className="table-btn pull-right glyphicon glyphicon-trash"
-            data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
-              function(span) {
-                if (span !== null) {
-                  const $span = $(span);
-                  if ($span.data('tooltip-init'))
-                    return;
-                  $span.data('tooltip-init', true);
-                  $span.tooltip();
-                  $span.confirmPopover({
-                    template: '#popover-template',
-                    title: i18n.customers.deleteTitle,
-                    content: i18n.customers.deleteMsg,
-                    $rootContainer: $('#customers-table-container'),
-                    onConfirm: () => that.props.deleteCustomer(customer.id)
-                  });
+          <span className="table-btn-container">
+            <span
+              onClick={function(event) {event.stopPropagation();}}
+              className="table-btn glyphicon glyphicon-trash"
+              data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
+                function(span) {
+                  if (span !== null) {
+                    const $span = $(span);
+                    if ($span.data('tooltip-init'))
+                      return;
+                    $span.data('tooltip-init', true);
+                    $span.tooltip();
+                    $span.confirmPopover({
+                      template: '#popover-template',
+                      title: i18n.customers.deleteTitle,
+                      content: i18n.customers.deleteMsg,
+                      $rootContainer: $('#customers-table-container'),
+                      onConfirm: () => that.props.deleteCustomer(customer.id)
+                    });
+                  }
                 }
-              }
-            }></span>
+              }></span>
+            </span>
         </td>
       </tr>
     );

@@ -77,6 +77,10 @@ export default React.createClass({
           }}/>
         </div>
         <h4>{i18n.homepage.appointments}</h4>
+        <button type="button" className="btn btn-primary calendar-print-sheets" name="submit">
+          {i18n.homepage.printCustomerSheets}
+          <span className="glyphicon glyphicon-print" aria-hidden="true"></span>
+        </button>
         {appointments}
         {planAppointmentForm}
         <div id="popover-template">

@@ -207,12 +207,41 @@ $sidebar-padding: 20px;
     cursor: pointer;
   }
 
-  .table-btn {
-    cursor: pointer;
+  .table-btn-container {
+    float: right;
+    margin: 1px 7px 1px 7px;
   }
 
-  .glyphicon-trash {
-    padding: 11px 15px 11px 15px;
+  .table-btn-container span {
+    margin: 2px;
+  }
+
+  .glyphicon-print {
+    color: #666;
+  }
+
+  .table-btn {
+    cursor: pointer;
+    padding: 6px 6px 6px 6px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    &:hover {
+      border: 1px solid $primary-color;
+    }
+  }
+
+  .table-btn.disabled {
+    cursor: auto;
+    color: #ccc;
+    &:hover {
+      border: 1px solid #ccc;
+    }
+  }
+
+  .glyphicon-plus {
+    padding-right: 5px;
+    padding-top: 5px;
+    color: #666;
   }
 
   td b {
@@ -258,10 +287,6 @@ $sidebar-padding: 20px;
  */
 
 #products-table-container {
-  .glyphicon-plus {
-    padding-right: 14px;
-    padding-top: 10px;
-  }
 
   .hidden-row {
     padding: 0;
@@ -446,6 +471,14 @@ $sidebar-padding: 20px;
     &:hover {
       cursor: pointer;
     }
+  }
+}
+
+.calendar-print-sheets {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  span {
+    margin-left: 10px;
   }
 }
 

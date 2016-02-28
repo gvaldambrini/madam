@@ -27,28 +27,30 @@ export default React.createClass({
           <td className={appClass}>{app.date}</td>
           <td className={appClass}>{app.planned ? i18n.appointments.planned : app.services}</td>
           <td className="no-padding">
-            <span
-              onClick={function(event) {event.stopPropagation();}}
-              className="table-btn pull-right glyphicon glyphicon-trash"
-              data-toggle="tooltip" data-placement="left"
-              title={i18n.appointments.deleteText} ref={
-                function(span) {
-                  if (span !== null) {
-                    const $span = $(span);
-                    if ($span.data('tooltip-init'))
-                      return;
-                    $span.data('tooltip-init', true);
-                    $span.tooltip();
-                    $span.confirmPopover({
-                      template: '#popover-template',
-                      title: i18n.appointments.deleteTitle,
-                      content: i18n.appointments.deleteMsg,
-                      $rootContainer: $('#appointments-table-container'),
-                      onConfirm: () => that.props.deleteAppointment(app)
-                    });
+            <span className="table-btn-container">
+              <span
+                onClick={function(event) {event.stopPropagation();}}
+                className="table-btn glyphicon glyphicon-trash"
+                data-toggle="tooltip" data-placement="left"
+                title={i18n.appointments.deleteText} ref={
+                  function(span) {
+                    if (span !== null) {
+                      const $span = $(span);
+                      if ($span.data('tooltip-init'))
+                        return;
+                      $span.data('tooltip-init', true);
+                      $span.tooltip();
+                      $span.confirmPopover({
+                        template: '#popover-template',
+                        title: i18n.appointments.deleteTitle,
+                        content: i18n.appointments.deleteMsg,
+                        $rootContainer: $('#appointments-table-container'),
+                        onConfirm: () => that.props.deleteAppointment(app)
+                      });
+                    }
                   }
-                }
-              }></span>
+                }></span>
+              </span>
           </td>
         </tr>
       );
