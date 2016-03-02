@@ -1,11 +1,11 @@
-import 'jquery/dist/jquery.min.js';
+import 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.min.js';
+import 'bootstrap';
 
 import 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css';
 import 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css';
 
-import 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js';
+import 'bootstrap-datepicker';
 import 'bootstrap-datepicker/dist/locales/bootstrap-datepicker.it.min.js';
 import 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js';
 
