@@ -157,15 +157,21 @@ function responseFetchCustomer(customerId, data) {
   };
 }
 
+export function fetchCustomerWithDetails(customerId) {
+  return $.ajax({
+    url: `/customers/${customerId}/details`,
+    method: 'get'
+  });
+}
+
 export function fetchCustomer(customerId) {
   return dispatch => {
-    $.ajax({
+    const ajaxPromise = $.ajax({
       url: '/customers/' + customerId,
-      method: 'get',
-      success: function(data) {
-        dispatch(responseFetchCustomer(customerId, data));
-      }
+      method: 'get'
     });
+    ajaxPromise.then((data) => dispatch(responseFetchCustomer(customerId, data)));
+    return ajaxPromise;
   };
 }
 

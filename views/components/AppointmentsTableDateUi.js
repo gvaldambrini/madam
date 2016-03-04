@@ -48,7 +48,16 @@ export default React.createClass({
                         $(span).tooltip();
                       }
                     }
-                  }></span>
+                }
+                onClick={
+                  function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (typeof app.id !== 'undefined') {
+                      $('#customer-sheet-printer').trigger('print', [app.id]);
+                    }
+                  }
+                }></span>
               <span onClick={function(event) {event.stopPropagation();}} className="glyphicon glyphicon-trash table-btn"
                 data-toggle="tooltip" data-placement="left"
                 title={i18n.homepage.deleteText} ref={
@@ -76,7 +85,7 @@ export default React.createClass({
     });
 
     return (
-      <table className='table table-hover'>
+      <table className='table table-condensed'>
         <thead>
           <tr>
             <th>{i18n.homepage.fullname}</th>

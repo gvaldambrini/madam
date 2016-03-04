@@ -2,7 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
-import { searchCustomers } from '../redux/modules/customers';
+import {
+  searchCustomers,
+  fetchCustomerWithDetails
+} from '../redux/modules/customers';
+
 import {
   fetchAppointmentsByDateIfNeeded,
   planAppointment,
@@ -81,6 +85,9 @@ const CalendarView = React.createClass({
     }
     this.props.dispatch(deleteAppointment(app.id, app));
   },
+  fetchCustomer: function(customerId) {
+    return fetchCustomerWithDetails(customerId);
+  },
   setDate: function(date) {
     this.context.router.push(`/calendar/${moment(date).format('YYYY-MM-DD')}`);
   },
@@ -93,6 +100,7 @@ const CalendarView = React.createClass({
         appointments={this.props.appointments}
         errors={this.state.errors}
         fetchCustomerSuggestions={this.fetchCustomerSuggestions}
+        fetchCustomer={this.fetchCustomer}
         deleteAppointment={this.deleteAppointment}
         editAppointment={this.editAppointment}
         addAppointment={this.addAppointment} />

@@ -247,6 +247,18 @@ class CustomerHandler {
     }
 
     /**
+     * The handler that returns the full details for a customer identified by the given customer id.
+     * @method
+     *
+     * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+     * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
+     * @param {function} _next the next middleware function to invoke, if any.
+     */
+    static fetchDetails(req, res, _next) {
+        res.json(req.customer);
+    }
+
+    /**
      * Validates the Customer data and returns the list of the errors if any.
      * @method
      *

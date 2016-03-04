@@ -45,6 +45,10 @@ form {
   }
 }
 
+#customer-sheet-printer {
+  display: none;
+}
+
 /*
  * Top navigation
  * Hide default border to remove 1px line.
@@ -488,5 +492,49 @@ $sidebar-padding: 20px;
   h4 {
     border-bottom: 2px solid $primary-color;
     padding-bottom: 15px;
+  }
+}
+
+@media screen {
+  #print-container {
+   display: none;
+  }
+}
+
+@media print {
+
+  body > * {
+    display: none;
+  }
+
+  #print-container {
+   display: block;
+  }
+
+  .customer-sheet {
+
+    .appointment {
+      margin-top: 10px;
+    }
+
+    .app-label {
+      margin-left: 5px;
+    }
+
+    .app-table {
+      margin-top: 5px;
+    }
+
+    table {
+      margin-bottom: 20px;
+
+      td {
+        padding: 3px 5px 3px 5px;
+
+        &:nth-child(1) {
+          width: 25%;
+        }
+      }
+    }
   }
 }

@@ -75,6 +75,7 @@ router.get('*', function(req, res, next) {
                 submitEdit: req.i18n.__('Edit appointment'),
                 confirmAppointment: req.i18n.__('Confirm appointment'),
                 notes: req.i18n.__('Notes'),
+                services: req.i18n.__('Services'),
                 addService: req.i18n.__('Add service'),
                 setWorkersMsg: req.i18n.__(
                     'To create an appointment, you have first to define the workers.'),
@@ -141,7 +142,7 @@ router.get('*', function(req, res, next) {
                 fullname: req.i18n.__('Name'),
                 appDetails: req.i18n.__('Details'),
                 printCustomerSheets: req.i18n.__('Print customer sheets'),
-                printCustomerSheet: req.i18n.__('Print customer sheet'),
+                printCustomerSheet: req.i18n.__('Print customer sheet')
             }
         }
     });

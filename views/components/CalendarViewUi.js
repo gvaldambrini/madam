@@ -5,6 +5,7 @@ import { fnRenderErrors } from './util';
 import PopoverTemplateUi from './PopoverTemplateUi';
 import AppointmentsTableDateUi from './AppointmentsTableDateUi';
 import PlanAppointmentFormUi from './PlanAppointmentFormUi';
+import CustomerSheetPrinterUi from './CustomerSheetPrinterUi';
 
 
 // The main presentational component used in the calendar / homepage section.
@@ -88,6 +89,8 @@ export default React.createClass({
             confirm={i18n.homepage.btnConfirm}
             cancel={i18n.homepage.btnCancel}/>
         </div>
+        <CustomerSheetPrinterUi
+          fetchCustomer={this.props.fetchCustomer}/>
       </div>
     );
   }

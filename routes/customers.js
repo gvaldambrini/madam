@@ -49,6 +49,8 @@ router.post('/', handlers.customer.create);
 router.put('/:id', handlers.customer.update);
 router.delete('/:id', handlers.customer.delete);
 
+router.get('/:id/details', handlers.customer.fetchDetails);
+
 // Appointment routes
 router.param('date', function(req, res, next, date) {
     if (moment(date, 'YYYY-MM-DD').isValid()) {
