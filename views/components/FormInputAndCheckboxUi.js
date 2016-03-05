@@ -4,14 +4,14 @@ import React from 'react';
 // A form input + checkbox presentational component.
 export default React.createClass({
   propTypes: {
-      handleChange: React.PropTypes.func.isRequired,
-      name: React.PropTypes.string.isRequired,
-      cblabel: React.PropTypes.string.isRequired,
-      cbname: React.PropTypes.string.isRequired,
-      label: React.PropTypes.string.isRequired,
-      value: React.PropTypes.string,
-      cbvalue: React.PropTypes.bool,
-      type: React.PropTypes.string
+    handleChange: React.PropTypes.func.isRequired,
+    name: React.PropTypes.string.isRequired,
+    cblabel: React.PropTypes.string.isRequired,
+    cbname: React.PropTypes.string.isRequired,
+    label: React.PropTypes.string.isRequired,
+    value: React.PropTypes.string,
+    cbvalue: React.PropTypes.bool,
+    type: React.PropTypes.string
   },
   getInitialState: function() {
     return {

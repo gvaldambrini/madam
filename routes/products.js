@@ -14,7 +14,7 @@ const productsPath = '/products';
 const ProductHandler = require('../routehandlers/product');
 
 const handlers = {
-    product: ProductHandler
+  product: ProductHandler
 };
 
 router.use(common.isAuthenticated);

@@ -4,11 +4,11 @@ import React from 'react';
 // A form input presentational component which includes a datepicker.
 export default React.createClass({
   propTypes: {
-      handleChange: React.PropTypes.func.isRequired,
-      name: React.PropTypes.string.isRequired,
-      label: React.PropTypes.string.isRequired,
-      value: React.PropTypes.string,
-      orientation: React.PropTypes.oneOf(['top', 'bottom', 'left', 'right', 'auto'])
+    handleChange: React.PropTypes.func.isRequired,
+    name: React.PropTypes.string.isRequired,
+    label: React.PropTypes.string.isRequired,
+    value: React.PropTypes.string,
+    orientation: React.PropTypes.oneOf(['top', 'bottom', 'left', 'right', 'auto'])
   },
   componentWillMount: function() {
     if (typeof this.props.orientation !== 'undefined') {

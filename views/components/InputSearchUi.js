@@ -4,8 +4,8 @@ import React from 'react';
 // A seach input presentational component.
 export default React.createClass({
   propTypes: {
-      search: React.PropTypes.func.isRequired,
-      placeholder: React.PropTypes.string.isRequired
+    search: React.PropTypes.func.isRequired,
+    placeholder: React.PropTypes.string.isRequired
   },
   searchClear: function() {
     return $("#search-clear");

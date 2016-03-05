@@ -49,10 +49,10 @@ export default React.createClass({
     const $workers = $groupBtn.find('ul a');
     let newIndex = 0;
     for (let i = 0; i < $workers.length; i++) {
-        if ($($workers[i]).text() === $button.text()) {
-            newIndex = (i + 1) % $workers.length;
-            break;
-        }
+      if ($($workers[i]).text() === $button.text()) {
+        newIndex = (i + 1) % $workers.length;
+        break;
+      }
     }
     const $newWorker = $($workers[newIndex]);
     const data = this.state;

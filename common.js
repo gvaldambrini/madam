@@ -22,9 +22,9 @@ const Common = function() {};
  * @method
  */
 Common.prototype.createClient = function() {
-    if (process.env.NODE_ENV === 'production')
-        return new elasticsearch.Client({host: process.env.BONSAI_URL, apiVersion: '1.5'});
-    return new elasticsearch.Client({apiVersion: '1.5'});
+  if (process.env.NODE_ENV === 'production')
+    return new elasticsearch.Client({host: process.env.BONSAI_URL, apiVersion: '1.5'});
+  return new elasticsearch.Client({apiVersion: '1.5'});
 };
 
 /**
@@ -49,7 +49,7 @@ Common.prototype.isAuthenticated = function(req, res, next) {
  * @param {string} localFormattedDate the local formatted date.
  */
 Common.prototype.toISODate = function(req, localFormattedDate) {
-    return moment(localFormattedDate, req.config.date_format).format('YYYY-MM-DD');
+  return moment(localFormattedDate, req.config.date_format).format('YYYY-MM-DD');
 };
 
 /**
@@ -60,9 +60,9 @@ Common.prototype.toISODate = function(req, localFormattedDate) {
  * @param {string} ISODate the iso date.
  */
 Common.prototype.toLocalFormattedDate = function(req, ISODate) {
-    if (typeof ISODate === 'undefined' || !ISODate)
-        return '-';
-    return moment(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
+  if (typeof ISODate === 'undefined' || !ISODate)
+    return '-';
+  return moment(ISODate, 'YYYY-MM-DD').format(req.config.date_format);
 };
 
 /**
@@ -72,7 +72,7 @@ Common.prototype.toLocalFormattedDate = function(req, ISODate) {
  * @param {array|string} container the container to converts.
  */
 Common.prototype.toArray = function(container) {
-    return (typeof container === 'string') ? [container] : container;
+  return (typeof container === 'string') ? [container] : container;
 };
 
 /**
@@ -89,19 +89,19 @@ Common.prototype.toArray = function(container) {
  * provided the default response data will be {id: <object id>}.
  */
 Common.prototype.saveCallback = function(req, res, esErr, esResp, newItem, resData) {
-    if (!esErr) {
-        const data = typeof resData !== 'undefined' ? resData : {id: esResp._id};
-        res.status(newItem ? 201 : 200).json(data);
-        return;
-    }
+  if (!esErr) {
+    const data = typeof resData !== 'undefined' ? resData : {id: esResp._id};
+    res.status(newItem ? 201 : 200).json(data);
+    return;
+  }
 
-    const errors = [];
-    if (esErr instanceof esErrors.NoConnections)
-        errors[errors.length] = {msg: req.i18n.__('Database connection error')};
-    else
-        errors[errors.length] = {msg: req.i18n.__('Database error')};
+  const errors = [];
+  if (esErr instanceof esErrors.NoConnections)
+    errors[errors.length] = {msg: req.i18n.__('Database connection error')};
+  else
+    errors[errors.length] = {msg: req.i18n.__('Database error')};
 
-    res.status(500).json({errors: errors});
+  res.status(500).json({errors: errors});
 };
 
 

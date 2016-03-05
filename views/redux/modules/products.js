@@ -19,11 +19,11 @@ export default function reducer(state = Map({
   productObjects: Map()
 }), action) {
   switch (action.type) {
-    case REQUEST_FETCH:
-      return state.set('filterText', action.payload);
-    case RESET_FILTER:
-      return state.set('filterText', '');
-    case PRODUCT_DELETED:
+  case REQUEST_FETCH:
+    return state.set('filterText', action.payload);
+  case RESET_FILTER:
+    return state.set('filterText', '');
+  case PRODUCT_DELETED:
     {
       const products = state.get('productList');
       for (let i = 0; i < products.size; i++) {
@@ -42,16 +42,16 @@ export default function reducer(state = Map({
 
       return state;
     }
-    case RESPONSE_FETCH:
-      return state.merge(
+  case RESPONSE_FETCH:
+    return state.merge(
         Map({
           loaded: true,
           productList: fromJS(action.payload)}));
-    case PRODUCT_FETCHED:
-      return state.setIn(
+  case PRODUCT_FETCHED:
+    return state.setIn(
         ['productObjects', action.payload.productId], fromJS(action.payload.data));
-    default:
-      return state;
+  default:
+    return state;
   }
 }
 

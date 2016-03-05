@@ -19,11 +19,11 @@ export default function reducer(state = Map({
   customerObjects: Map()
 }), action) {
   switch (action.type) {
-    case REQUEST_FETCH:
-      return state.set('filterText', action.payload);
-    case RESET_FILTER:
-      return state.set('filterText', '');
-    case CUSTOMER_DELETED:
+  case REQUEST_FETCH:
+    return state.set('filterText', action.payload);
+  case RESET_FILTER:
+    return state.set('filterText', '');
+  case CUSTOMER_DELETED:
     {
       const customerList = state
         .get('customerList')
@@ -40,16 +40,16 @@ export default function reducer(state = Map({
         })
       );
     }
-    case RESPONSE_FETCH:
-      return state.merge(
+  case RESPONSE_FETCH:
+    return state.merge(
         Map({
           loaded: true,
           customerList: fromJS(action.payload)}));
-    case CUSTOMER_FETCHED:
-      return state.setIn(
+  case CUSTOMER_FETCHED:
+    return state.setIn(
         ['customerObjects', action.payload.customerId], fromJS(action.payload.data));
-    default:
-      return state;
+  default:
+    return state;
   }
 }
 

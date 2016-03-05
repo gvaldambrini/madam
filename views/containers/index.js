@@ -17,21 +17,21 @@ import ServicesForm from './ServicesForm';
 import WorkersForm from './WorkersForm';
 
 module.exports = {
-    MainContent: MainContent,
-    MainView: MainView,
-    LoginForm: LoginForm,
-    CustomerForm: CustomerForm,
-    CustomerView: CustomerView,
-    CalendarCustomerForm: CalendarCustomerForm,
-    CalendarCustomerView: CalendarCustomerView,
-    CustomersView: CustomersView,
-    ProductForm: ProductForm,
-    ProductsView: ProductsView,
-    AppointmentView: AppointmentView,
-    AppointmentsView: AppointmentsView,
-    CalendarAppointmentView: CalendarAppointmentView,
-    CalendarAppointmentsView: CalendarAppointmentsView,
-    CalendarView: CalendarView,
-    ServicesForm: ServicesForm,
-    WorkersForm: WorkersForm
+  MainContent: MainContent,
+  MainView: MainView,
+  LoginForm: LoginForm,
+  CustomerForm: CustomerForm,
+  CustomerView: CustomerView,
+  CalendarCustomerForm: CalendarCustomerForm,
+  CalendarCustomerView: CalendarCustomerView,
+  CustomersView: CustomersView,
+  ProductForm: ProductForm,
+  ProductsView: ProductsView,
+  AppointmentView: AppointmentView,
+  AppointmentsView: AppointmentsView,
+  CalendarAppointmentView: CalendarAppointmentView,
+  CalendarAppointmentsView: CalendarAppointmentsView,
+  CalendarView: CalendarView,
+  ServicesForm: ServicesForm,
+  WorkersForm: WorkersForm
 };

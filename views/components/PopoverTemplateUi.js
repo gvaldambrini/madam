@@ -5,8 +5,8 @@ import React from 'react';
 // a confirm and a cancel button.
 export default React.createClass({
   propTypes: {
-      confirm: React.PropTypes.string.isRequired,
-      cancel: React.PropTypes.string.isRequired
+    confirm: React.PropTypes.string.isRequired,
+    cancel: React.PropTypes.string.isRequired
   },
   render: function() {
     return (

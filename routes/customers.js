@@ -18,8 +18,8 @@ const CustomerHandler = require('../routehandlers/customer');
 const AppointmentHandler = require('../routehandlers/appointment');
 
 const handlers = {
-    customer: CustomerHandler,
-    appointment: AppointmentHandler
+  customer: CustomerHandler,
+  appointment: AppointmentHandler
 };
 
 router.use(common.isAuthenticated);
@@ -30,19 +30,19 @@ router.get('/details', handlers.customer.fetchMultiDetails);
 
 // Customer routes
 router.param('id', function(req, res, next, id) {
-    client.get({
-        index: req.config.mainIndex,
-        type: 'customer',
-        id: id
-    }, function(err, resp, _respcode) {
-        if (err) {
-            res.sendStatus(404);
-            return;
-        }
-        req.customer = resp._source;
-        req.customerVersion = resp._version;
-        next();
-    });
+  client.get({
+    index: req.config.mainIndex,
+    type: 'customer',
+    id: id
+  }, function(err, resp, _respcode) {
+    if (err) {
+      res.sendStatus(404);
+      return;
+    }
+    req.customer = resp._source;
+    req.customerVersion = resp._version;
+    next();
+  });
 });
 
 router.get('/:id', handlers.customer.fetch);
@@ -54,12 +54,12 @@ router.get('/:id/details', handlers.customer.fetchDetails);
 
 // Appointment routes
 router.param('date', function(req, res, next, date) {
-    if (moment(date, 'YYYY-MM-DD').isValid()) {
-        next();
-    }
-    else {
-        res.sendStatus(404);
-    }
+  if (moment(date, 'YYYY-MM-DD').isValid()) {
+    next();
+  }
+  else {
+    res.sendStatus(404);
+  }
 });
 
 router.get('/appointments/:date', handlers.appointment.fetchByDate);

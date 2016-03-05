@@ -4,13 +4,13 @@ import React from 'react';
 // A radio form input presentational component.
 export default React.createClass({
   propTypes: {
-      handleChange: React.PropTypes.func.isRequired,
+    handleChange: React.PropTypes.func.isRequired,
+    name: React.PropTypes.string.isRequired,
+    label: React.PropTypes.string.isRequired,
+    values: React.PropTypes.arrayOf(React.PropTypes.shape({
       name: React.PropTypes.string.isRequired,
-      label: React.PropTypes.string.isRequired,
-      values: React.PropTypes.arrayOf(React.PropTypes.shape({
-        name: React.PropTypes.string.isRequired,
-        value: React.PropTypes.string.isRequired
-      })).isRequired
+      value: React.PropTypes.string.isRequired
+    })).isRequired
   },
   getInitialState: function() {
     return {value: ''};

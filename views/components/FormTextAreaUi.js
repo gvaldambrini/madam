@@ -4,11 +4,11 @@ import React from 'react';
 // A form textarea presentational component.
 export default React.createClass({
   propTypes: {
-      handleChange: React.PropTypes.func.isRequired,
-      name: React.PropTypes.string.isRequired,
-      label: React.PropTypes.string.isRequired,
-      value: React.PropTypes.string,
-      formHorizontal: React.PropTypes.bool
+    handleChange: React.PropTypes.func.isRequired,
+    name: React.PropTypes.string.isRequired,
+    label: React.PropTypes.string.isRequired,
+    value: React.PropTypes.string,
+    formHorizontal: React.PropTypes.bool
   },
   getDefaultProps: function() {
     return {

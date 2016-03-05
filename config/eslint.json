@@ -22,6 +22,7 @@
     "semi": [2, "always"],
     "key-spacing": 2,
     "padded-blocks": [2, "never"],
-    "quote-props": [2, "as-needed"]
+    "quote-props": [2, "as-needed"],
+    "indent": [2, 2]
   }
 }

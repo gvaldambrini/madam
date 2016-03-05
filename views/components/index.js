@@ -16,20 +16,20 @@ import WorkersFormUi from './WorkersFormUi';
 import SettingsViewUi from './SettingsViewUi';
 
 module.exports = {
-    WrapperUi: WrapperUi,
-    MainViewUi: MainViewUi,
-    MainContentUi: MainContentUi,
-    NavbarUi: NavbarUi,
-    LoginFormUi: LoginFormUi,
-    CustomerFormUi: CustomerFormUi,
-    CustomerViewUi: CustomerViewUi,
-    CustomersViewUi: CustomersViewUi,
-    ProductFormUi: ProductFormUi,
-    ProductsViewUi: ProductsViewUi,
-    AppointmentViewUi: AppointmentViewUi,
-    AppointmentsViewUi: AppointmentsViewUi,
-    CalendarViewUi: CalendarViewUi,
-    ServicesFormUi: ServicesFormUi,
-    WorkersFormUi: WorkersFormUi,
-    SettingsViewUi: SettingsViewUi
+  WrapperUi: WrapperUi,
+  MainViewUi: MainViewUi,
+  MainContentUi: MainContentUi,
+  NavbarUi: NavbarUi,
+  LoginFormUi: LoginFormUi,
+  CustomerFormUi: CustomerFormUi,
+  CustomerViewUi: CustomerViewUi,
+  CustomersViewUi: CustomersViewUi,
+  ProductFormUi: ProductFormUi,
+  ProductsViewUi: ProductsViewUi,
+  AppointmentViewUi: AppointmentViewUi,
+  AppointmentsViewUi: AppointmentsViewUi,
+  CalendarViewUi: CalendarViewUi,
+  ServicesFormUi: ServicesFormUi,
+  WorkersFormUi: WorkersFormUi,
+  SettingsViewUi: SettingsViewUi
 };

@@ -18,8 +18,8 @@ const ServicesHandler = require('../routehandlers/services');
 router.use(common.isAuthenticated);
 
 const handlers = {
-    workers: WorkersHandler,
-    services: ServicesHandler
+  workers: WorkersHandler,
+  services: ServicesHandler
 };
 
 router.get('/workers', handlers.workers.fetch);

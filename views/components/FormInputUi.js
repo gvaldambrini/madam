@@ -4,13 +4,13 @@ import React from 'react';
 // A form input presentational component.
 export default React.createClass({
   propTypes: {
-      handleChange: React.PropTypes.func.isRequired,
-      name: React.PropTypes.string.isRequired,
-      label: React.PropTypes.string.isRequired,
-      value: React.PropTypes.string,
-      type: React.PropTypes.string,
-      focus: React.PropTypes.bool,
-      mandatory: React.PropTypes.bool
+    handleChange: React.PropTypes.func.isRequired,
+    name: React.PropTypes.string.isRequired,
+    label: React.PropTypes.string.isRequired,
+    value: React.PropTypes.string,
+    type: React.PropTypes.string,
+    focus: React.PropTypes.bool,
+    mandatory: React.PropTypes.bool
   },
   getDefaultProps: function() {
     return {
@@ -44,9 +44,11 @@ export default React.createClass({
             name={this.props.name} placeholder={this.props.label}
             autoFocus={this.props.focus}
             value={this.state.value}
-            onChange={function(event) {
+            onChange={
+              function(event) {
                 that.props.handleChange(that.props.name, event.currentTarget.value);
-              }}/>
+              }
+            }/>
         </div>
       </div>
     );

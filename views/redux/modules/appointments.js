@@ -21,15 +21,15 @@ function reducerPerCustomer(state = Map({
   appointmentObjects: Map()
 }), action) {
   switch (action.type) {
-    case RESPONSE_FETCH:
-      return state.merge(
+  case RESPONSE_FETCH:
+    return state.merge(
         Map({
           appointmentList: fromJS(action.payload.data.appointments),
           name: action.payload.data.name,
           surname: action.payload.data.surname
         })
       );
-    case APPOINTMENT_DELETED:
+  case APPOINTMENT_DELETED:
     {
       let appointmentList = state.get('appointmentList');
       if (typeof appointmentList !== 'undefined') {
@@ -48,12 +48,12 @@ function reducerPerCustomer(state = Map({
         })
       );
     }
-    case RESPONSE_APPOINTMENT_FETCH:
-      return state.setIn(
+  case RESPONSE_APPOINTMENT_FETCH:
+    return state.setIn(
         ['appointmentObjects', action.payload.appId],
         fromJS(action.payload.data));
-    default:
-      return state;
+  default:
+    return state;
   }
 }
 
@@ -61,17 +61,17 @@ function reducerPerDate(state = Map({
   appointmentList: List()
 }), action) {
   switch (action.type) {
-    case RESPONSE_FETCH_BY_DATE:
-      return state.set('appointmentList', fromJS(action.payload.data.appointments));
-    case APPOINTMENT_DELETED:
+  case RESPONSE_FETCH_BY_DATE:
+    return state.set('appointmentList', fromJS(action.payload.data.appointments));
+  case APPOINTMENT_DELETED:
     {
       const appointmentList = state
         .get('appointmentList')
         .filterNot(app => app.get('appid') === action.payload.appId);
       return state.set('appointmentList', appointmentList);
     }
-    default:
-      return state;
+  default:
+    return state;
   }
 }
 
@@ -80,7 +80,7 @@ export default function reducer(state = Map({
   dates: Map()
 }), action) {
   if (action.type === APPOINTMENT_DELETED) {
-      return state
+    return state
         .setIn(
           ['customers', action.payload.customerId],
           reducerPerCustomer(state.getIn(['customers', action.payload.customerId]), action))
@@ -90,17 +90,17 @@ export default function reducer(state = Map({
   }
 
   switch (action.type) {
-    case RESPONSE_FETCH:
-    case RESPONSE_APPOINTMENT_FETCH:
-      return state.setIn(
+  case RESPONSE_FETCH:
+  case RESPONSE_APPOINTMENT_FETCH:
+    return state.setIn(
         ['customers', action.payload.customerId],
         reducerPerCustomer(state.getIn(['customers', action.payload.customerId]), action));
-    case RESPONSE_FETCH_BY_DATE:
-      return state.setIn(
+  case RESPONSE_FETCH_BY_DATE:
+    return state.setIn(
         ['dates', action.payload.date],
         reducerPerDate(state.getIn(['dates', action.payload.date]), action));
-    default:
-      return state;
+  default:
+    return state;
   }
 }
 

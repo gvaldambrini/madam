@@ -12,14 +12,14 @@ export default function reducer(state = Map({
   serviceList: List()
 }), action) {
   switch (action.type) {
-    case RESPONSE_FETCH:
-      return state.merge(
+  case RESPONSE_FETCH:
+    return state.merge(
         Map({
           loaded: true,
           serviceList: fromJS(action.payload.map(el => Map({name: el})))
         }));
-    default:
-      return state;
+  default:
+    return state;
   }
 }
 
