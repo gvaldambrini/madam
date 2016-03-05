@@ -258,6 +258,32 @@ class CustomerHandler {
         res.json(req.customer);
     }
 
+
+    /**
+     * The handler that returns the full details for a list of customers identified by the given id.
+     * @method
+     *
+     * @param {object} req the current {@link http://expressjs.com/4x/api.html#req|request object}.
+     * @param {object} res the {@link http://expressjs.com/4x/api.html#res|response object}.
+     * @param {function} _next the next middleware function to invoke, if any.
+     */
+    static fetchMultiDetails(req, res, _next) {
+        if (typeof req.query.ids === 'undefined') {
+            res.sendStatus(400);
+            return;
+        }
+
+        client.mget({
+            index: req.config.mainIndex,
+            type: 'customer',
+            body: {
+                ids: req.query.ids.split(',')
+            }
+        }, function(err, resp, _respcode) {
+            res.json(resp.docs.map(el => el._source));
+        });
+    }
+
     /**
      * Validates the Customer data and returns the list of the errors if any.
      * @method

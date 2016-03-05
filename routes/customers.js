@@ -26,6 +26,7 @@ router.use(common.isAuthenticated);
 
 router.get('/simple-search', handlers.customer.simpleSearch);
 router.get('/search', handlers.customer.search);
+router.get('/details', handlers.customer.fetchMultiDetails);
 
 // Customer routes
 router.param('id', function(req, res, next, id) {

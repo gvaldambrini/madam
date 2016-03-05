@@ -164,6 +164,14 @@ export function fetchCustomerWithDetails(customerId) {
   });
 }
 
+export function fetchCustomersWithDetails(customerIds) {
+  return $.ajax({
+    url: '/customers/details',
+    method: 'get',
+    data: {ids: customerIds.join(',')}
+  });
+}
+
 export function fetchCustomer(customerId) {
   return dispatch => {
     const ajaxPromise = $.ajax({

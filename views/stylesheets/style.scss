@@ -235,7 +235,7 @@ $sidebar-padding: 20px;
   }
 
   .table-btn.disabled {
-    cursor: auto;
+    cursor: not-allowed;
     color: #ccc;
     &:hover {
       border: 1px solid #ccc;
@@ -512,6 +512,9 @@ $sidebar-padding: 20px;
   }
 
   .customer-sheet {
+    height: 120mm;
+    display: block;
+    page-break-inside : avoid;
 
     .appointment {
       margin-top: 10px;
@@ -526,10 +529,10 @@ $sidebar-padding: 20px;
     }
 
     table {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
 
       td {
-        padding: 3px 5px 3px 5px;
+        padding: 1px 5px 1px 5px !important;
 
         &:nth-child(1) {
           width: 25%;

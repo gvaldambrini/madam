@@ -17,6 +17,8 @@ export default React.createClass({
     appointments: React.PropTypes.array.isRequired,
     errors: React.PropTypes.array.isRequired,
     fetchCustomerSuggestions: React.PropTypes.func.isRequired,
+    fetchCustomer: React.PropTypes.func.isRequired,
+    fetchCustomers: React.PropTypes.func.isRequired,
     deleteAppointment: React.PropTypes.func.isRequired,
     editAppointment: React.PropTypes.func.isRequired,
     addAppointment: React.PropTypes.func.isRequired
@@ -46,6 +48,8 @@ export default React.createClass({
           plan={this.props.addAppointment}
           fetchCustomerSuggestions={this.props.fetchCustomerSuggestions}/>
       );
+
+    const customers = this.props.appointments.map(el => el.id).filter(el => el);
 
     return (
       <div id="calendar-table-container" className="content-body">
@@ -78,7 +82,19 @@ export default React.createClass({
           }}/>
         </div>
         <h4>{i18n.homepage.appointments}</h4>
-        <button type="button" className="btn btn-primary calendar-print-sheets" name="submit">
+        <button type="button" className={
+            customers.length === 0
+            ? "btn btn-primary calendar-print-sheets disabled"
+            : "btn btn-primary calendar-print-sheets"
+         } name="submit" onClick={
+          function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (customers.length > 0) {
+              $('#customer-sheet-printer').trigger('print-multi', [customers]);
+            }
+          }
+        }>
           {i18n.homepage.printCustomerSheets}
           <span className="glyphicon glyphicon-print" aria-hidden="true"></span>
         </button>
@@ -90,7 +106,8 @@ export default React.createClass({
             cancel={i18n.homepage.btnCancel}/>
         </div>
         <CustomerSheetPrinterUi
-          fetchCustomer={this.props.fetchCustomer}/>
+          fetchCustomer={this.props.fetchCustomer}
+          fetchCustomers={this.props.fetchCustomers}/>
       </div>
     );
   }
