@@ -32,6 +32,24 @@ export default React.createClass({
           <span className="table-btn-container">
             <span
               onClick={function(event) {event.stopPropagation();}}
+              className="glyphicon glyphicon-print table-btn"
+              data-toggle="tooltip" data-placement="left"
+              title={i18n.customers.printCustomerSheet} ref={
+                  function(span) {
+                    if (span !== null) {
+                      $(span).tooltip();
+                    }
+                  }
+              }
+              onClick={
+                function(event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  $('#customer-sheet-printer').trigger('print', [customer.id]);
+                }
+              }></span>
+            <span
+              onClick={function(event) {event.stopPropagation();}}
               className="table-btn glyphicon glyphicon-trash"
               data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
                 function(span) {

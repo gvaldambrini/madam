@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import PopoverTemplateUi from './PopoverTemplateUi';
 import AppointmentsTableUi from './AppointmentsTableUi';
 
 
@@ -45,11 +44,6 @@ export default React.createClass({
         </p>
         <div className="appointment-table-container">
         {appointments}
-        </div>
-        <div id="popover-template">
-          <PopoverTemplateUi
-            confirm={i18n.appointments.btnConfirm}
-            cancel={i18n.appointments.btnCancel}/>
         </div>
       </div>
     );

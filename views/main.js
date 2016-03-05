@@ -28,6 +28,7 @@ import './javascripts/confirm-popover.js';
 import './stylesheets/style.scss';
 
 import {
+  MainContent,
   MainView,
   LoginForm,
   CustomerForm,
@@ -47,7 +48,6 @@ import {
 } from './containers';
 
 import {
-  MainContentUi,
   WrapperUi,
   SettingsViewUi
 } from './components';
@@ -88,7 +88,7 @@ const store = configureStore();
 const routes = function() {
   return (
     <Route component={MainView}>
-      <Route path="/" component={MainContentUi}>
+      <Route path="/" component={MainContent}>
         <IndexRedirect to="calendar" />
         // Calendar section
         // this would be ideally just a main route with path equal to "/calendar(/:date)",

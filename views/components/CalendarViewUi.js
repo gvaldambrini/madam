@@ -2,10 +2,9 @@ import React from 'react';
 import moment from 'moment';
 
 import { fnRenderErrors } from './util';
-import PopoverTemplateUi from './PopoverTemplateUi';
+
 import AppointmentsTableDateUi from './AppointmentsTableDateUi';
 import PlanAppointmentFormUi from './PlanAppointmentFormUi';
-import CustomerSheetPrinterUi from './CustomerSheetPrinterUi';
 
 
 // The main presentational component used in the calendar / homepage section.
@@ -17,8 +16,6 @@ export default React.createClass({
     appointments: React.PropTypes.array.isRequired,
     errors: React.PropTypes.array.isRequired,
     fetchCustomerSuggestions: React.PropTypes.func.isRequired,
-    fetchCustomer: React.PropTypes.func.isRequired,
-    fetchCustomers: React.PropTypes.func.isRequired,
     deleteAppointment: React.PropTypes.func.isRequired,
     editAppointment: React.PropTypes.func.isRequired,
     addAppointment: React.PropTypes.func.isRequired
@@ -107,14 +104,6 @@ export default React.createClass({
         </button>
         {appointments}
         {planAppointmentForm}
-        <div id="popover-template">
-          <PopoverTemplateUi
-            confirm={i18n.homepage.btnConfirm}
-            cancel={i18n.homepage.btnCancel}/>
-        </div>
-        <CustomerSheetPrinterUi
-          fetchCustomer={this.props.fetchCustomer}
-          fetchCustomers={this.props.fetchCustomers}/>
       </div>
     );
   }

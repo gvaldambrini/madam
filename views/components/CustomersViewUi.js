@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router';
 
 import InputSearchUi from './InputSearchUi';
-import PopoverTemplateUi from './PopoverTemplateUi';
 import CustomersTableUi from './CustomersTableUi';
 
 
@@ -48,11 +47,6 @@ export default React.createClass({
         </div>
         <div id="customers-table-container" className="content-body">
           {customers}
-        </div>
-        <div id="popover-template">
-          <PopoverTemplateUi
-            confirm={i18n.customers.btnConfirm}
-            cancel={i18n.customers.btnCancel}/>
         </div>
       </div>
     );

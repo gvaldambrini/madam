@@ -2,12 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
-import {
-  searchCustomers,
-  fetchCustomerWithDetails,
-  fetchCustomersWithDetails
-} from '../redux/modules/customers';
-
+import { searchCustomers } from '../redux/modules/customers';
 import {
   fetchAppointmentsByDateIfNeeded,
   planAppointment,
@@ -98,8 +93,6 @@ const CalendarView = React.createClass({
         appointments={this.props.appointments}
         errors={this.state.errors}
         fetchCustomerSuggestions={this.fetchCustomerSuggestions}
-        fetchCustomer={fetchCustomerWithDetails}
-        fetchCustomers={fetchCustomersWithDetails}
         deleteAppointment={this.deleteAppointment}
         editAppointment={this.editAppointment}
         addAppointment={this.addAppointment} />

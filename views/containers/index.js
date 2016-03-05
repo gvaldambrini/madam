@@ -1,3 +1,4 @@
+import MainContent from './MainContent';
 import MainView from './MainView';
 import LoginForm from './LoginForm';
 import CustomerForm from './CustomerForm';
@@ -16,6 +17,7 @@ import ServicesForm from './ServicesForm';
 import WorkersForm from './WorkersForm';
 
 module.exports = {
+    MainContent: MainContent,
     MainView: MainView,
     LoginForm: LoginForm,
     CustomerForm: CustomerForm,

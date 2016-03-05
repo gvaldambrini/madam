@@ -22,6 +22,10 @@ router.get('*', function(req, res, next) {
         i18n: {
             title: req.i18n.__('MadamPettine'),
             logout: req.i18n.__('logout'),
+            popover: {
+                btnConfirm: req.i18n.__('Confirm'),
+                btnCancel: req.i18n.__('Cancel')
+            },
             sidebar: {
                 home: req.i18n.__('Home'),
                 customers: req.i18n.__('Customers'),
@@ -52,10 +56,9 @@ router.get('*', function(req, res, next) {
                 deleteText: req.i18n.__('Delete customer'),
                 deleteTitle: req.i18n.__('Delete the customer?'),
                 deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
-                btnConfirm: req.i18n.__('Confirm'),
-                btnCancel: req.i18n.__('Cancel'),
                 submitAdd: req.i18n.__('Create customer'),
-                submitEdit: req.i18n.__('Edit customer')
+                submitEdit: req.i18n.__('Edit customer'),
+                printCustomerSheet: req.i18n.__('Print customer sheet')
             },
             appointments: {
                 date: req.i18n.__('Date'),
@@ -63,8 +66,6 @@ router.get('*', function(req, res, next) {
                 details: req.i18n.__('Details'),
                 planned: req.i18n.__('Planned'),
                 createNew: req.i18n.__('Create new appointment'),
-                btnConfirm: req.i18n.__('Confirm'),
-                btnCancel: req.i18n.__('Cancel'),
                 deleteText: req.i18n.__('Delete appointment'),
                 deleteTitle: req.i18n.__('Delete the appointment?'),
                 deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
@@ -88,8 +89,6 @@ router.get('*', function(req, res, next) {
                 edit: req.i18n.__('Edit product'),
                 search: req.i18n.__('Search...'),
                 emptyTableMsg: req.i18n.__('No products to display.'),
-                btnConfirm: req.i18n.__('Confirm'),
-                btnCancel: req.i18n.__('Cancel'),
                 deleteText: req.i18n.__('Delete product'),
                 deleteTitle: req.i18n.__('Delete the product?'),
                 deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
@@ -130,8 +129,6 @@ router.get('*', function(req, res, next) {
                 customerPlaceholder: req.i18n.__('Insert a new customer or select an existing one'),
                 planned: req.i18n.__('Planned'),
                 appointments: req.i18n.__('Appointments'),
-                btnConfirm: req.i18n.__('Confirm'),
-                btnCancel: req.i18n.__('Cancel'),
                 deleteTitle: req.i18n.__('Delete the appointment?'),
                 deleteMsg: req.i18n.__('The operation cannot be undone. Continue?'),
                 deleteText: req.i18n.__('Delete appointment'),
@@ -141,8 +138,7 @@ router.get('*', function(req, res, next) {
                 createNewCustomer: req.i18n.__('Create new customer and confirm appointment'),
                 fullname: req.i18n.__('Name'),
                 appDetails: req.i18n.__('Details'),
-                printCustomerSheets: req.i18n.__('Print customer sheets'),
-                printCustomerSheet: req.i18n.__('Print customer sheet')
+                printCustomerSheets: req.i18n.__('Print customer sheets')
             }
         }
     });

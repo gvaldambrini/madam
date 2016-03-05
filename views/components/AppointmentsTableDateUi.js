@@ -42,7 +42,7 @@ export default React.createClass({
                 ? "glyphicon glyphicon-print table-btn disabled" :
                 "glyphicon glyphicon-print table-btn"}
                 data-toggle="tooltip" data-placement="left"
-                title={i18n.homepage.printCustomerSheet} ref={
+                title={i18n.customers.printCustomerSheet} ref={
                     function(span) {
                       if (span !== null && typeof app.id !== 'undefined') {
                         $(span).tooltip();
