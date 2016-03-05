@@ -39,6 +39,13 @@ export default React.createClass({
           editAppointment={this.props.editAppointment}/>
       );
     }
+    else {
+      appointments = (
+        <div className="alert alert-info" role="alert">
+          {i18n.appointments.emptyTableMsg}
+        </div>
+      );
+    }
 
     let planAppointmentForm;
     if (moment(this.props.date).isAfter(moment(), 'day') ||
