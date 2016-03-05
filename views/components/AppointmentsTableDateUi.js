@@ -39,8 +39,8 @@ export default React.createClass({
                 onClick={function(event) {event.stopPropagation();}}
                 className={
                 typeof app.id === 'undefined'
-                ? "glyphicon glyphicon-print table-btn disabled" :
-                "glyphicon glyphicon-print table-btn"}
+                ? "glyphicon glyphicon-print table-btn hidden-xs disabled" :
+                "glyphicon glyphicon-print table-btn hidden-xs"}
                 data-toggle="tooltip" data-placement="left"
                 title={i18n.customers.printCustomerSheet} ref={
                     function(span) {
@@ -85,7 +85,7 @@ export default React.createClass({
     });
 
     return (
-      <table className='table table-condensed'>
+      <table className='table table-hover'>
         <thead>
           <tr>
             <th>{i18n.homepage.fullname}</th>

@@ -32,7 +32,7 @@ export default React.createClass({
           <span className="table-btn-container">
             <span
               onClick={function(event) {event.stopPropagation();}}
-              className="glyphicon glyphicon-print table-btn"
+              className="glyphicon glyphicon-print table-btn hidden-xs"
               data-toggle="tooltip" data-placement="left"
               title={i18n.customers.printCustomerSheet} ref={
                   function(span) {

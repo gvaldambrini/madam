@@ -58,32 +58,34 @@ export default React.createClass({
     return (
       <div id="calendar-table-container" className="content-body">
         {fnRenderErrors(this.props.errors)}
-        <div className='date-selector-header'>
-          <span className="glyphicon glyphicon-menu-left" onClick={function(event) {
-            const date = moment(that.props.date).subtract(1, 'days');
-            that.props.setDate(date);
-            const $dateSelector = $(event.currentTarget)
-              .closest('.date-selector-header')
-              .find('.date-selector');
-            $dateSelector.datepicker('setDate', date.format(config.date_format));
-          }}/>
-          <span className="date-selector" data-provide="datepicker" ref={
-            function(span) {
-              $(span).datepicker().off('changeDate').on(
-                'changeDate', event => that.props.setDate(moment(event.date.toISOString()))
-              );
-            }
-          }>
-            {moment(this.props.date).format(config.date_format)}
-          </span>
-          <span className="glyphicon glyphicon-menu-right" onClick={function(event) {
-            const date = moment(that.props.date).add(1, 'days');
-            that.props.setDate(date);
-            const $dateSelector = $(event.currentTarget)
-              .closest('.date-selector-header')
-              .find('.date-selector');
-            $dateSelector.datepicker('setDate', date.format(config.date_format));
-          }}/>
+        <div className="date-selector-wrapper">
+          <div className='date-selector-header'>
+            <span className="glyphicon glyphicon-menu-left" onClick={function(event) {
+              const date = moment(that.props.date).subtract(1, 'days');
+              that.props.setDate(date);
+              const $dateSelector = $(event.currentTarget)
+                .closest('.date-selector-header')
+                .find('.date-selector');
+              $dateSelector.datepicker('setDate', date.format(config.date_format));
+            }}/>
+            <span className="date-selector" data-provide="datepicker" ref={
+              function(span) {
+                $(span).datepicker().off('changeDate').on(
+                  'changeDate', event => that.props.setDate(moment(event.date.toISOString()))
+                );
+              }
+            }>
+              {moment(this.props.date).format(config.date_format)}
+            </span>
+            <span className="glyphicon glyphicon-menu-right" onClick={function(event) {
+              const date = moment(that.props.date).add(1, 'days');
+              that.props.setDate(date);
+              const $dateSelector = $(event.currentTarget)
+                .closest('.date-selector-header')
+                .find('.date-selector');
+              $dateSelector.datepicker('setDate', date.format(config.date_format));
+            }}/>
+          </div>
         </div>
         <h4>{i18n.homepage.appointments}</h4>
         <button type="button" className={

@@ -229,6 +229,7 @@ $sidebar-padding: 20px;
     padding: 6px 6px 6px 6px;
     border: 1px solid #ccc;
     border-radius: 20px;
+    background-color: white;
     &:hover {
       border: 1px solid $primary-color;
     }
@@ -299,6 +300,10 @@ $sidebar-padding: 20px;
     .table {
       border-top: 1px $primary-color solid;
     }
+  }
+
+  tr[aria-expanded='true'] {
+    background-color: #eef0f0;
   }
 }
 
@@ -440,9 +445,12 @@ $sidebar-padding: 20px;
   }
 }
 
+.date-selector-wrapper {
+  text-align: center;
+}
+
 .date-selector-header {
-  margin: auto;
-  width: 30%;
+  display: inline-block;
 
   .glyphicon-menu-left {
     font-size: 13pt;
