@@ -31,9 +31,11 @@ function reducerPerCustomer(state = Map({
       );
     case APPOINTMENT_DELETED:
     {
-      const appointmentList = state
-        .get('appointmentList')
-        .filterNot(app => app.get('appid') === action.payload.appId);
+      let appointmentList = state.get('appointmentList');
+      if (typeof appointmentList !== 'undefined') {
+        appointmentList = appointmentList.filterNot(
+          app => app.get('appid') === action.payload.appId);
+      }
 
       const appointmentObjects = state
         .get('appointmentObjects')
