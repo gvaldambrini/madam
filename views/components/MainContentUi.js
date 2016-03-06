@@ -8,6 +8,11 @@ import PopoverTemplateUi from './PopoverTemplateUi';
 // The main content presentational component which includes the sidebar and displays
 // the children.
 export default React.createClass({
+  propTypes: {
+    services: React.PropTypes.array.isRequired,
+    fetchCustomer: React.PropTypes.func.isRequired,
+    fetchCustomers: React.PropTypes.func.isRequired
+  },
   render: function() {
     return (
       <div className="row">
@@ -15,9 +20,7 @@ export default React.createClass({
         <div className="col-sm-10 col-sm-offset-2 main">
           {this.props.children}
         </div>
-        <CustomerSheetPrinterUi
-          fetchCustomer={this.props.fetchCustomer}
-          fetchCustomers={this.props.fetchCustomers}/>
+        <CustomerSheetPrinterUi {...this.props}/>
         <div id="popover-template">
           <PopoverTemplateUi
             confirm={i18n.popover.btnConfirm}

@@ -517,33 +517,50 @@ $sidebar-padding: 20px;
 
   #print-container {
    display: block;
+   font-size: 9pt;
   }
 
   .customer-sheet {
     height: 120mm;
     display: block;
-    page-break-inside : avoid;
+    page-break-inside: avoid;
+    page-break-after: always;
 
-    .appointment {
-      margin-top: 10px;
-    }
-
-    .app-label {
+    .phones {
       margin-left: 5px;
     }
 
-    .app-table {
-      margin-top: 5px;
+    .appointment {
+      margin-top: 20px;
+      margin-left: 5px;
     }
 
-    table {
+    .notes {
+      margin-top: 10px;
+      margin-left: 5px;
+    }
+
+    table.appointment-grid {
       margin-bottom: 15px;
+
+      th {
+        text-align: center;
+        padding: 3px 5px 3px 5px !important;
+        &:nth-child(1) {
+          text-align: left;
+          text-indent: 3px;
+        }
+      }
 
       td {
         padding: 1px 5px 1px 5px !important;
+        text-align: center;
+        width: 11%;
 
         &:nth-child(1) {
-          width: 25%;
+          width: 23%;
+          text-align: left;
+          text-indent: 3px;
         }
       }
     }
