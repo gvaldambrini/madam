@@ -20,6 +20,9 @@ export default React.createClass({
     editAppointment: React.PropTypes.func.isRequired,
     addAppointment: React.PropTypes.func.isRequired
   },
+  componentWillMount: function() {
+      $.fn.datepicker.defaults.orientation = 'bottom';
+  },
   render: function() {
     const that = this;
     if (!this.props.loaded) {

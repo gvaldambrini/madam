@@ -48,7 +48,7 @@ export default React.createClass({
             <FormInputUi name='brand' value={this.props.data.brand}
               label={i18n.products.brand} handleChange={this.props.inputChange}/>
             <FormInputDateUi name='sold_date' value={this.props.data.sold_date}
-              label={i18n.products.soldDate} orientation='top'
+              label={i18n.products.soldDate}
               handleChange={this.props.inputChange}/>
             <FormTextAreaUi name='notes' value={this.props.data.notes}
               label={i18n.products.notes}

@@ -80,7 +80,7 @@ export default React.createClass({
               value={this.props.data.discount}
               handleChange={this.props.inputChange}/>
             <FormInputDateUi name='first_seen' value={this.props.data.first_seen}
-              label={i18n.customers.firstSeen}
+              label={i18n.customers.firstSeen} orientation='top'
               handleChange={this.props.inputChange}/>
             <FormTextAreaUi name='notes' value={this.props.data.notes}
               label={i18n.customers.notes} handleChange={this.props.inputChange}/>
