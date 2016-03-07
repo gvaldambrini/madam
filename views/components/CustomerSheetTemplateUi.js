@@ -17,7 +17,7 @@ export default React.createClass({
       if (typeof el.date === 'undefined') {
         return <th key={index}></th>;
       }
-      return <th key={index}>{moment(el.date).format('DD/MM')}</th>
+      return <th key={index}>{moment(el.date).format('DD/MM')}</th>;
     });
 
     const serviceList = services.map(function(service, index) {
@@ -56,7 +56,7 @@ export default React.createClass({
     );
   },
   render: function() {
-    let apps = []
+    let apps = [];
     if (typeof this.props.data.appointments !== 'undefined') {
       apps = this.props.data.appointments.slice();
     }

@@ -13,10 +13,10 @@ export default React.createClass({
   getDefaultProps: function() {
     return {
       orientation: 'bottom'
-    }
+    };
   },
   componentWillMount: function() {
-      $.fn.datepicker.defaults.orientation = this.props.orientation;
+    $.fn.datepicker.defaults.orientation = this.props.orientation;
   },
   handleChange: function(event) {
     this.props.handleChange(this.props.name, $(event.currentTarget).val());

@@ -11,7 +11,7 @@ export default React.createClass({
     fetchCustomers: React.PropTypes.func.isRequired
   },
   print: function(_event, customer) {
-    var that = this;
+    const that = this;
     this.props.fetchCustomer(customer).then(function(data) {
       ReactDOM.render(
         <CustomerSheetTemplateUi services={that.props.services} data={data}/>,
@@ -21,7 +21,7 @@ export default React.createClass({
     });
   },
   printMulti: function(_event, customers) {
-    var that = this;
+    const that = this;
     this.props.fetchCustomers(customers).then(function(data) {
       const sheets = data.map(function(obj, index) {
         return <CustomerSheetTemplateUi services={that.props.services} data={obj} key={index}/>;
