@@ -145,7 +145,6 @@ const client = common.createClient();
             },
             email: {type: 'string'},
             allow_email: {type: 'boolean'},
-            discount: {type: 'integer'},
             first_seen: {type: 'date'},
             last_seen: {type: 'date'},
             notes: {type: 'string'},
@@ -162,8 +161,6 @@ const client = common.createClient();
                     worker: {type: 'string'}
                   }
                 },
-                satisfaction: {type: 'integer'},
-                discount: {type: 'integer'},
                 notes: {type: 'string'}
               }
             },

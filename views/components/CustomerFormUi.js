@@ -3,7 +3,6 @@ import React from 'react';
 import { fnRenderErrors } from './util';
 import FormInputUi from './FormInputUi';
 import FormInputAndCheckboxUi from './FormInputAndCheckboxUi';
-import FormInputRadioUi from './FormInputRadioUi';
 import FormInputDateUi from './FormInputDateUi';
 import FormTextAreaUi from './FormTextAreaUi';
 
@@ -70,14 +69,6 @@ export default React.createClass({
               name='email' label={i18n.customers.email}
               cbname='allow_email' cblabel={i18n.customers.allowEmail}
               cbvalue={this.props.data.allow_email}
-              handleChange={this.props.inputChange}/>
-            <FormInputRadioUi name='discount' label={i18n.customers.discount}
-              values={[
-                {name: '0%',  value: '0'},
-                {name: '10%', value: '10'},
-                {name: '20%', value: '20'},
-                {name: '30%', value: '30'}]}
-              value={this.props.data.discount}
               handleChange={this.props.inputChange}/>
             <FormInputDateUi name='first_seen' value={this.props.data.first_seen}
               label={i18n.customers.firstSeen} orientation='top'

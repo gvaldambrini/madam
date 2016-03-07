@@ -132,7 +132,6 @@ describe('API tests: customer CRUD', function() {
                             phone: '55533243',
                             email: 'simple@email.com',
                             first_seen: '24/11/2015',
-                            discount: '10',
                             allow_sms: 'false',
                             allow_email: 'true',
                             notes: 'very important person'
@@ -153,7 +152,6 @@ describe('API tests: customer CRUD', function() {
                         obj.phone.should.equal('55533243');
                         obj.email.should.equal('simple@email.com');
                         obj.first_seen.should.equal('2015-11-24');
-                        obj.discount.should.equal(10);
                         obj.allow_sms.should.equal(false);
                         obj.allow_email.should.equal(true);
                         obj.notes.should.equal('very important person');
@@ -351,7 +349,6 @@ describe('API tests: customer CRUD', function() {
                                 phone: '55500231',
                                 email: 'other@email.com',
                                 first_seen: '26/10/2015',
-                                discount: '20',
                                 allow_sms: 'false',
                                 allow_email: 'false',
                                 notes: 'not a so important person'
@@ -372,7 +369,6 @@ describe('API tests: customer CRUD', function() {
                             obj.phone.should.equal('55500231');
                             obj.email.should.equal('other@email.com');
                             obj.first_seen.should.equal('2015-10-26');
-                            obj.discount.should.equal(20);
                             obj.allow_sms.should.equal(false);
                             obj.allow_email.should.equal(false);
                             obj.notes.should.equal('not a so important person');

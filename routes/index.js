@@ -50,7 +50,6 @@ router.get('*', function(req, res, next) {
         email: req.i18n.__('Email'),
         allowEmail: req.i18n.__('Allow email'),
         firstSeen: req.i18n.__('First seen'),
-        discount: req.i18n.__('Discount'),
         notes: req.i18n.__('Notes'),
         headerInfo: req.i18n.__('Info'),
         headerAppointments: req.i18n.__('Appointments'),

@@ -8,7 +8,7 @@ const client = common.createClient();
  * @var
  */
 const customerFields = [
-  'name', 'surname', 'mobile_phone', 'phone', 'email', 'first_seen', 'discount',
+  'name', 'surname', 'mobile_phone', 'phone', 'email', 'first_seen',
   'allow_sms', 'allow_email', 'notes'];
 
 
@@ -224,8 +224,6 @@ class CustomerHandler {
       if (sourceObj[field]) {
         if (field === 'first_seen')
           obj[field] = common.toLocalFormattedDate(req, sourceObj[field]);
-        else if (field === 'discount')
-          obj[field] = '' + sourceObj[field];
         else
             obj[field] = sourceObj[field];
       }
@@ -335,8 +333,6 @@ class CustomerHandler {
           obj[field] = common.toISODate(req, sourceObj[field]);
         else if (field === 'allow_sms' || field === 'allow_email')
           obj[field] = sourceObj[field] === "true";
-        else if (field === 'discount')
-          obj[field] = parseInt(sourceObj[field], 10);
         else
             obj[field] = sourceObj[field];
       }
