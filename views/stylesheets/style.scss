@@ -393,6 +393,10 @@ $sidebar-padding: 20px;
 /*
  * Home page
  */
+ #calendar-table-container .form-horizontal {
+  padding-right: 0;
+ }
+
 .react-autosuggest {
   position: relative;
   margin-right: 3px;
