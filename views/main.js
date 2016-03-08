@@ -19,7 +19,12 @@ import {
   browserHistory
 } from 'react-router';
 
+import {
+  syncHistoryWithStore,
+  routerReducer
+} from 'react-router-redux';
 import { Provider } from 'react-redux';
+
 import configureStore from './redux/configureStore';
 
 import Cookies from 'js-cookie';
@@ -83,7 +88,9 @@ function requireAuth(nextState, replace) {
   }
 }
 
-const store = configureStore();
+const store = configureStore(routerReducer);
+const history = syncHistoryWithStore(browserHistory, store);
+
 
 const routes = function() {
   return (
@@ -151,7 +158,7 @@ const routes = function() {
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router routes={routes()} history={browserHistory}/>
+    <Router routes={routes()} history={history}/>
   </Provider>,
   document.getElementById('main-container')
 );

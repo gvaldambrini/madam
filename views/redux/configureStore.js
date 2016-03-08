@@ -1,7 +1,8 @@
 import {
   createStore,
   combineReducers,
-  applyMiddleware
+  applyMiddleware,
+  compose
 } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
@@ -11,19 +12,23 @@ import workers from './modules/workers';
 import customers from './modules/customers';
 import appointments from './modules/appointments';
 
-const rootReducer = combineReducers({
-  services,
-  products,
-  workers,
-  customers,
-  appointments
-});
+export default function configureStore(routerReducer, initialState) {
+  const rootReducer = combineReducers({
+    services,
+    products,
+    workers,
+    customers,
+    appointments,
+    routing: routerReducer
+  });
 
-export default function configureStore(initialState) {
   const store = createStore(
     rootReducer,
     initialState,
-    applyMiddleware(thunkMiddleware)
+    compose(
+      applyMiddleware(thunkMiddleware),
+      window.devToolsExtension ? window.devToolsExtension() : f => f
+    )
   );
 
   return store;
