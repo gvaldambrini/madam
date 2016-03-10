@@ -44,9 +44,11 @@ export default React.createClass({
 
             <FormInputUi name='name' value={this.props.data.name}
               label={i18n.products.name} focus={true} mandatory={true}
-              handleChange={this.props.inputChange}/>
+              handleChange={this.props.inputChange}
+              handleSubmit={this.handleSubmit}/>
             <FormInputUi name='brand' value={this.props.data.brand}
-              label={i18n.products.brand} handleChange={this.props.inputChange}/>
+              label={i18n.products.brand} handleChange={this.props.inputChange}
+              handleSubmit={this.handleSubmit}/>
             <FormInputDateUi name='sold_date' value={this.props.data.sold_date}
               label={i18n.products.soldDate}
               handleChange={this.props.inputChange}/>

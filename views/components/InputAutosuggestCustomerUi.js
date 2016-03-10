@@ -11,15 +11,22 @@ export default React.createClass({
   propTypes: {
     setCustomer: React.PropTypes.func.isRequired,
     getCustomer: React.PropTypes.func.isRequired,
-    fetchSuggestions: React.PropTypes.func.isRequired
+    fetchSuggestions: React.PropTypes.func.isRequired,
+    submit: React.PropTypes.func.isRequired
   },
   inputAttr: function() {
     return {
       placeholder: i18n.homepage.customerPlaceholder,
       className: 'form-control',
+      onKeyPress: this.onKeyPress,
       onChange: this.onInputChanged,
       id: 'input-customer'
     };
+  },
+  onKeyPress: function(event) {
+    if (event.nativeEvent.keyCode === 13) {
+      this.props.submit(event);
+    }
   },
   onInputChanged: function(value) {
     if (this._suggestion_selected) {

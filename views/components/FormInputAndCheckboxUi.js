@@ -5,6 +5,7 @@ import React from 'react';
 export default React.createClass({
   propTypes: {
     handleChange: React.PropTypes.func.isRequired,
+    handleSubmit: React.PropTypes.func,
     name: React.PropTypes.string.isRequired,
     cblabel: React.PropTypes.string.isRequired,
     cbname: React.PropTypes.string.isRequired,
@@ -37,6 +38,7 @@ export default React.createClass({
     this.props.handleChange(target.name, value);
   },
   render: function() {
+    const that = this;
     return (
       <div className="form-group">
         <label className="control-label col-sm-2" htmlFor={this.props.name}>
@@ -46,7 +48,16 @@ export default React.createClass({
           <input className="form-control" type={this.props.type}
             name={this.props.name} placeholder={this.props.label}
             value={this.state.value}
-            onChange={this.handleChange}/>
+            onChange={this.handleChange}
+            onKeyPress={
+              function(event) {
+                if (typeof that.props.handleSubmit !== 'undefined') {
+                  if (event.nativeEvent.keyCode === 13) {
+                    that.props.handleSubmit(event);
+                  }
+                }
+              }
+            }/>
         </div>
         <div className="col-sm-offset-2 col-sm-10">
           <div className="checkbox">

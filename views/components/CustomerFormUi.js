@@ -55,21 +55,28 @@ export default React.createClass({
             </div>
             <FormInputUi name='name' value={this.props.data.name}
               label={i18n.customers.name} focus={true} mandatory={true}
-              handleChange={this.props.inputChange}/>
+              handleChange={this.props.inputChange}
+              handleSubmit={this.handleSubmit}/>
             <FormInputUi name='surname' value={this.props.data.surname}
-              label={i18n.customers.surname} handleChange={this.props.inputChange}/>
+              label={i18n.customers.surname}
+              handleChange={this.props.inputChange}
+              handleSubmit={this.handleSubmit}/>
             <FormInputAndCheckboxUi type='tel' value={this.props.data.mobile_phone}
               name='mobile_phone' label={i18n.customers.mobilePhone}
               cbname='allow_sms' cblabel={i18n.customers.allowSms}
               cbvalue={this.props.data.allow_sms}
-              handleChange={this.props.inputChange}/>
+              handleChange={this.props.inputChange}
+              handleSubmit={this.handleSubmit}/>
             <FormInputUi type='tel' name='phone' value={this.props.data.phone}
-              label={i18n.customers.phone} handleChange={this.props.inputChange}/>
+              label={i18n.customers.phone}
+              handleChange={this.props.inputChange}
+              handleSubmit={this.handleSubmit}/>
             <FormInputAndCheckboxUi type='email' value={this.props.data.email}
               name='email' label={i18n.customers.email}
               cbname='allow_email' cblabel={i18n.customers.allowEmail}
               cbvalue={this.props.data.allow_email}
-              handleChange={this.props.inputChange}/>
+              handleChange={this.props.inputChange}
+              handleSubmit={this.handleSubmit}/>
             <FormInputDateUi name='first_seen' value={this.props.data.first_seen}
               label={i18n.customers.firstSeen} orientation='top'
               handleChange={this.props.inputChange}/>

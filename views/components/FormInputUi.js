@@ -5,6 +5,7 @@ import React from 'react';
 export default React.createClass({
   propTypes: {
     handleChange: React.PropTypes.func.isRequired,
+    handleSubmit: React.PropTypes.func,
     name: React.PropTypes.string.isRequired,
     label: React.PropTypes.string.isRequired,
     value: React.PropTypes.string,
@@ -47,6 +48,15 @@ export default React.createClass({
             onChange={
               function(event) {
                 that.props.handleChange(that.props.name, event.currentTarget.value);
+              }
+            }
+            onKeyPress={
+              function(event) {
+                if (typeof that.props.handleSubmit !== 'undefined') {
+                  if (event.nativeEvent.keyCode === 13) {
+                    that.props.handleSubmit(event);
+                  }
+                }
               }
             }/>
         </div>

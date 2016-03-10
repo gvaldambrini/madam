@@ -18,7 +18,15 @@ export default React.createClass({
       <form className="search-form">
         <input id="search-input" type="text"
           placeholder={this.props.placeholder} className="form-control"
-          onChange={this.search}/>
+          onChange={this.search}
+          onKeyPress={
+            function(event) {
+              if (event.nativeEvent.keyCode === 13) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+            }
+          }/>
         <span id="search-clear" className="glyphicon glyphicon-remove-circle"
           onClick={this.resetSearch}></span>
       </form>

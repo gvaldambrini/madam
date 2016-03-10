@@ -46,7 +46,8 @@ export default React.createClass({
           <InputAutosuggestCustomerUi
             getCustomer={this.getCustomer}
             setCustomer={this.setCustomer}
-            fetchSuggestions={this.props.fetchCustomerSuggestions}/>
+            fetchSuggestions={this.props.fetchCustomerSuggestions}
+            submit={this.handleSubmit}/>
           <span className="input-group-btn">
             <button type="button" className="btn btn-primary" name="submit"
               onClick={this.handleSubmit}>
