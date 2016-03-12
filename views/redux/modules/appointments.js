@@ -1,34 +1,46 @@
+const REQUEST_FETCH = 'appointments/REQUEST_FETCH';
 const RESPONSE_FETCH = 'appointments/RESPONSE_FETCH';
 const APPOINTMENT_DELETED = 'appointments/APPOINTMENT_DELETED';
 const RESPONSE_APPOINTMENT_FETCH = 'appointments/RESPONSE_APPOINTMENT_FETCH';
+const INVALIDATE = 'appointments/INVALIDATE';
 
+const INVALIDATE_DATE = 'appointments/INVALIDATE_DATE';
+const REQUEST_FETCH_BY_DATE = 'appointments/REQUEST_FETCH_BY_DATE';
 const RESPONSE_FETCH_BY_DATE = 'appointments/RESPONSE_FETCH_BY_DATE';
 
 import moment from 'moment';
 import {
-  List,
   Map,
   fromJS
 } from 'immutable';
 
-import { fetchCustomers } from './customers';
+import { invalidateCustomers } from './customers';
 
 
 function reducerPerCustomer(state = Map({
   name: '',
   surname: '',
   appointmentList: undefined,
+  fetching: false,
   appointmentObjects: Map()
 }), action) {
   switch (action.type) {
+  case INVALIDATE:
+    return state.merge(Map({
+      appointmentList: undefined,
+      fetching: false})
+    );
+  case REQUEST_FETCH:
+    return state.set('fetching', true);
   case RESPONSE_FETCH:
     return state.merge(
-        Map({
-          appointmentList: fromJS(action.payload.data.appointments),
-          name: action.payload.data.name,
-          surname: action.payload.data.surname
-        })
-      );
+      Map({
+        fetching: false,
+        appointmentList: fromJS(action.payload.data.appointments),
+        name: action.payload.data.name,
+        surname: action.payload.data.surname
+      })
+    );
   case APPOINTMENT_DELETED:
     {
       let appointmentList = state.get('appointmentList');
@@ -58,16 +70,27 @@ function reducerPerCustomer(state = Map({
 }
 
 function reducerPerDate(state = Map({
-  appointmentList: List()
+  appointmentList: undefined,
+  fetching: false
 }), action) {
   switch (action.type) {
+  case REQUEST_FETCH_BY_DATE:
+    return state.set('fetching', true);
   case RESPONSE_FETCH_BY_DATE:
-    return state.set('appointmentList', fromJS(action.payload.data.appointments));
+    return state.merge(Map({
+      appointmentList: fromJS(action.payload.data.appointments),
+      fetching: false}));
+  case INVALIDATE_DATE:
+    return state.merge(Map({
+      appointmentList: undefined,
+      fetching: false}));
   case APPOINTMENT_DELETED:
     {
-      const appointmentList = state
-        .get('appointmentList')
-        .filterNot(app => app.get('appid') === action.payload.appId);
+      let appointmentList = state.get('appointmentList');
+      if (typeof appointmentList !== 'undefined') {
+        appointmentList = appointmentList.filterNot(
+          app => app.get('appid') === action.payload.appId);
+      }
       return state.set('appointmentList', appointmentList);
     }
   default:
@@ -92,9 +115,11 @@ export default function reducer(state = Map({
   switch (action.type) {
   case RESPONSE_FETCH:
   case RESPONSE_APPOINTMENT_FETCH:
+  case INVALIDATE:
     return state.setIn(
         ['customers', action.payload.customerId],
         reducerPerCustomer(state.getIn(['customers', action.payload.customerId]), action));
+  case INVALIDATE_DATE:
   case RESPONSE_FETCH_BY_DATE:
     return state.setIn(
         ['dates', action.payload.date],
@@ -104,18 +129,28 @@ export default function reducer(state = Map({
   }
 }
 
+function requestFetchAppointments(customerId) {
+  return {
+    type: REQUEST_FETCH,
+    payload: {
+      customerId
+    }
+  };
+}
+
 function responseFetchAppointments(customerId, data) {
   return {
     type: RESPONSE_FETCH,
     payload: {
-      customerId: customerId,
-      data: data
+      customerId,
+      data
     }
   };
 }
 
 function fetchAppointments(customerId) {
   return dispatch => {
+    dispatch(requestFetchAppointments(customerId));
     $.ajax({
       url: `/customers/${customerId}/appointments`,
       method: 'get',
@@ -129,7 +164,7 @@ function fetchAppointments(customerId) {
 function shouldFetchAppointments(state, customerId) {
   const apps = state.appointments;
   if (typeof apps.getIn(['customers', customerId, 'appointmentList']) === 'undefined') {
-    return true;
+    return !(apps.getIn(['customers', customerId, 'fetching']) === true);
   }
   return false;
 }
@@ -142,18 +177,28 @@ export function fetchAppointmentsIfNeeded(customerId) {
   };
 }
 
+function requestFetchAppointmentsByDate(date) {
+  return {
+    type: REQUEST_FETCH_BY_DATE,
+    payload: {
+      date
+    }
+  };
+}
+
 function responseFetchAppointmentsByDate(date, data) {
   return {
     type: RESPONSE_FETCH_BY_DATE,
     payload: {
-      date: date,
-      data: data
+      date,
+      data
     }
   };
 }
 
 function fetchAppointmentsByDate(date) {
   return dispatch => {
+    dispatch(requestFetchAppointmentsByDate(date));
     $.ajax({
       url: `/customers/appointments/${date}`,
       method: 'get',
@@ -165,9 +210,9 @@ function fetchAppointmentsByDate(date) {
 }
 
 function shouldFetchAppointmentsByDate(state, date) {
-  const appointments = state.appointments;
-  if (!appointments.hasIn(['dates', date])) {
-    return true;
+  const apps = state.appointments;
+  if (typeof apps.getIn(['dates', date, 'appointmentList']) === 'undefined') {
+    return !(apps.getIn(['dates', date, 'fetching']) === true);
   }
   return false;
 }
@@ -176,6 +221,15 @@ export function fetchAppointmentsByDateIfNeeded(date) {
   return (dispatch, getState) => {
     if (shouldFetchAppointmentsByDate(getState(), date)) {
       return dispatch(fetchAppointmentsByDate(date));
+    }
+  };
+}
+
+export function invalidateAppointmentsOnDate(date) {
+  return {
+    type: INVALIDATE_DATE,
+    payload: {
+      date
     }
   };
 }
@@ -215,9 +269,9 @@ function responseFetchAppointment(customerId, appId, data) {
   return {
     type: RESPONSE_APPOINTMENT_FETCH,
     payload: {
-      customerId: customerId,
-      appId: appId,
-      data: data
+      customerId,
+      appId,
+      data
     }
   };
 }
@@ -250,6 +304,15 @@ export function fetchAppointmentIfNeeded(customerId, appId) {
   };
 }
 
+export function invalidateAppointments(customerId) {
+  return {
+    type: INVALIDATE,
+    payload: {
+      customerId
+    }
+  };
+}
+
 export function saveAppointment(customerId, appId, data) {
   return dispatch => {
     let url, method;
@@ -271,14 +334,13 @@ export function saveAppointment(customerId, appId, data) {
       data.services = data.services.filter(item => item.enabled);
       // update the item on the objects list
       dispatch(responseFetchAppointment(customerId, obj.id, data));
-      // let's refresh the appointment list and the customer ones
-      // that displays the last seen data which can change when
-      // saving an appointment.
-      dispatch(fetchAppointments(customerId));
-      dispatch(fetchCustomers(''));
+      dispatch(invalidateAppointments(customerId));
+      // we need to invalidate the customer list that displays the last seen data
+      // which can change when saving an appointment.
+      dispatch(invalidateCustomers());
 
       const appDate = moment(data.date, config.date_format).format('YYYY-MM-DD');
-      dispatch(fetchAppointmentsByDate(appDate));
+      dispatch(invalidateAppointmentsOnDate(appDate));
     };
 
     ajaxPromise.then(onSuccess);
@@ -296,9 +358,9 @@ export function planAppointment(date, data) {
     });
 
     const onSuccess = function(_obj) {
-      dispatch(fetchAppointmentsByDate(date));
+      dispatch(invalidateAppointmentsOnDate(date));
       if (typeof data.id !== 'undefined') {
-        dispatch(fetchAppointments(data.id));
+        dispatch(invalidateAppointments(data.id));
       }
     };
     ajaxPromise.then(onSuccess);

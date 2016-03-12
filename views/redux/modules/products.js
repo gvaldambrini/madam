@@ -1,26 +1,28 @@
 const REQUEST_FETCH = 'products/REQUEST_FETCH';
 const RESPONSE_FETCH = 'products/RESPONSE_FETCH';
 const RESET_FILTER = 'products/RESET_FILTER';
+const INVALIDATE = 'products/INVALIDATE';
 
 const PRODUCT_DELETED = 'products/PRODUCT_DELETED';
 const PRODUCT_FETCHED = 'products/PRODUCT_FETCHED';
 
 import {
-  List,
   Map,
   fromJS
 } from 'immutable';
 
 
 export default function reducer(state = Map({
-  loaded: false,
   filterText: '',
-  productList: List(),
+  productList: undefined,
+  fetching: false,
   productObjects: Map()
 }), action) {
   switch (action.type) {
   case REQUEST_FETCH:
-    return state.set('filterText', action.payload);
+    return state.merge(Map({
+      filterText: action.payload,
+      fetching: true}));
   case RESET_FILTER:
     return state.set('filterText', '');
   case PRODUCT_DELETED:
@@ -44,9 +46,14 @@ export default function reducer(state = Map({
     }
   case RESPONSE_FETCH:
     return state.merge(
-        Map({
-          loaded: true,
-          productList: fromJS(action.payload)}));
+      Map({
+        productList: fromJS(action.payload),
+        fetching: false}));
+  case INVALIDATE:
+    return state.merge(
+      Map({
+        productList: undefined,
+        fetching: false}));
   case PRODUCT_FETCHED:
     return state.setIn(
         ['productObjects', action.payload.productId], fromJS(action.payload.data));
@@ -88,7 +95,8 @@ function shouldFetchProducts(state, filterText) {
   if (products.get('filterText') !== filterText) {
     return true;
   }
-  if (!products.get('loaded')) {
+  if (typeof products.get('productList') === 'undefined' &&
+      products.get('fetching') !== true) {
     return true;
   }
   return false;
@@ -99,6 +107,12 @@ export function fetchProductsIfNeeded(filterText) {
     if (shouldFetchProducts(getState(), filterText)) {
       return dispatch(fetchProducts(filterText));
     }
+  };
+}
+
+function invalidateProducts() {
+  return {
+    type: INVALIDATE
   };
 }
 
@@ -181,7 +195,7 @@ export function saveProduct(productId, data) {
       // update the item on the objects list
       dispatch(responseFetchProduct(obj.id, data));
       // let's refresh the products list
-      dispatch(fetchProducts(''));
+      dispatch(invalidateProducts());
     };
 
     ajaxPromise.then(onSuccess);

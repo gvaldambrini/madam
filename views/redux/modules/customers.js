@@ -1,26 +1,30 @@
 const REQUEST_FETCH = 'customers/REQUEST_FETCH';
 const RESPONSE_FETCH = 'customers/RESPONSE_FETCH';
 const RESET_FILTER = 'customers/RESET_FILTER';
+const INVALIDATE = 'customers/INVALIDATE';
 
 const CUSTOMER_DELETED = 'customers/CUSTOMER_DELETED';
 const CUSTOMER_FETCHED = 'customers/CUSTOMER_FETCHED';
 
 import {
-  List,
   Map,
   fromJS
 } from 'immutable';
 
+import { invalidateAppointmentsOnDate } from './appointments';
+
 
 export default function reducer(state = Map({
-  loaded: false,
   filterText: '',
-  customerList: List(),
+  customerList: undefined,
+  fetching: false,
   customerObjects: Map()
 }), action) {
   switch (action.type) {
   case REQUEST_FETCH:
-    return state.set('filterText', action.payload);
+    return state.merge(Map({
+      filterText: action.payload,
+      fetching: true}));
   case RESET_FILTER:
     return state.set('filterText', '');
   case CUSTOMER_DELETED:
@@ -41,10 +45,13 @@ export default function reducer(state = Map({
       );
     }
   case RESPONSE_FETCH:
-    return state.merge(
-        Map({
-          loaded: true,
-          customerList: fromJS(action.payload)}));
+    return state.merge(Map({
+      customerList: fromJS(action.payload),
+      fetching: false}));
+  case INVALIDATE:
+    return state.merge(Map({
+      customerList: undefined,
+      fetching: false}));
   case CUSTOMER_FETCHED:
     return state.setIn(
         ['customerObjects', action.payload.customerId], fromJS(action.payload.data));
@@ -86,7 +93,8 @@ function shouldFetchCustomers(state, filterText) {
   if (customers.get('filterText') !== filterText) {
     return true;
   }
-  if (!customers.get('loaded')) {
+  if (typeof customers.get('customerList') === 'undefined' &&
+      customers.get('fetching') !== true) {
     return true;
   }
   return false;
@@ -97,6 +105,12 @@ export function fetchCustomersIfNeeded(filterText) {
     if (shouldFetchCustomers(getState(), filterText)) {
       return dispatch(fetchCustomers(filterText));
     }
+  };
+}
+
+export function invalidateCustomers() {
+  return {
+    type: INVALIDATE
   };
 }
 
@@ -143,7 +157,7 @@ export function resetCustomersFilters() {
       return;
     }
     dispatch(resetFilterText());
-    dispatch(fetchCustomers(''));
+    dispatch(invalidateCustomers());
   };
 }
 
@@ -204,7 +218,20 @@ export function saveCustomer(customerId, data) {
       // update the item on the objects list
       dispatch(responseFetchCustomer(obj.id, data));
       // let's refresh the customer list
-      dispatch(fetchCustomers(''));
+      dispatch(invalidateCustomers());
+
+      // We need to invalidate every date that contains an appointment or
+      // a planned appointment for the customer.
+      fetchCustomerWithDetails(obj.id).then(function(data) {
+        if (typeof data.appointments !== 'undefined') {
+          data.appointments.forEach(
+            el => dispatch(invalidateAppointmentsOnDate(el.date)));
+        }
+        if (typeof data.planned_appointments !== 'undefined') {
+          data.planned_appointments.forEach(
+            el => dispatch(invalidateAppointmentsOnDate(el.date)));
+        }
+      });
     };
 
     ajaxPromise.then(onSuccess);

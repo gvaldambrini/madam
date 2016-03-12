@@ -48,10 +48,11 @@ const ProductsView = React.createClass({
 
 function mapStateToProps(state) {
   const products = state.products;
+  const loaded = typeof products.get('productList') !== 'undefined';
   return {
-    loaded: products.get('loaded'),
+    loaded: loaded,
     filterText: products.get('filterText'),
-    products: products.get('productList').toJS()
+    products: loaded ? products.get('productList').toJS() : []
   };
 }
 

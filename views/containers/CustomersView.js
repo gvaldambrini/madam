@@ -44,11 +44,11 @@ const CustomersView = React.createClass({
 
 function mapStateToProps(state) {
   const customers = state.customers;
-
+  const loaded = typeof customers.get('customerList') !== 'undefined';
   return {
-    loaded: customers.get('loaded'),
+    loaded: loaded,
     filterText: customers.get('filterText'),
-    customers: customers.get('customerList').toJS()
+    customers: loaded ? customers.get('customerList').toJS() : []
   };
 }
 

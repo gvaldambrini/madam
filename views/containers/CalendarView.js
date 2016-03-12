@@ -36,6 +36,9 @@ const CalendarView = React.createClass({
       this.props.dispatch(fetchAppointmentsByDateIfNeeded(nextProps.params.date));
       this.setState({date: moment(nextProps.params.date).format('YYYY-MM-DD')});
     }
+    else if (!nextProps.loaded) {
+      this.props.dispatch(fetchAppointmentsByDateIfNeeded(this.state.date));
+    }
   },
   fetchCustomerSuggestions: function(input, callback) {
     searchCustomers(input).then(data => callback(null, data.customers));
@@ -75,10 +78,8 @@ const CalendarView = React.createClass({
     this.context.router.push(url);
   },
   deleteAppointment: function(app) {
-    if (app.planned) {
-      // Bad hack required as redux expects a local formatted date.
-      app.date = moment(this.state.date).format(config.date_format);
-    }
+    // Bad hack required as redux expects a local formatted date.
+    app.date = moment(this.state.date).format(config.date_format);
     this.props.dispatch(deleteAppointment(app.id, app));
   },
   setDate: function(date) {
@@ -106,15 +107,10 @@ function mapStateToProps(state, ownProps) {
     ? ownProps.params.date
     : moment().format('YYYY-MM-DD');
 
-  const loaded = state.appointments.hasIn(['dates', date]);
-  let appointments = [];
-  if (loaded) {
-    appointments = state.appointments.getIn(
-      ['dates', date, 'appointmentList']).toJS();
-  }
+  let appointments = state.appointments.getIn(['dates', date, 'appointmentList']);
   return {
-    loaded,
-    appointments
+    loaded: typeof appointments !== 'undefined',
+    appointments: (typeof appointments !== 'undefined') ? appointments.toJS() : []
   };
 }
 
