@@ -12,11 +12,14 @@ import {
 
 // The product form container used in the products section.
 const ProductForm = React.createClass({
+  propTypes: {
+    productObject: React.PropTypes.object,
+    params: React.PropTypes.shape({
+      id: React.PropTypes.string
+    }).isRequired
+  },
   contextTypes: {
     router: React.PropTypes.object.isRequired
-  },
-  propTypes: {
-    productObject: React.PropTypes.object
   },
   getInitialState: function() {
     // The form local state is initialized from the one stored in redux

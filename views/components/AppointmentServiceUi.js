@@ -82,21 +82,24 @@ export default React.createClass({
   render: function() {
     const that = this;
     const workers = this.props.workers.map(
-      worker =>
-      <li key={worker.name}>
-        <a style={{color: worker.color}} href="#" ref={function(a) {
-          // Probably due to a react.js bug, the standard onClick
-          // method does not call the selectWorker when the click
-          // is performed via javascript (using the console or
-          // nightwatch).
-          // The jQuery approach does not suffer this problem.
-          $(a)
-            .unbind('click', that.selectWorker)
-            .on('click', that.selectWorker);
-        }}>
-          {worker.name}
-        </a>
-      </li>
+      function(worker) {
+        return (
+          <li key={worker.name}>
+            <a style={{color: worker.color}} href="#" ref={function(a) {
+              // Probably due to a react.js bug, the standard onClick
+              // method does not call the selectWorker when the click
+              // is performed via javascript (using the console or
+              // nightwatch).
+              // The jQuery approach does not suffer this problem.
+              $(a)
+                .unbind('click', that.selectWorker)
+                .on('click', that.selectWorker);
+            }}>
+              {worker.name}
+            </a>
+          </li>
+        );
+      }
     );
 
     return (
@@ -131,7 +134,7 @@ export default React.createClass({
                 {this.state.worker.name}
               </button>
               <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  <span className="caret"></span>
+                <span className="caret"></span>
               </button>
               <ul className="dropdown-menu dropdown-menu-right" role="menu">
                 {workers}

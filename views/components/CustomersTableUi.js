@@ -16,62 +16,65 @@ export default React.createClass({
   render: function() {
     const that = this;
     const customerRows = this.props.customers.map(
-      (customer, _index) =>
-      <tr key={customer.id} onClick={
-          function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            that.props.editCustomer(customer.id);
-          }
-        }>
-        <td dangerouslySetInnerHTML={this.renderHighlight(customer.name)} />
-        <td dangerouslySetInnerHTML={this.renderHighlight(customer.surname)} />
-        <td className="hidden-xs" dangerouslySetInnerHTML={this.renderHighlight(customer.phone)} />
-        <td className="hidden-xs">{customer.last_seen}</td>
-        <td className="no-padding">
-          <span className="table-btn-container">
-            <span
-              onClick={function(event) {event.stopPropagation();}}
-              className="glyphicon glyphicon-print table-btn hidden-xs"
-              data-toggle="tooltip" data-placement="left"
-              title={i18n.customers.printCustomerSheet} ref={
-                  function(span) {
-                    if (span !== null) {
-                      $(span).tooltip();
-                    }
-                  }
+      function(customer, _index) {
+        return (
+          <tr key={customer.id} onClick={
+              function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                that.props.editCustomer(customer.id);
               }
-              onClick={
-                function(event) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  $('#customer-sheet-printer').trigger('print', [customer.id]);
-                }
-              }></span>
-            <span
-              onClick={function(event) {event.stopPropagation();}}
-              className="table-btn glyphicon glyphicon-trash"
-              data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
-                function(span) {
-                  if (span !== null) {
-                    const $span = $(span);
-                    if ($span.data('tooltip-init'))
-                      return;
-                    $span.data('tooltip-init', true);
-                    $span.tooltip();
-                    $span.confirmPopover({
-                      template: '#popover-template',
-                      title: i18n.customers.deleteTitle,
-                      content: i18n.customers.deleteMsg,
-                      $rootContainer: $('#customers-table-container'),
-                      onConfirm: () => that.props.deleteCustomer(customer.id)
-                    });
+            }>
+            <td dangerouslySetInnerHTML={that.renderHighlight(customer.name)} />
+            <td dangerouslySetInnerHTML={that.renderHighlight(customer.surname)} />
+            <td className="hidden-xs" dangerouslySetInnerHTML={that.renderHighlight(customer.phone)} />
+            <td className="hidden-xs">{customer.last_seen}</td>
+            <td className="no-padding">
+              <span className="table-btn-container">
+                <span
+                  className="glyphicon glyphicon-print table-btn hidden-xs"
+                  data-toggle="tooltip" data-placement="left"
+                  title={i18n.customers.printCustomerSheet} ref={
+                      function(span) {
+                        if (span !== null) {
+                          $(span).tooltip();
+                        }
+                      }
                   }
-                }
-              }></span>
-            </span>
-        </td>
-      </tr>
+                  onClick={
+                    function(event) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      $('#customer-sheet-printer').trigger('print', [customer.id]);
+                    }
+                  }></span>
+                <span
+                  onClick={function(event) {event.stopPropagation();}}
+                  className="table-btn glyphicon glyphicon-trash"
+                  data-toggle="tooltip" data-placement="left" title={i18n.customers.deleteText} ref={
+                    function(span) {
+                      if (span !== null) {
+                        const $span = $(span);
+                        if ($span.data('tooltip-init'))
+                          return;
+                        $span.data('tooltip-init', true);
+                        $span.tooltip();
+                        $span.confirmPopover({
+                          template: '#popover-template',
+                          title: i18n.customers.deleteTitle,
+                          content: i18n.customers.deleteMsg,
+                          $rootContainer: $('#customers-table-container'),
+                          onConfirm: () => that.props.deleteCustomer(customer.id)
+                        });
+                      }
+                    }
+                  }>
+                </span>
+              </span>
+            </td>
+          </tr>
+        );
+      }
     );
 
     return (

@@ -14,15 +14,21 @@ import { AppointmentViewUi } from '../components';
 
 // The base appointment container that contains the related form.
 const BaseAppointmentView = React.createClass({
-  contextTypes: {
-    router: React.PropTypes.object.isRequired
-  },
   propTypes: {
     destPath: React.PropTypes.string.isRequired,
     workerList: React.PropTypes.array.isRequired,
     workersLoaded: React.PropTypes.bool.isRequired,
     serviceList: React.PropTypes.array.isRequired,
-    servicesLoaded: React.PropTypes.bool.isRequired
+    servicesLoaded: React.PropTypes.bool.isRequired,
+    appObject: React.PropTypes.object,
+    params: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      appid: React.PropTypes.string,
+      date: React.PropTypes.string
+    }).isRequired
+  },
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
   },
   getInitialState: function() {
     let data = {
@@ -83,7 +89,7 @@ const BaseAppointmentView = React.createClass({
     }
   },
   isEditForm: function() {
-    if (this.props.location.pathname.indexOf('planned') === -1 &&
+    if (this.props.route.path.indexOf('planned') === -1 &&
         typeof this.props.params.appid !== 'undefined') {
       return true;
     }
@@ -205,7 +211,7 @@ const BaseAppointmentView = React.createClass({
   },
   render: function() {
     let submitText, formTitle;
-    if (this.props.location.pathname.indexOf('planned') !== -1) {
+    if (this.props.route.path.indexOf('planned') !== -1) {
       submitText = i18n.appointments.confirmAppointment;
       formTitle = i18n.appointments.titleConfirmAppointment;
     }

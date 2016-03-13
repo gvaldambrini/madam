@@ -36,7 +36,6 @@ export default React.createClass({
           <td className="no-padding">
             <span className="table-btn-container">
               <span
-                onClick={function(event) {event.stopPropagation();}}
                 className={
                 typeof app.id === 'undefined'
                 ? "glyphicon glyphicon-print table-btn hidden-xs disabled" :

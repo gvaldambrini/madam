@@ -12,11 +12,16 @@ import { CustomerFormUi } from '../components';
 
 // The customer form container used in the calendar / homepage section.
 const CalendarCustomerForm = React.createClass({
+  propTypes: {
+    customerObject: React.PropTypes.object,
+    params: React.PropTypes.shape({
+      id: React.PropTypes.string,
+      date: React.PropTypes.string,
+      appid: React.PropTypes.string
+    }).isRequired
+  },
   contextTypes: {
     router: React.PropTypes.object.isRequired
-  },
-  propTypes: {
-    customerObject: React.PropTypes.object
   },
   getInitialState: function() {
     // The form local state is initialized from the one stored in redux

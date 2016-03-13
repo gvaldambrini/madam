@@ -12,13 +12,13 @@ import { CustomersViewUi } from '../components';
 
 // The customers main container used in the customers section.
 const CustomersView = React.createClass({
-  contextTypes: {
-    router: React.PropTypes.object.isRequired
-  },
   propTypes: {
     loaded: React.PropTypes.bool.isRequired,
     filterText: React.PropTypes.string,
     customers: React.PropTypes.array.isRequired
+  },
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
   },
   componentDidMount: function() {
     this.props.dispatch(fetchCustomersIfNeeded(this.props.filterText));

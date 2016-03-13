@@ -10,7 +10,9 @@ export default React.createClass({
     label: React.PropTypes.string.isRequired,
     handleChange: React.PropTypes.func.isRequired,
     firstInput: React.PropTypes.bool.isRequired,
-    disabled: React.PropTypes.bool.isRequired
+    disabled: React.PropTypes.bool.isRequired,
+    name: React.PropTypes.string,
+    color: React.PropTypes.string
   },
   getInitialState: function() {
     return {
@@ -109,37 +111,37 @@ export default React.createClass({
                   }
                 }
               }>
-                  <input className="form-control" type="text" name="name"
-                    value={this.props.name} ref={
-                    // workaround needed to trigger the onChange handler (textChanged in this case)
-                    // from jQuery (which in turn needs to call the change() after the val('something'))
-                    // that is not the "normal" usage from a real user but is required to have tests
-                    // working.
-                      function(input) {
-                        if (input !== null) {
-                          $(input)
-                            .unbind('change', that.textChanged)
-                            .change(that.textChanged);
-                        }
+                <input className="form-control" type="text" name="name"
+                  value={this.props.name} ref={
+                  // workaround needed to trigger the onChange handler (textChanged in this case)
+                  // from jQuery (which in turn needs to call the change() after the val('something'))
+                  // that is not the "normal" usage from a real user but is required to have tests
+                  // working.
+                    function(input) {
+                      if (input !== null) {
+                        $(input)
+                          .unbind('change', that.textChanged)
+                          .change(that.textChanged);
                       }
                     }
-                    onChange={this.textChanged}
-                    disabled={this.props.disabled}/>
-                  <input type="hidden" name="color" className="colorpicker-field"
-                    value={this.props.color}/>
-                  <span className="input-group-addon colorpicker-selector" ref={
-                    function(span) {
-                      const $span = $(span);
-                      if (that.props.disabled) {
-                        $span.addClass('disabled');
-                      }
-                      else {
-                        $span.removeClass('disabled');
-                      }
+                  }
+                  onChange={this.textChanged}
+                  disabled={this.props.disabled}/>
+                <input type="hidden" name="color" className="colorpicker-field"
+                  value={this.props.color}/>
+                <span className="input-group-addon colorpicker-selector" ref={
+                  function(span) {
+                    const $span = $(span);
+                    if (that.props.disabled) {
+                      $span.addClass('disabled');
                     }
-                  }>
-                    <i></i>
-                  </span>
+                    else {
+                      $span.removeClass('disabled');
+                    }
+                  }
+                }>
+                  <i></i>
+                </span>
               </div>
             </div>
             <div className="col-xs-1">

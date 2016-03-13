@@ -13,6 +13,16 @@ export default React.createClass({
   searchInput: function() {
     return $("#search-input");
   },
+  search: function() {
+    const text = this.searchInput().val();
+    this.searchClear().toggle(Boolean(text));
+    this.props.search(text);
+  },
+  resetSearch: function() {
+    this.searchInput().val('').focus();
+    this.searchClear().hide();
+    this.search();
+  },
   render: function() {
     return (
       <form className="search-form">
@@ -31,15 +41,5 @@ export default React.createClass({
           onClick={this.resetSearch}></span>
       </form>
     );
-  },
-  search: function() {
-    const text = this.searchInput().val();
-    this.searchClear().toggle(Boolean(text));
-    this.props.search(text);
-  },
-  resetSearch: function() {
-    this.searchInput().val('').focus();
-    this.searchClear().hide();
-    this.search();
   }
 });

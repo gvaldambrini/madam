@@ -10,7 +10,8 @@ export default React.createClass({
     label: React.PropTypes.string.isRequired,
     handleChange: React.PropTypes.func.isRequired,
     firstInput: React.PropTypes.bool.isRequired,
-    disabled: React.PropTypes.bool.isRequired
+    disabled: React.PropTypes.bool.isRequired,
+    value: React.PropTypes.string
   },
   getInitialState: function() {
     return {

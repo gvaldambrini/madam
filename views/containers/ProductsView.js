@@ -12,13 +12,13 @@ import { ProductsViewUi } from '../components';
 
 // The products main container used in the products section.
 const ProductsView = React.createClass({
-  contextTypes: {
-    router: React.PropTypes.object.isRequired
-  },
   propTypes: {
     loaded: React.PropTypes.bool.isRequired,
     filterText: React.PropTypes.string,
     products: React.PropTypes.array.isRequired
+  },
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
   },
   componentDidMount: function() {
     this.props.dispatch(fetchProductsIfNeeded(this.props.filterText));

@@ -51,8 +51,9 @@ export default React.createClass({
                         });
                       }
                     }
-                  }></span>
+                  }>
                 </span>
+              </span>
             </td>
           </tr>
         );
@@ -80,11 +81,12 @@ export default React.createClass({
                       $(span).tooltip();
                     }
                   }
-                }></span>
+                }>
               </span>
+            </span>
           </td>
         </tr>,
-        <tr>
+        <tr key={product.name + product.brand + 'hidden'}>
           <td colSpan={4} className="hidden-row">
             <div id={'expanded-row' + index} className="collapse">
               <table className='table table-hover'>

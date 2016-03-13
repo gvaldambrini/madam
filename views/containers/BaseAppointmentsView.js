@@ -13,12 +13,16 @@ import { AppointmentsViewUi } from '../components';
 // The base appointments container that contains the related appointments table for
 // a given customer.
 const BaseAppointmentsView = React.createClass({
-  contextTypes: {
-    router: React.PropTypes.object.isRequired
-  },
   propTypes: {
     loaded: React.PropTypes.bool.isRequired,
-    appointments: React.PropTypes.array.isRequired
+    appointments: React.PropTypes.array.isRequired,
+    editAppointmentPath: React.PropTypes.func.isRequired,
+    params: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired
+    }).isRequired
+  },
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
   },
   componentDidMount: function() {
     this.props.dispatch(fetchAppointmentsIfNeeded(this.props.params.id));

@@ -5,14 +5,14 @@ import Autosuggest from 'react-autosuggest';
 // The presentational component used to input a customer having an autosuggestion
 // dropdown menu with the existing customers.
 export default React.createClass({
-  contextTypes: {
-    router: React.PropTypes.object.isRequired
-  },
   propTypes: {
     setCustomer: React.PropTypes.func.isRequired,
     getCustomer: React.PropTypes.func.isRequired,
     fetchSuggestions: React.PropTypes.func.isRequired,
     submit: React.PropTypes.func.isRequired
+  },
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
   },
   inputAttr: function() {
     return {

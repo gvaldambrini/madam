@@ -6,6 +6,11 @@ import BaseAppointmentsView from './BaseAppointmentsView';
 
 // The appointments main container used in the calendar / homepage section.
 export default React.createClass({
+  propTypes: {
+    params: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired
+    }).isRequired
+  },
   editAppointmentPath: function(app) {
     const date = moment(app.date, config.date_format);
     if (app.planned) {

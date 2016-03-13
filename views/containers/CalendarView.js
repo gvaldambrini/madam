@@ -14,6 +14,13 @@ import { CalendarViewUi } from '../components';
 
 // The main container used in the calendar / homepage section.
 const CalendarView = React.createClass({
+  propTypes: {
+    loaded: React.PropTypes.bool.isRequired,
+    appointments: React.PropTypes.array.isRequired,
+    params: React.PropTypes.shape({
+      date: React.PropTypes.string
+    }).isRequired
+  },
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },

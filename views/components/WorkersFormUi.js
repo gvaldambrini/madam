@@ -14,7 +14,14 @@ export default React.createClass({
     removeInput: React.PropTypes.func.isRequired,
     disabled: React.PropTypes.bool.isRequired,
     inputChange: React.PropTypes.func.isRequired,
-    submit: React.PropTypes.func.isRequired
+    submit: React.PropTypes.func.isRequired,
+    route: React.PropTypes.shape({
+      i18n: React.PropTypes.shape({
+        title: React.PropTypes.string.isRequired,
+        unlock: React.PropTypes.string.isRequired,
+        save: React.PropTypes.string.isRequired
+      }).isRequired
+    }).isRequired
   },
   handleSubmit: function(event) {
     event.preventDefault();

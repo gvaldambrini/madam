@@ -14,7 +14,14 @@ export default React.createClass({
     removeInput: React.PropTypes.func.isRequired,
     disabled: React.PropTypes.bool.isRequired,
     inputChange: React.PropTypes.func.isRequired,
-    submit: React.PropTypes.func.isRequired
+    submit: React.PropTypes.func.isRequired,
+    route: React.PropTypes.shape({
+      i18n: React.PropTypes.shape({
+        title: React.PropTypes.string.isRequired,
+        unlock: React.PropTypes.string.isRequired,
+        save: React.PropTypes.string.isRequired
+      }).isRequired
+    }).isRequired
   },
   handleSubmit: function(event) {
     event.preventDefault();
@@ -60,7 +67,7 @@ export default React.createClass({
               <div className="col-sm-offset-2 col-sm-10">
                 <button type="button" className="btn btn-primary"
                   name="submit" onClick={this.handleSubmit}>
-                  {this.props.disabled ? this.props.route.i18n.unlock : this.props.route.i18n.save }
+                  {this.props.disabled ? this.props.route.i18n.unlock : this.props.route.i18n.save}
                 </button>
               </div>
             </div>

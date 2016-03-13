@@ -32,12 +32,16 @@ export default React.createClass({
     this.props.addService();
   },
   render: function() {
+    const that = this;
     const services = this.props.services.map(
-      (service, index) =>
-      <AppointmentServiceUi serviceId={index.toString()}
-        data={service}
-        updateService={this.props.updateService}
-        workers={this.props.workers} key={index} />
+      function(service, index) {
+        return (
+          <AppointmentServiceUi serviceId={index.toString()}
+            data={service}
+            updateService={that.props.updateService}
+            workers={that.props.workers} key={index} />
+        );
+      }
     );
     return (
       <div>
