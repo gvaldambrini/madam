@@ -13,9 +13,9 @@ describe('API tests: customer appointments', function() {
     var customer3Id;
 
     var workers = [
-        {name: 'Arya', color: '#ff0000'},
-        {name: 'Sansa', color: '#00ff00'},
-        {name: 'Margaery', color: '#0000ff'}
+        {name_raw: 'Arya', color: '#ff0000'},
+        {name_raw: 'Sansa', color: '#00ff00'},
+        {name_raw: 'Margaery', color: '#0000ff'}
     ];
 
     this.slow(300);

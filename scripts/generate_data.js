@@ -110,7 +110,7 @@ const client = common.createClient();
         for (let k = 0; k < getRandomInt(Math.floor(services.length / 2), services.length); k++) {
           appServices[appServices.length] = {
             description: popRandomElement(serviceNames),
-            worker: getRandomElement(workers).name
+            worker: getRandomElement(workers).name_raw
           };
         }
 
@@ -186,7 +186,7 @@ const client = common.createClient();
     body[body.length] = {index: {_index: mainIndex, _type: 'workers', _id: common.workersDocId}};
     for (let i = 0; i < numWorkers; i++) {
       workers[workers.length] = {
-        name: getRandomElement(firstnames),
+        name_raw: getRandomElement(firstnames),
         color: rainbow(numWorkers, i)
       };
     }
@@ -194,7 +194,7 @@ const client = common.createClient();
 
     // Services
     body[body.length] = {index: {_index: mainIndex, _type: 'services', _id: common.servicesDocId}};
-    body[body.length] = {names: services};
+    body[body.length] = {name_raw: services};
     client.bulk({body: body});
   }
 

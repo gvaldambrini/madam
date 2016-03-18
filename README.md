@@ -45,7 +45,7 @@ The application is written to run in development mode on a local environment
 and in production mode (`NODE_ENV == 'production'`) on [Heroku](https://www.heroku.com/).
 
 #### Development mode
-1. [Download elasticsearch version 1.5.x](https://www.elastic.co/downloads/elasticsearch)
+1. [Download elasticsearch version 2.2.x](https://www.elastic.co/downloads/elasticsearch)
 and launch it.
 2. Generate indices and mappings running:
 ```

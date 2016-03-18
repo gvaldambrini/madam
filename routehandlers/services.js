@@ -26,7 +26,8 @@ class ServicesHandler {
       id: common.servicesDocId
     }, (err, resp, _respcode) =>
         res.json({
-          services: resp.found && resp._source.names.length > 0 ? resp._source.names : []
+          services: resp.found && resp._source.name_raw.length > 0
+            ? resp._source.name_raw : []
         })
     );
   }
@@ -53,7 +54,7 @@ class ServicesHandler {
       refresh: true,
       id: common.servicesDocId,
       body: {
-        names: services
+        name_raw: services
       }
     };
 

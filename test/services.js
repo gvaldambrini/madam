@@ -63,9 +63,9 @@ describe('API tests: services', function() {
             },
             function(res, callback) {
                 utils.es.getServices(function(obj) {
-                    obj.names.should.be.an.Array().and.have.length(2);
-                    obj.names[0].should.equal('shampoo');
-                    obj.names[1].should.equal('haircut');
+                    obj.name_raw.should.be.an.Array().and.have.length(2);
+                    obj.name_raw[0].should.equal('shampoo');
+                    obj.name_raw[1].should.equal('haircut');
                     callback(null, null);
                 });
             }
@@ -80,7 +80,7 @@ describe('API tests: services', function() {
                     type: 'services',
                     id: common.servicesDocId,
                     body: {
-                        names: ['wardrobe', 'massage', 'smile']
+                        name_raw: ['wardrobe', 'massage', 'smile']
                     }
                 }, function(err, resp, respcode) {
                     callback(err, resp);

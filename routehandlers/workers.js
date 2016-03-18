@@ -27,7 +27,12 @@ class WorkersHandler {
     }, function(err, resp, _respcode) {
       let workers = [];
       if (resp.found && resp._source.workers.length > 0) {
-        workers = resp._source.workers;
+        workers = resp._source.workers.map(function(el) {
+          return {
+            name: el.name_raw,
+            color: el.color
+          };
+        });
       }
       res.json({
         workers: workers
@@ -48,7 +53,7 @@ class WorkersHandler {
     for (let i = 0; i < req.body.workers.length; i++) {
       if (req.body.workers[i].name.trim()) {
         workers.push({
-          name: req.body.workers[i].name.trim(),
+          name_raw: req.body.workers[i].name.trim(),
           color: req.body.workers[i].color
         });
       }
@@ -71,8 +76,18 @@ class WorkersHandler {
     };
 
     client.index(args,
-      (err, resp, _respcode) =>
-      common.saveCallback(req, res, err, resp, false, {workers: workers})
+      function(err, resp, _respcode) {
+        const data = {
+          workers: workers.map(function(el) {
+            return {
+              name: el.name_raw,
+              color: el.color
+            };
+          })
+        };
+        return common.saveCallback(req, res, err, resp, false, data);
+      }
+
     );
   }
 }

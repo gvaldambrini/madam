@@ -69,9 +69,9 @@ describe('API tests: workers', function() {
             function(res, callback) {
                 utils.es.getWorkers(function(obj) {
                     obj.workers.should.be.an.Array().and.have.length(2);
-                    obj.workers[0].name.should.equal('name1');
+                    obj.workers[0].name_raw.should.equal('name1');
                     obj.workers[0].color.should.equal('#c0c0c0');
-                    obj.workers[1].name.should.equal('name2');
+                    obj.workers[1].name_raw.should.equal('name2');
                     obj.workers[1].color.should.equal('#dd00dd');
                     callback(null, null);
                 });
@@ -88,9 +88,9 @@ describe('API tests: workers', function() {
                     id: common.workersDocId,
                     body: {
                         workers: [
-                            {name: 'smart', color: 'red'},
-                            {name: 'dumb', color: 'green'},
-                            {name: 'ugly', color: 'pink'}
+                            {name_raw: 'smart', color: 'red'},
+                            {name_raw: 'dumb', color: 'green'},
+                            {name_raw: 'ugly', color: 'pink'}
                         ]
                     }
                 }, function(err, resp, respcode) {

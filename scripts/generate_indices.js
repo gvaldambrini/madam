@@ -101,7 +101,7 @@ const client = common.createClient();
                 autocomplete: {
                   type: 'string',
                   search_analyzer: 'searchable_text',
-                  index_analyzer: 'searchable_text_autocomplete',
+                  analyzer: 'searchable_text_autocomplete',
                   term_vector: 'with_positions_offsets'
                 }
               }
@@ -113,7 +113,7 @@ const client = common.createClient();
                 autocomplete: {
                   type: 'string',
                   search_analyzer: 'searchable_text',
-                  index_analyzer: 'searchable_text_autocomplete',
+                  analyzer: 'searchable_text_autocomplete',
                   term_vector: 'with_positions_offsets'
                 }
               }
@@ -125,7 +125,7 @@ const client = common.createClient();
                 partial: {
                   type: 'string',
                   search_analyzer: 'searchable_text',
-                  index_analyzer: 'searchable_text_partial',
+                  analyzer: 'searchable_text_partial',
                   term_vector: 'with_positions_offsets'
                 }
               }
@@ -138,7 +138,7 @@ const client = common.createClient();
                 partial: {
                   type: 'string',
                   search_analyzer: 'searchable_text',
-                  index_analyzer: 'searchable_text_partial',
+                  analyzer: 'searchable_text_partial',
                   term_vector: 'with_positions_offsets'
                 }
               }
@@ -198,7 +198,7 @@ const client = common.createClient();
                 autocomplete: {
                   type: 'string',
                   search_analyzer: 'searchable_text',
-                  index_analyzer: 'searchable_text_autocomplete',
+                  analyzer: 'searchable_text_autocomplete',
                   term_vector: 'with_positions_offsets'
                 }
               }
@@ -210,7 +210,7 @@ const client = common.createClient();
                 autocomplete: {
                   type: 'string',
                   search_analyzer: 'searchable_text',
-                  index_analyzer: 'searchable_text_autocomplete',
+                  analyzer: 'searchable_text_autocomplete',
                   term_vector: 'with_positions_offsets'
                 }
               }
@@ -240,9 +240,8 @@ const client = common.createClient();
       body: {
         workers: {
           properties: {
-            name: {
+            name_raw: {
               type: "string",
-              index_name: "worker_name",
               index: "not_analyzed"
             },
             color: {
@@ -267,9 +266,8 @@ const client = common.createClient();
       body: {
         services: {
           properties: {
-            names: {
+            name_raw: {
               type: "string",
-              index_name: "service_name",
               index: "not_analyzed"
             }
           }

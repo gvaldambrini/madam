@@ -28,7 +28,7 @@ class AppointmentHandler {
       const queryBody = {
         query: {
           bool: {
-            must: { term: { 'customer.appointments.date': req.params.date }}
+            must: { term: { 'appointments.date': req.params.date }}
           }
         }
       };
@@ -65,7 +65,7 @@ class AppointmentHandler {
       const queryBody = {
         query: {
           bool: {
-            must: { term: { 'customer.planned_appointments.date': req.params.date }}
+            must: { term: { 'planned_appointments.date': req.params.date }}
           }
         }
       };
@@ -307,8 +307,8 @@ class AppointmentHandler {
       query: {
         bool: {
           should: [
-            { term: { "calendar.days.planned_appointments.appid": req.params.appid }},
-            { term: { "customer.planned_appointments.appid": req.params.appid }}
+            { term: { "days.planned_appointments.appid": req.params.appid }},
+            { term: { "planned_appointments.appid": req.params.appid }}
           ],
           minimum_should_match: 1
         }
