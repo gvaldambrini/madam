@@ -19,17 +19,17 @@ describe('API tests: customer CRUD', function() {
 
     describe('Create customer', function() {
 
-        it('should return an error if the name is not present', function(done) {
+        it('should return an error if the name and the surname are not present', function(done) {
             utils.waterfall([
                 function(callback) {
                     utils.request.post(cookies, '/customers/')
-                        .send({name: '', surname: 'someone'})
+                        .send({name: '', 'email': 'anaddress@email.com'})
                         .expect(400)
                         .end(callback);
                 },
                 function(res, callback) {
                     res.body.errors.should.be.an.Array().and.have.length(1);
-                    res.body.errors[0].msg.should.equal('The name is mandatory');
+                    res.body.errors[0].msg.should.equal('Either name or surname must be specified');
                     callback(null, null);
                 }
             ], done);
@@ -115,6 +115,28 @@ describe('API tests: customer CRUD', function() {
                 function(customerId, callback) {
                     utils.es.getCustomer(customerId, function(obj) {
                         obj.name.should.equal('someone');
+                        callback(null, null);
+                    });
+                }
+            ], done);
+        });
+
+        it('should return CREATED and the customer id if the submitted data contains only the surname', function(done) {
+            utils.waterfall([
+                function(callback) {
+                    utils.request.post(cookies, '/customers/')
+                        .send({surname: 'someone else'})
+                        .expect(201)
+                        .end(callback);
+                },
+                function(res, callback) {
+                    res.body.should.not.have.property('errors');
+                    res.body.should.have.property('id');
+                    callback(null, res.body.id);
+                },
+                function(customerId, callback) {
+                    utils.es.getCustomer(customerId, function(obj) {
+                        obj.surname.should.equal('someone else');
                         callback(null, null);
                     });
                 }
@@ -236,17 +258,17 @@ describe('API tests: customer CRUD', function() {
                 });
             });
 
-            it('should return an error if the submitted data does not contain the name', function(done) {
+            it('should return an error if the submitted data does not contain the name and the surname', function(done) {
                 utils.waterfall([
                     function(callback) {
                         utils.request.put(cookies, '/customers/' + customerId)
-                            .send({name: '', surname: 'newname'})
+                            .send({name: '', surname: '', 'note': 'empty customer'})
                             .expect(400)
                             .end(callback);
                     },
                     function(res, callback) {
                         res.body.errors.should.be.an.Array().and.have.length(1);
-                        res.body.errors[0].msg.should.equal('The name is mandatory');
+                        res.body.errors[0].msg.should.equal('Either name or surname must be specified');
                         callback(null, null);
                     }
                 ], done);
@@ -332,6 +354,30 @@ describe('API tests: customer CRUD', function() {
                             obj.name.should.equal('newname');
                             obj.should.not.have.properties([
                                 'surname', 'first_seen', 'mobile_phone', 'allow_sms']);
+                            callback(null, null);
+                        });
+                    }
+                ], done);
+            });
+
+            it('should return OK and the customer id if the submitted data contains only the surname', function(done) {
+                utils.waterfall([
+                    function(callback) {
+                        utils.request.put(cookies, '/customers/' + customerId)
+                            .send({surname: 'newsurname'})
+                            .expect(200)
+                            .end(callback);
+                    },
+                    function(res, callback) {
+                        res.body.should.not.have.property('errors');
+                        res.body.should.have.property('id');
+                        callback(null, res.body.id);
+                    },
+                    function(customerId, callback) {
+                        utils.es.getCustomer(customerId, function(obj) {
+                            obj.surname.should.equal('newsurname');
+                            obj.should.not.have.properties([
+                                'name', 'first_seen', 'mobile_phone', 'allow_sms']);
                             callback(null, null);
                         });
                     }

@@ -160,8 +160,8 @@ class CustomerHandler {
 
       // sort by name & surname (ascending)
     function sortFn(a, b) {
-      const aName = a.name.toLowerCase();
-      const bName = b.name.toLowerCase();
+      const aName = a.name ? a.name.toLowerCase() : '';
+      const bName = b.name ? b.name.toLowerCase() : '';
 
       const aSurname = a.surname ? a.surname.toLowerCase() : '';
       const bSurname = b.surname ? b.surname.toLowerCase() : '';
@@ -193,13 +193,19 @@ class CustomerHandler {
           else
             phone_mobile = '-';
 
+      let name = getField(hits[i], 'name', 'autocomplete');
+      if (!name) {
+        name = '-';
+      }
+
       let surname = getField(hits[i], 'surname', 'autocomplete');
-      if (!surname)
+      if (!surname) {
         surname = '-';
+      }
 
       results[results.length] = {
         id: hits[i]._id,
-        name: getField(hits[i], 'name', 'autocomplete'),
+        name: name,
         surname: surname,
         phone: phone_mobile,
         last_seen: common.toLocalFormattedDate(req, hits[i]._source.last_seen)
@@ -292,7 +298,9 @@ class CustomerHandler {
     for (let i = 0; i < customerFields.length; i++)
       req.sanitize(customerFields[i]).trim();
 
-    req.checkBody('name', req.i18n.__('The name is mandatory')).notEmpty();
+    if (!req.body.name) {
+      req.checkBody('surname', req.i18n.__('Either name or surname must be specified')).notEmpty();
+    }
 
     if (!req.body.mobile_phone)
       req.checkBody(
@@ -303,7 +311,7 @@ class CustomerHandler {
       req.checkBody('allow_email', req.i18n.__(
         'To set allow email, you must specify an email')).optional().isEmpty();
     }
-      else {
+    else {
       req.checkBody('email', req.i18n.__(
         'The email does not seem a valid email')).isEmail();
     }

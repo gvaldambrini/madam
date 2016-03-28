@@ -54,7 +54,7 @@ export default React.createClass({
               </div>
             </div>
             <FormInputUi name='name' value={this.props.data.name}
-              label={i18n.customers.name} focus={true} mandatory={true}
+              label={i18n.customers.name} focus={true}
               handleChange={this.props.inputChange}
               handleSubmit={this.handleSubmit}/>
             <FormInputUi name='surname' value={this.props.data.surname}

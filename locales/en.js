@@ -90,5 +90,6 @@
 	"The sold date does not seem a valid date": "The sold date does not seem a valid date",
 	"No appointments to display.": "No appointments to display.",
 	"Print customer sheets": "Print customer sheets",
-	"Print customer sheet": "Print customer sheet"
+	"Print customer sheet": "Print customer sheet",
+	"Either name or surname must be specified": "Either name or surname must be specified"
 }

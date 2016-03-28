@@ -90,5 +90,6 @@
 	"The sold date does not seem a valid date": "La data di vendita non sembra essere valida",
 	"No appointments to display.": "Nessun appuntamento da mostrare.",
 	"Print customer sheets": "Stampa schede clienti",
-	"Print customer sheet": "Stampa scheda cliente"
+	"Print customer sheet": "Stampa scheda cliente",
+	"Either name or surname must be specified": "E' necessario specificare uno fra nome e cognome"
 }
