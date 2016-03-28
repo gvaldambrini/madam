@@ -92,11 +92,23 @@ export default React.createClass({
       phones = this.props.data.phone;
     }
 
+    let notes;
+    if (this.props.data.notes) {
+      notes = this.props.data.notes.split('\n').map(function(el, index) {
+        return (
+          <span key={index}>
+            {el}
+            <br/>
+          </span>
+        );
+      });
+    }
+
     return (
       <div className="customer-sheet">
         <h3>{this.props.data.name} {this.props.data.surname}</h3>
         <div className="phones">{i18n.customers.phones} {phones}</div>
-        <div className="notes">{this.props.data.notes}</div>
+        <div className="notes">{notes}</div>
         <div className="appointment">
           {this.renderGrid(services, apps)}
         </div>
